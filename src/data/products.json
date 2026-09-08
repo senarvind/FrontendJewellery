@@ -1,0 +1,53 @@
+[
+  {
+    "id": "prod-1788595308291",
+    "category": "nose-pins",
+    "productType": ".noz pin",
+    "description": "Black+AD STONE   pic 20",
+    "material": "92.50 % silver",
+    "dimensionL": "8mm",
+    "dimensionW": "8mm",
+    "dimensionH": "7mm",
+    "weight": ".0.640mg",
+    "sellingPrice": 489,
+    "mrp": 756,
+    "frontImage": "/images/products/1788595292919-whatsapp-image-2026-09-05-at-11.08.53-am.jpeg",
+    "backImage": "/images/products/1788595302201-whatsapp-image-2026-09-05-at-11.08.54-am.jpeg",
+    "modelImage": "/images/products/1788595306525-whatsapp-image-2026-09-05-at-11.08.54-am-1-.jpeg",
+    "createdAt": "2026-09-05T08:01:48.291Z"
+  },
+  {
+    "id": "prod-1788594894241",
+    "category": "nose-pins",
+    "productType": "noz pin",
+    "description": "Yellow stone pice 20",
+    "material": "92.50 % silver",
+    "dimensionL": "7mm",
+    "dimensionW": "7mm",
+    "dimensionH": "7mm",
+    "weight": "0.280mg mg",
+    "sellingPrice": 400,
+    "mrp": 530,
+    "frontImage": "/images/products/1788594888118-whatsapp-image-2026-09-05-at-11.08.08-am-1-.jpeg",
+    "backImage": "/images/products/1788594872692-whatsapp-image-2026-09-05-at-11.08.08-am-1-.jpeg",
+    "modelImage": "/images/products/1788594892791-whatsapp-image-2026-09-05-at-11.08.08-am.jpeg",
+    "createdAt": "2026-09-05T07:54:54.241Z"
+  },
+  {
+    "id": "er-001",
+    "category": "earrings",
+    "productType": "92.5 Silver Studs",
+    "description": "Pure 92.5% Silver Micro-Pave AD Stone Geometric Rhombus Stud Earring with 925 Hallmark Screw Stem",
+    "material": "92.50% Pure Sterling Silver",
+    "dimensionL": "10mm",
+    "dimensionW": "10mm",
+    "dimensionH": "8mm",
+    "weight": "1.850g",
+    "sellingPrice": 700,
+    "mrp": 999,
+    "frontImage": "/images/products/silver-ad-rhombus-earring.jpg",
+    "backImage": "/images/products/silver-ad-rhombus-earring-back.png",
+    "modelImage": "/images/products/silver-ad-rhombus-earring.jpg",
+    "createdAt": "2026-09-05T12:00:00.000Z"
+  }
+]
