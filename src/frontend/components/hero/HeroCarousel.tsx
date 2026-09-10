@@ -12,10 +12,9 @@ interface HeroCarouselProps {
 
 export default function HeroCarousel({
   slides,
-  autoPlayInterval = 5000
+  autoPlayInterval = 3000
 }: HeroCarouselProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
 
@@ -27,14 +26,18 @@ export default function HeroCarousel({
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   }, [slides.length]);
 
+  // Automatic continuous sliding timer for mobile and desktop view
   useEffect(() => {
-    if (isPaused || slides.length <= 1) return;
+    if (slides.length <= 1) return;
+
     const timer = setInterval(() => {
       nextSlide();
     }, autoPlayInterval);
-    return () => clearInterval(timer);
-  }, [isPaused, autoPlayInterval, nextSlide, slides.length]);
 
+    return () => clearInterval(timer);
+  }, [autoPlayInterval, nextSlide, slides.length]);
+
+  // Touch Swipe Handlers for mobile & tablet
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.targetTouches[0].clientX;
   };
@@ -46,7 +49,7 @@ export default function HeroCarousel({
   const handleTouchEnd = () => {
     if (!touchStartX.current || !touchEndX.current) return;
     const distance = touchStartX.current - touchEndX.current;
-    const minSwipeDistance = 50;
+    const minSwipeDistance = 35;
 
     if (distance > minSwipeDistance) {
       nextSlide();
@@ -60,16 +63,16 @@ export default function HeroCarousel({
 
   return (
     <div
-      className="w-full flex flex-col items-center"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      className="w-full flex flex-col items-center relative group select-none"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="relative w-full overflow-hidden shadow-[0_4px_25px_rgba(0,0,0,0.03)] rounded-2xl border border-[#F0E6D8] bg-[#FFE2D8]">
-        <div 
-          className="flex transition-transform duration-700 ease-in-out h-[300px] sm:h-[390px] md:h-[450px] lg:h-[490px]"
+      <div className="relative w-full overflow-hidden shadow-[0_8px_30px_rgba(122,16,33,0.1)] rounded-2xl border border-[#E8CFC5] bg-[#FFE2D8]">
+
+        {/* Smooth Slide Transition Track */}
+        <div
+          className="flex transition-transform duration-1000 ease-in-out h-[310px] sm:h-[390px] md:h-[450px] lg:h-[490px]"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
           {slides.map((slide) => (
@@ -78,8 +81,17 @@ export default function HeroCarousel({
             </div>
           ))}
         </div>
+
+        {/* Bottom Slide Progress Line */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#E8CFC5]/40 overflow-hidden">
+          <div
+            key={currentSlide}
+            className="h-full bg-[#D4AF37] transition-all duration-[3000ms] ease-linear w-full origin-left"
+          />
+        </div>
       </div>
 
+      {/* Pagination Control Dots */}
       {slides.length > 1 && (
         <HeroPagination
           totalSlides={slides.length}

@@ -15,7 +15,7 @@ export const heroSlides: HeroSlideData[] = [
     subtitle: "A Symbol of Love & Grace",
     category: "SACRED SIGNATURE COLLECTION",
     alt: "Flora Mangalsutra - Pure Gold & Diamond",
-    href: "/products/mangalsutras",
+    href: "/products/mangalsutra",
     image: "/images/categories/Mangalsutra.png"
   },
   {
@@ -35,5 +35,23 @@ export const heroSlides: HeroSlideData[] = [
     alt: "Diamond and Gold Rings",
     href: "/products/rings",
     image: "/images/categories/ring.png"
+  },
+  {
+    id: 4,
+    title: "Royal Gold Bangles",
+    subtitle: "Traditional Heritage Craftsmanship",
+    category: "ROYAL BANGLE COLLECTION",
+    alt: "Royal Gold & Silver Bangles",
+    href: "/products/bangles",
+    image: "/images/categories/bangels.png"
+  },
+  {
+    id: 5,
+    title: "Exquisite Earrings",
+    subtitle: "Sparkle with Timeless Beauty",
+    category: "EXCLUSIVE EARRING SELECTION",
+    alt: "Exquisite Gold & Silver Earrings",
+    href: "/products/earrings",
+    image: "/images/categories/earrings.png"
   }
 ];
