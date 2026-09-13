@@ -158,7 +158,7 @@ export default function Navbar() {
                 </svg>
               </a>
               <a
-                href="https://www.instagram.com/keshar_jewellers/"
+                href=" https://www.instagram.com/kesharjewellers2003/?utm_source=ig_web_button_share_sheet"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-[#E6C766] transition-colors"

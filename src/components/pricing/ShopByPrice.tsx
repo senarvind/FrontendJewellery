@@ -22,35 +22,35 @@ export default function ShopByPrice() {
             <Link
               key={tier.id}
               href={tier.href}
-              className="group relative flex flex-col justify-between h-[320px] sm:h-[360px] md:h-[390px] lg:h-[420px] rounded-2xl p-6 sm:p-7 overflow-hidden transition-all duration-500 shadow-md hover:shadow-2xl hover:-translate-y-1.5 border border-[#D4AF37] bg-[#B82E44]"
+              className="group relative flex flex-col justify-between h-[320px] sm:h-[360px] md:h-[390px] lg:h-[420px] rounded-2xl p-6 sm:p-7 overflow-hidden transition-all duration-500 shadow-md hover:shadow-2xl hover:-translate-y-1.5 border border-[#E8CFC5] bg-[#FFE2D8]"
             >
-              {/* Background ambient lighting */}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(212,175,55,0.2),_transparent_65%)] pointer-events-none" />
-              <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-[#480C14]/60 rounded-full blur-2xl pointer-events-none" />
+              {/* Background ambient lighting matching HeroCarousel */}
+              <div className="absolute top-0 right-0 w-48 h-48 bg-[#E8A58A]/30 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#D4AF37]/20 rounded-full blur-2xl pointer-events-none" />
 
-              {/* Badge with #FFC7B8 (peach) background and #B82E44 (mehroon) text */}
+              {/* Badge with #B82E44 background and white text */}
               <div className="flex justify-end relative z-10">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-wider uppercase bg-[#FFC7B8] text-[#B82E44] shadow-sm">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold tracking-wider uppercase bg-[#B82E44] text-[#FFF8F0] shadow-sm">
                   {tier.badge}
                 </span>
               </div>
 
               {/* Center: Icon & Description */}
               <div className="flex-1 flex flex-col items-center justify-center text-center my-4 relative z-10">
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/10 backdrop-blur-md border border-[#D4AF37]/40 flex items-center justify-center text-4xl sm:text-5xl shadow-inner group-hover:scale-110 transition-transform duration-300">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white/80 backdrop-blur-md border border-[#E8A58A] flex items-center justify-center text-4xl sm:text-5xl shadow-sm group-hover:scale-110 transition-transform duration-300">
                   {tier.icon}
                 </div>
-                <p className="font-sans text-xs text-[#FFF8F0]/80 font-light mt-3 px-4 leading-relaxed">
+                <p className="font-sans text-xs text-[#6F4A4A] font-medium mt-3 px-4 leading-relaxed">
                   {tier.itemsDescription}
                 </p>
               </div>
 
-              {/* Bottom: Price Label & CTA Button with #FFC7B8 background and #B82E44 text */}
-              <div className="text-center relative z-10 pt-3 border-t border-[#D4AF37]/30 flex flex-col items-center gap-2">
-                <span className="font-serif italic text-xl sm:text-2xl lg:text-3xl text-[#FFF8F0] font-medium group-hover:text-[#FFC7B8] transition-colors">
+              {/* Bottom: Price Label & CTA Button matching HeroCarousel theme */}
+              <div className="text-center relative z-10 pt-3 border-t border-[#E8CFC5] flex flex-col items-center gap-2">
+                <span className="font-serif italic text-xl sm:text-2xl lg:text-3xl text-[#B82E44] font-semibold group-hover:text-[#7C1B2A] transition-colors">
                   {tier.priceLabel}
                 </span>
-                <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-[#FFC7B8] text-[#B82E44] group-hover:bg-[#FFE2D8] transition-colors shadow-sm mt-1">
+                <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-[#B82E44] text-[#FFF8F0] group-hover:bg-[#7C1B2A] transition-colors shadow-sm mt-1">
                   Shop Now →
                 </span>
               </div>
