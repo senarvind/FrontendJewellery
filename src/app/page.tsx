@@ -1,5 +1,6 @@
 import HeroSection from "@/frontend/components/hero/HeroSection";
 import CategoryCarousel from "@/frontend/components/categories/CategoryCarousel";
+import CategoryProductsShowcase from "@/frontend/components/home/CategoryProductsShowcase";
 import ShopByPrice from "@/frontend/components/pricing/ShopByPrice";
 import TrustSection from "@/frontend/components/home/TrustSection";
 import WhatsAppButton from "@/frontend/components/layout/WhatsAppButton";
@@ -72,10 +73,13 @@ export default async function Home() {
       {/* 2. Horizontal Category Carousel */}
       <CategoryCarousel categories={categories} />
 
-      {/* 3. Shop by Price Section */}
+      {/* 3. Category Products Showcase (Real Admin Created Products) */}
+      <CategoryProductsShowcase />
+
+      {/* 4. Shop by Price Section */}
       <ShopByPrice />
 
-      {/* 4. Trust & USP Section */}
+      {/* 5. Trust & USP Section */}
       <TrustSection />
 
       {/* Floating WhatsApp Button */}
