@@ -17,7 +17,7 @@ export const heroSlides: HeroSlideData[] = [
     category: "",
     alt: "Keshar Jewellers Wallpaper Banner",
     href: "/products",
-    image: "/images/Banner.png",
+    image: "/images/whatsapp.jpeg",
     isFullBanner: true,
   },
   {
