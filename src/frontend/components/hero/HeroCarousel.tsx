@@ -71,8 +71,8 @@ export default function HeroCarousel({
       <div className="relative w-full overflow-hidden shadow-[0_8px_30px_rgba(122,16,33,0.1)] rounded-2xl border border-[#E8CFC5] bg-[#FFE2D8]">
 
         {/* Smooth Slide Transition Track */}
-        <div
-          className="flex transition-transform duration-1000 ease-in-out h-[310px] sm:h-[390px] md:h-[450px] lg:h-[490px]"
+        <div 
+          className="flex transition-transform duration-700 ease-in-out aspect-[4/3] md:aspect-[16/9] 2xl:aspect-[21/9] min-h-[400px]"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
           {slides.map((slide) => (

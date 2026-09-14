@@ -36,12 +36,13 @@ async function getUniqueCategories(): Promise<CategoryItem[]> {
   const uniqueCategories = new Map<string, CategoryItem>();
 
   for (const category of CATEGORIES) {
-    uniqueCategories.set(normalizeCategorySlug(category.slug), category);
+    uniqueCategories.set(normalizeCategorySlug(category.slug || category.name), category);
   }
 
   const allProducts = await getAllProducts();
 
   for (const product of allProducts) {
+    if (!product.category) continue;
     const slug = product.category.toLowerCase().trim().replace(/\s+/g, "-");
     if (!slug) continue;
 
@@ -52,6 +53,7 @@ async function getUniqueCategories(): Promise<CategoryItem[]> {
         name: categoryName(slug),
         slug,
         icon: "✨",
+        image: product.frontImage || undefined,
         gradient: "from-[#FDE8E9] to-[#F7D2D6]",
         href: `/products/${slug}`,
       });

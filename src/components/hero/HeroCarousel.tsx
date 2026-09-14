@@ -69,7 +69,7 @@ export default function HeroCarousel({
     >
       <div className="relative w-full overflow-hidden shadow-[0_4px_25px_rgba(0,0,0,0.03)] rounded-2xl border border-[#F0E6D8] bg-[#FFE2D8]">
         <div 
-          className="flex transition-transform duration-700 ease-in-out h-[300px] sm:h-[390px] md:h-[450px] lg:h-[490px]"
+          className="flex transition-transform duration-700 ease-in-out aspect-[4/3] md:aspect-[16/9] 2xl:aspect-[21/9] min-h-[400px]"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
           {slides.map((slide) => (

@@ -1,16 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Product, STORE_CATEGORIES } from "@/frontend/types/product";
+import { Product } from "@/frontend/types/product";
 import ProductCard from "@/frontend/components/products/ProductCard";
 import { getAllProducts } from "@/lib/api";
 
 export default function CategoryProductsShowcase() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [itemsPerView, setItemsPerView] = useState<number>(4);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isTransitioning, setIsTransitioning] = useState<boolean>(true);
+  const touchStartXRef = useRef<number | null>(null);
 
+  // Fetch products
   useEffect(() => {
     async function loadProducts() {
       try {
@@ -26,55 +31,117 @@ export default function CategoryProductsShowcase() {
     loadProducts();
   }, []);
 
-  // Filter products based on selected tab
-  const filteredProducts = products.filter((p) => {
-    if (selectedCategory === "all") return true;
-    const cat = (p.category || "").toLowerCase().trim();
-    const target = selectedCategory.toLowerCase().trim();
-    const normalizedCat = cat.replace(/[^a-z0-9]/g, "");
-    const normalizedTarget = target.replace(/[^a-z0-9]/g, "");
-    return (
-      cat === target ||
-      normalizedCat.includes(normalizedTarget) ||
-      normalizedTarget.includes(normalizedCat)
-    );
-  });
+  // Update visible items count on screen resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setItemsPerView(1);
+      } else if (window.innerWidth < 768) {
+        setItemsPerView(2);
+      } else if (window.innerWidth < 1024) {
+        setItemsPerView(3);
+      } else {
+        setItemsPerView(4);
+      }
+    };
 
-  // Calculate product counts per category
-  const categoryCounts = React.useMemo(() => {
-    const counts: Record<string, number> = { all: products.length };
-    for (const p of products) {
-      const cat = (p.category || "").toLowerCase().trim();
-      const slug = cat.replace(/\s+/g, "-");
-      counts[slug] = (counts[slug] || 0) + 1;
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Build an extended product array so carousel ALWAYS has enough items to slide infinitely
+  const displayProducts = React.useMemo(() => {
+    if (products.length === 0) return [];
+    if (products.length <= 4) {
+      return [...products, ...products, ...products, ...products];
     }
-    return counts;
+    if (products.length <= 8) {
+      return [...products, ...products];
+    }
+    return [...products, ...products];
   }, [products]);
 
-  // Featured top categories for tabs
-  const topTabs = [
-    { slug: "all", name: "All Products" },
-    { slug: "rings", name: "Rings" },
-    { slug: "necklaces", name: "Necklaces" },
-    { slug: "earrings", name: "Earrings" },
-    { slug: "bangles", name: "Bangles" },
-    { slug: "nose-pins", name: "Nose Pins" },
-    { slug: "pendants", name: "Pendants" },
-    { slug: "mangalsutra", name: "Mangalsutra" },
-    { slug: "bracelets", name: "Bracelets" },
-    { slug: "chains", name: "Chains" },
-  ];
+  const totalItems = displayProducts.length;
+  const maxSlide = Math.max(0, totalItems - itemsPerView);
+
+  // Slide controls
+  const nextSlide = useCallback(() => {
+    if (totalItems <= itemsPerView) return;
+
+    setCurrentIndex((prev) => {
+      if (prev >= maxSlide) {
+        // Reset smoothly to beginning
+        return 0;
+      }
+      return prev + 1;
+    });
+  }, [totalItems, itemsPerView, maxSlide]);
+
+  const prevSlide = useCallback(() => {
+    if (totalItems <= itemsPerView) return;
+
+    setCurrentIndex((prev) => {
+      if (prev <= 0) {
+        return maxSlide;
+      }
+      return prev - 1;
+    });
+  }, [totalItems, itemsPerView, maxSlide]);
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(Math.min(Math.max(0, index), maxSlide));
+  };
+
+  // Auto-slide animation interval (every 1.6 seconds, pauses on hover)
+  useEffect(() => {
+    if (isPaused || totalItems <= itemsPerView) return;
+
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 1600);
+
+    return () => clearInterval(interval);
+  }, [isPaused, nextSlide, totalItems, itemsPerView]);
+
+  // Touch handlers for mobile swiping
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartXRef.current - touchEndX;
+
+    if (diff > 40) {
+      nextSlide();
+    } else if (diff < -40) {
+      prevSlide();
+    }
+    touchStartXRef.current = null;
+  };
+
+  // Original product dots
+  const activeDot = products.length > 0 ? currentIndex % products.length : 0;
+  const totalDots = Math.min(products.length, 8);
 
   return (
-    <section className="py-10 sm:py-16 px-3 sm:px-8 lg:px-12 bg-[#FFF8F0]">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-12 sm:py-18 px-3 sm:px-8 lg:px-12 bg-[#FFF8F0] relative overflow-hidden">
+      {/* Decorative subtle background elements */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none opacity-40">
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#FFE2D8]/50 rounded-full blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#FFF0EA]/70 rounded-full blur-3xl" />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          <span className="text-[#C77D62] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-1.5 sm:mb-2">
+        <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-10">
+          <span className="text-[#C77D62] uppercase tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-2">
             ✦ Authentic Hallmark Jewellery ✦
           </span>
           <h2 className="font-serif text-2xl sm:text-4xl lg:text-5xl text-[#9B1B30] tracking-tight mb-2 sm:mb-3">
-            Shop By Category
+            Our Latest Products
           </h2>
           <div className="flex items-center justify-center gap-3 my-2 text-[#D4AF37]/60 w-36 sm:w-48 mx-auto">
             <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
@@ -82,78 +149,89 @@ export default function CategoryProductsShowcase() {
             <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
           </div>
           <p className="font-light text-[#6F4A4A] text-xs sm:text-base leading-relaxed">
-            Browse our latest handcrafted gold and sterling silver collections directly from our workshop.
+            Discover our newest handcrafted 916 BIS Hallmarked gold and pure silver creations.
           </p>
-        </div>
-
-        {/* Category Tabs Scrollbar */}
-        <div className="overflow-x-auto scrollbar-none flex items-center justify-start sm:justify-center gap-2 pb-3 mb-8 sm:mb-12">
-          {topTabs.map((tab) => {
-            const count = categoryCounts[tab.slug] ?? 0;
-            const isSelected = selectedCategory === tab.slug;
-            return (
-              <button
-                key={tab.slug}
-                onClick={() => setSelectedCategory(tab.slug)}
-                className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer border ${
-                  isSelected
-                    ? "bg-[#B82E44] text-[#FFF8F0] border-[#B82E44] shadow-md scale-105"
-                    : "bg-[#FFF0EA] text-[#35191C] border-[#E8CFC5] hover:border-[#B82E44] hover:bg-[#FFE2D8]"
-                }`}
-              >
-                <span>{tab.name}</span>
-                {count > 0 && (
-                  <span
-                    className={`text-[9px] px-1.5 py-0.2 rounded-full font-bold ${
-                      isSelected
-                        ? "bg-[#7C1B2A] text-white"
-                        : "bg-[#E8CFC5] text-[#7C1B2A]"
-                    }`}
-                  >
-                    {count}
-                  </span>
-                )}
-              </button>
-            );
-          })}
         </div>
 
         {/* Loading Spinner */}
         {isLoading ? (
-          <div className="py-16 text-center">
-            <div className="inline-block w-8 h-8 border-4 border-[#B82E44] border-t-transparent rounded-full animate-spin mb-3" />
-            <p className="text-xs text-[#6F4A4A] font-medium">Loading Keshar Jewellers catalog...</p>
+          <div className="py-20 text-center">
+            <div className="inline-block w-10 h-10 border-4 border-[#B82E44] border-t-transparent rounded-full animate-spin mb-3" />
+            <p className="text-xs text-[#6F4A4A] font-medium tracking-wide">
+              Loading latest jewellery collection...
+            </p>
           </div>
-        ) : filteredProducts.length > 0 ? (
-          <div>
-            {/* Products Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
-              {filteredProducts.slice(0, 8).map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+        ) : products.length > 0 ? (
+          <div
+            className="relative group/slider"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
+            {/* ANIMATED SLIDER VIEWPORT & TRACK */}
+            <div
+              className="overflow-hidden w-full py-4 -my-4"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
+              <div
+                className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform"
+                style={{
+                  transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+                }}
+              >
+                {displayProducts.map((product, idx) => (
+                  <div
+                    key={`${product.id}-${idx}`}
+                    className="flex-shrink-0 px-2 sm:px-3 box-border"
+                    style={{
+                      width: `${100 / itemsPerView}%`,
+                    }}
+                  >
+                    <div className="h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl rounded-2xl">
+                      <ProductCard product={product} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
+            {/* Slider Pagination Indicator Dots */}
+            {totalDots > 1 && (
+              <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-6 sm:mt-8">
+                {Array.from({ length: totalDots }).map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => goToSlide(idx)}
+                    aria-label={`Go to product ${idx + 1}`}
+                    className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
+                      activeDot === idx
+                        ? "w-8 sm:w-10 bg-gradient-to-r from-[#9B1B30] to-[#B82E44] shadow-md"
+                        : "w-2 bg-[#E8CFC5] hover:bg-[#C77D62]"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+
             {/* View Full Collection Button */}
-            <div className="text-center mt-8 sm:mt-12">
+            <div className="text-center mt-6 sm:mt-10">
               <Link
-                href={selectedCategory === "all" ? "/products/all" : `/products/${selectedCategory}`}
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#7C1B2A] hover:bg-[#B82E44] text-[#FFF8F0] rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-md hover:scale-105"
+                href="/products/all"
+                className="inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-[#7C1B2A] to-[#9B1B30] hover:from-[#9B1B30] hover:to-[#B82E44] text-[#FFF8F0] rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-[0_4px_16px_rgba(124,27,42,0.25)] hover:shadow-[0_6px_24px_rgba(124,27,42,0.35)] hover:scale-105 active:scale-95"
               >
-                <span>
-                  Explore All {selectedCategory === "all" ? "Products" : selectedCategory.replace(/-/g, " ")} ({filteredProducts.length})
-                </span>
-                <span>→</span>
+                <span>Explore All Products ({products.length})</span>
+                <span className="transition-transform group-hover:translate-x-1">→</span>
               </Link>
             </div>
           </div>
         ) : (
-          /* Empty Category State */
+          /* Empty State */
           <div className="bg-[#FFFDFC] border border-[#E8CFC5] rounded-3xl p-8 sm:p-12 text-center max-w-xl mx-auto shadow-sm">
             <div className="w-12 h-12 mx-auto rounded-full bg-[#FFF0EA] border border-[#D4AF37]/40 flex items-center justify-center text-xl mb-3">
               💎
             </div>
             <h3 className="font-serif text-lg sm:text-xl text-[#9B1B30] mb-2 font-bold">
-              No products found in this category yet
+              No products found yet
             </h3>
             <p className="text-xs text-[#6F4A4A] mb-6">
               New handcrafted items are created regularly by our master artisans. Custom designs are available on order.
@@ -161,7 +239,7 @@ export default function CategoryProductsShowcase() {
             <Link
               href="https://wa.me/919827415111?text=Hello%20Keshar%20Jewellers,%20I%20am%20looking%20for%20custom%20jewellery%20designs."
               target="_blank"
-              className="inline-block px-5 py-2.5 bg-[#B82E44] text-[#FFF8F0] rounded-xl text-xs font-semibold uppercase tracking-wider hover:bg-[#7C1B2A] transition-colors"
+              className="inline-block px-5 py-2.5 bg-[#B82E44] text-[#FFF8F0] rounded-xl text-xs font-semibold uppercase tracking-wider hover:bg-[#7C1B2A] transition-colors shadow-sm"
             >
               Enquire on WhatsApp
             </Link>

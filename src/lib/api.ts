@@ -1,7 +1,7 @@
 import { Product } from "@/frontend/types/product";
 
 const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+  process.env.NEXT_PUBLIC_API_URL || "https://my-jewellery-backend.onrender.com"
 ).trim().replace(/\/+$/, "");
 
 const DEFAULT_RENDER_BACKEND = "https://my-jewellery-backend.onrender.com";
