@@ -81,15 +81,21 @@ export default function CheckoutModal({
       // 2. Call backend to create Razorpay Order
       const res = await createRazorpayOrderApi(totalAmount);
       if (!res || !res.success || !res.orderId) {
-        setErrorMsg(res?.error || "Failed to initiate Razorpay order. Please try again.");
+        setErrorMsg(res?.error || "Failed to initiate Razorpay order. Please check your API credentials.");
         setLoading(false);
         return;
       }
 
       const razorpayKey =
-        res.key || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_1234567890abcdef";
+        res.key || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
 
-      // 3. Open Razorpay Payment Window
+      if (!razorpayKey) {
+        setErrorMsg("Razorpay Key ID is missing. Please set NEXT_PUBLIC_RAZORPAY_KEY_ID in your environment variables.");
+        setLoading(false);
+        return;
+      }
+
+      // 3. Open Official Razorpay Payment Window
       const options = {
         key: razorpayKey,
         amount: res.amount,
@@ -146,7 +152,7 @@ export default function CheckoutModal({
       razorpayInstance.open();
     } catch (err: any) {
       console.error(err);
-      setErrorMsg(err.message || "An unexpected error occurred.");
+      setErrorMsg(err.message || "An unexpected error occurred launching Razorpay.");
     } finally {
       setLoading(false);
     }
