@@ -15,12 +15,37 @@ interface WishlistContextType {
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
+function safeSetItem(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(key, value);
+  } catch (e: any) {
+    if (
+      e.name === "QuotaExceededError" ||
+      e.code === 22 ||
+      e.number === -2147024882 ||
+      (e.message && e.message.includes("quota"))
+    ) {
+      console.warn(`localStorage quota exceeded for key "${key}". Clearing stored cache.`);
+      try {
+        localStorage.removeItem("keshar_wishlist_items");
+        localStorage.removeItem("keshar_cart_items");
+        localStorage.setItem(key, value);
+      } catch (retryErr) {
+        console.warn(`Unable to write to localStorage for "${key}". App will use in-memory state.`);
+      }
+    } else {
+      console.warn(`Failed to save "${key}" to localStorage:`, e);
+    }
+  }
+}
+
 function getOrCreateSessionId(): string {
   if (typeof window === "undefined") return "";
   let sessionId = localStorage.getItem("keshar_guest_cart_session");
   if (!sessionId) {
     sessionId = "guest_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now();
-    localStorage.setItem("keshar_guest_cart_session", sessionId);
+    safeSetItem("keshar_guest_cart_session", sessionId);
   }
   return sessionId;
 }
@@ -72,7 +97,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
 
           if (dbItems.length > 0) {
             setWishlistItems(dbItems);
-            localStorage.setItem("keshar_wishlist_items", JSON.stringify(dbItems));
+            safeSetItem("keshar_wishlist_items", JSON.stringify(dbItems));
           } else if (localItems.length > 0) {
             // Sync local wishlist to DB
             const formatted = localItems.map((p) => ({ productId: p.id, product: p }));
@@ -101,11 +126,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!isLoaded) return;
 
-    try {
-      localStorage.setItem("keshar_wishlist_items", JSON.stringify(wishlistItems));
-    } catch (e) {
-      console.error("Failed to save wishlist to localStorage", e);
-    }
+    safeSetItem("keshar_wishlist_items", JSON.stringify(wishlistItems));
 
     const sessionId = getOrCreateSessionId();
     const syncTimeout = setTimeout(async () => {

@@ -1,12 +1,23 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
+import CheckoutModal, { CheckoutItem } from "@/components/checkout/CheckoutModal";
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity, clearCart, subtotal, totalItemsCount } = useCart();
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+
+  // Map cart items for CheckoutModal
+  const checkoutItems: CheckoutItem[] = cartItems.map((item) => ({
+    productId: item.product.id,
+    productName: item.product.productType || item.product.description || "Jewellery Item",
+    category: item.product.category,
+    quantity: item.quantity,
+    price: item.product.sellingPrice || 0,
+  }));
 
   // Create WhatsApp checkout message with all items in cart
   const waCartMessage = encodeURIComponent(
@@ -229,18 +240,26 @@ export default function CartPage() {
 
               {/* Action Buttons */}
               <div className="space-y-3 pt-2">
+                <button
+                  onClick={() => setIsCheckoutOpen(true)}
+                  className="w-full py-3.5 px-5 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-center"
+                >
+                  <span className="text-base">💳</span>
+                  <span>Pay Online (Razorpay Gateway)</span>
+                </button>
+
                 <Link
                   href={`https://wa.me/919827415111?text=${waCartMessage}`}
                   target="_blank"
-                  className="w-full py-3.5 px-5 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-center"
+                  className="w-full py-3 px-5 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] font-bold text-xs uppercase tracking-wider rounded-xl border border-[#E8CFC5] transition-all flex items-center justify-center gap-2 text-center"
                 >
                   <span className="text-base">💬</span>
-                  <span>Proceed to WhatsApp Checkout</span>
+                  <span>WhatsApp Checkout</span>
                 </Link>
 
                 <Link
                   href="/"
-                  className="w-full py-2.5 px-4 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] font-bold text-xs uppercase tracking-wider rounded-xl border border-[#E8CFC5] transition-all flex items-center justify-center gap-1.5 text-center"
+                  className="w-full py-2.5 px-4 text-[#6F4A4A] hover:text-[#7C1B2A] font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 text-center"
                 >
                   <span>← Continue Shopping</span>
                 </Link>
@@ -266,6 +285,17 @@ export default function CartPage() {
 
           </div>
         )}
+
+        {/* Razorpay Checkout Modal */}
+        <CheckoutModal
+          isOpen={isCheckoutOpen}
+          onClose={() => setIsCheckoutOpen(false)}
+          items={checkoutItems}
+          totalAmount={subtotal}
+          onSuccess={() => {
+            clearCart();
+          }}
+        />
 
       </div>
     </main>

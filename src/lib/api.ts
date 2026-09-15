@@ -110,3 +110,56 @@ export async function getProductById(id: string): Promise<Product | null> {
   const found = SAMPLE_PRODUCTS.find((p) => p.id === id || p.id.includes(id));
   return found || SAMPLE_PRODUCTS[0];
 }
+
+async function safePost(endpoint: string, bodyData: any) {
+  const urlsToTry = [
+    `${API_BASE_URL}${endpoint}`,
+    `http://localhost:5000${endpoint}`,
+    `${DEFAULT_RENDER_BACKEND}${endpoint}`,
+  ];
+
+  // Unique URLs preserving order
+  const uniqueUrls = Array.from(new Set(urlsToTry));
+
+  for (const url of uniqueUrls) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bodyData),
+      });
+
+      const contentType = res.headers.get("content-type") || "";
+      const text = await res.text();
+
+      // Check if response is JSON
+      if (contentType.includes("application/json") || text.trim().startsWith("{") || text.trim().startsWith("[")) {
+        try {
+          const data = JSON.parse(text);
+          if (res.ok || data.success !== undefined || data.orderId || data.error) {
+            return data;
+          }
+        } catch (parseErr) {
+          console.warn(`JSON parse failed for ${url}:`, parseErr);
+        }
+      }
+    } catch (err) {
+      // Fetch error for this URL, fallback to next URL
+    }
+  }
+
+  return {
+    success: false,
+    error: "Backend payment service is unreachable. Please ensure the Express backend is running on http://localhost:5000",
+  };
+}
+
+export async function createRazorpayOrderApi(amount: number) {
+  return await safePost("/api/payment/create-order", { amount });
+}
+
+export async function verifyRazorpayPaymentApi(paymentPayload: Record<string, any>) {
+  return await safePost("/api/payment/verify", paymentPayload);
+}
+
+

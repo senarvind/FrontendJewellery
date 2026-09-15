@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/frontend/types/product";
 import { useCart } from "@/context/CartContext";
+import CheckoutModal, { CheckoutItem } from "@/components/checkout/CheckoutModal";
 
 interface ProductDetailClientProps {
   product: Product;
@@ -15,7 +16,18 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [addedToCart, setAddedToCart] = useState<boolean>(false);
   const [quantity, setQuantity] = useState<number>(1);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
   const { addToCart } = useCart();
+
+  const checkoutItems: CheckoutItem[] = [
+    {
+      productId: product.id,
+      productName: product.productType || product.description,
+      category: product.category,
+      quantity: quantity,
+      price: product.sellingPrice,
+    },
+  ];
 
   const images = [
     { label: "Front View", src: product.frontImage || "/images/placeholder.jpg" },
@@ -251,29 +263,36 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               </div>
             </div>
 
-            {/* Action Buttons: Add to Cart & Buy Now */}
+            {/* Action Buttons: Buy Now Razorpay, Add to Cart & WhatsApp */}
             <div className="space-y-3 pt-2">
+              {/* ⚡ Primary Buy Now via Razorpay */}
+              <button
+                onClick={() => setIsCheckoutOpen(true)}
+                className="w-full py-4 px-5 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              >
+                <span className="text-base">💳</span>
+                <span>Buy Now with Razorpay (Online Payment)</span>
+              </button>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                
                 {/* 🛒 Add to Cart Button */}
                 <button
                   onClick={handleAddToCart}
-                  className="w-full py-3.5 px-5 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] font-bold text-xs uppercase tracking-wider rounded-xl border border-[#E8CFC5] active:scale-[0.98] transition-all shadow-xs flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] font-bold text-xs uppercase tracking-wider rounded-xl border border-[#E8CFC5] active:scale-[0.98] transition-all shadow-xs flex items-center justify-center gap-2"
                 >
                   <span className="text-base">🛒</span>
                   <span>Add to Cart</span>
                 </button>
 
-                {/* ⚡ Buy Now / WhatsApp Direct Button */}
+                {/* 💬 WhatsApp Enquire Button */}
                 <Link
                   href={`https://wa.me/919827415111?text=${waMessage}`}
                   target="_blank"
-                  className="w-full py-3.5 px-5 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] font-bold text-xs uppercase tracking-wider rounded-xl border border-[#E8CFC5] active:scale-[0.98] transition-all shadow-xs flex items-center justify-center gap-2"
                 >
-                  <span className="text-base">⚡</span>
-                  <span>Buy Now / Enquire</span>
+                  <span className="text-base">💬</span>
+                  <span>WhatsApp Enquire</span>
                 </Link>
-
               </div>
             </div>
 
@@ -299,6 +318,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </div>
 
         </div>
+
+        {/* Razorpay Checkout Modal */}
+        <CheckoutModal
+          isOpen={isCheckoutOpen}
+          onClose={() => setIsCheckoutOpen(false)}
+          items={checkoutItems}
+          totalAmount={product.sellingPrice * quantity}
+        />
 
       </div>
     </div>

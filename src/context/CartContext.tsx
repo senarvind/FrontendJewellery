@@ -21,12 +21,37 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+function safeSetItem(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(key, value);
+  } catch (e: any) {
+    if (
+      e.name === "QuotaExceededError" ||
+      e.code === 22 ||
+      e.number === -2147024882 ||
+      (e.message && e.message.includes("quota"))
+    ) {
+      console.warn(`localStorage quota exceeded for key "${key}". Clearing stored cache.`);
+      try {
+        localStorage.removeItem("keshar_wishlist_items");
+        localStorage.removeItem("keshar_cart_items");
+        localStorage.setItem(key, value);
+      } catch (retryErr) {
+        console.warn(`Unable to write to localStorage for "${key}". App will use in-memory state.`);
+      }
+    } else {
+      console.warn(`Failed to save "${key}" to localStorage:`, e);
+    }
+  }
+}
+
 function getOrCreateSessionId(): string {
   if (typeof window === "undefined") return "";
   let sessionId = localStorage.getItem("keshar_guest_cart_session");
   if (!sessionId) {
     sessionId = "guest_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now();
-    localStorage.setItem("keshar_guest_cart_session", sessionId);
+    safeSetItem("keshar_guest_cart_session", sessionId);
   }
   return sessionId;
 }
@@ -83,7 +108,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
           if (dbItems.length > 0) {
             setCartItems(dbItems);
-            localStorage.setItem("keshar_cart_items", JSON.stringify(dbItems));
+            safeSetItem("keshar_cart_items", JSON.stringify(dbItems));
           } else if (localItems.length > 0) {
             // If DB cart is empty but local cart has items, sync local items to DB
             await fetch("/api/cart", {
@@ -112,11 +137,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     if (!isLoaded) return;
 
     // Save to localStorage immediately
-    try {
-      localStorage.setItem("keshar_cart_items", JSON.stringify(cartItems));
-    } catch (e) {
-      console.error("Failed to save cart to localStorage", e);
-    }
+    safeSetItem("keshar_cart_items", JSON.stringify(cartItems));
 
     // Debounced sync to MongoDB database
     const sessionId = getOrCreateSessionId();
