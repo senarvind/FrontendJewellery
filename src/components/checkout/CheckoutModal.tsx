@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { createRazorpayOrderApi, verifyRazorpayPaymentApi } from "@/lib/api";
 
 export interface CheckoutItem {
@@ -45,6 +46,7 @@ export default function CheckoutModal({
   totalAmount,
   onSuccess,
 }: CheckoutModalProps) {
+  const [mounted, setMounted] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -56,7 +58,11 @@ export default function CheckoutModal({
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState<any>(null);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
 
   const handlePayNow = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,12 +164,12 @@ export default function CheckoutModal({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-[#FFF8F0] border border-[#E8CFC5] w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+  const modalContent = (
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-md overflow-y-auto animate-fadeIn">
+      <div className="bg-[#FFF8F0] border border-[#E8CFC5] w-full max-w-lg rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.4)] overflow-hidden flex flex-col max-h-[90vh] my-auto relative z-[100000] animate-scaleUp">
         
         {/* Modal Header */}
-        <div className="bg-[#7C1B2A] text-[#FFF8F0] px-6 py-5 flex items-center justify-between shadow-md">
+        <div className="bg-[#7C1B2A] text-[#FFF8F0] px-6 py-5 flex items-center justify-between shadow-md flex-shrink-0">
           <div className="flex items-center gap-2">
             <span className="text-xl">💳</span>
             <h2 className="font-serif text-xl font-bold tracking-wide">
@@ -172,14 +178,14 @@ export default function CheckoutModal({
           </div>
           <button
             onClick={onClose}
-            className="text-[#FFF8F0]/80 hover:text-white text-2xl font-bold transition-colors"
+            className="text-[#FFF8F0]/80 hover:text-white text-2xl font-bold transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10"
           >
             &times;
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto space-y-5">
+        <div className="p-6 overflow-y-auto space-y-5 flex-1">
           {paymentSuccess ? (
             /* Success Screen */
             <div className="text-center space-y-4 py-4">
@@ -361,4 +367,7 @@ export default function CheckoutModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
+

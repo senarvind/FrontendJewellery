@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Product } from "@/frontend/types/product";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import CheckoutModal, { CheckoutItem } from "@/components/checkout/CheckoutModal";
 
 interface ProductCardProps {
   product: Product;
@@ -15,10 +16,21 @@ export default function ProductCard({ product }: ProductCardProps) {
   // 0 = Front Image, 1 = Back Image, 2 = Model Image
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [justAdded, setJustAdded] = useState<boolean>(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
 
   const isLiked = isInWishlist(product.id);
+
+  const checkoutItems: CheckoutItem[] = [
+    {
+      productId: product.id,
+      productName: product.productType || product.description,
+      category: product.category,
+      quantity: 1,
+      price: product.sellingPrice,
+    },
+  ];
 
   const images = [
     { label: "Front", src: product.frontImage || "/images/placeholder.jpg" },
@@ -181,16 +193,28 @@ export default function ProductCard({ product }: ProductCardProps) {
             <span>{justAdded ? "✓ Added" : "🛒 Cart"}</span>
           </button>
 
-          {/* Buy Now / WhatsApp Link */}
-          <Link
-            href={`https://wa.me/919827415111?text=${waMessage}`}
-            target="_blank"
-            className="flex-1 py-1.5 sm:py-2.5 px-1.5 sm:px-3 bg-[#B82E44] hover:bg-[#7C1B2A] text-[#FFF8F0] text-[9px] sm:text-[11px] font-bold uppercase tracking-wider rounded-xl shadow-xs transition-all text-center"
+          {/* Buy Now Button (Triggers Razorpay Gateway Modal) */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsCheckoutOpen(true);
+            }}
+            className="flex-1 py-1.5 sm:py-2.5 px-1.5 sm:px-3 bg-[#B82E44] hover:bg-[#7C1B2A] text-[#FFF8F0] text-[9px] sm:text-[11px] font-bold uppercase tracking-wider rounded-xl shadow-xs active:scale-[0.98] transition-all text-center flex items-center justify-center gap-1"
           >
-            <span>Buy Now</span>
-          </Link>
+            <span>💳 Buy Now</span>
+          </button>
         </div>
       </div>
+
+      {/* Razorpay Checkout Modal */}
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        items={checkoutItems}
+        totalAmount={product.sellingPrice}
+      />
     </div>
   );
 }
