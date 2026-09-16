@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { createRazorpayOrderApi, verifyRazorpayPaymentApi } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
 export interface CheckoutItem {
   productId?: string;
@@ -46,6 +48,7 @@ export default function CheckoutModal({
   totalAmount,
   onSuccess,
 }: CheckoutModalProps) {
+  const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -61,6 +64,14 @@ export default function CheckoutModal({
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      if (user.name) setCustomerName(user.name);
+      if (user.email) setCustomerEmail(user.email);
+      if (user.phone) setCustomerPhone(user.phone);
+    }
+  }, [user]);
 
   if (!isOpen || !mounted) return null;
 
@@ -186,7 +197,38 @@ export default function CheckoutModal({
 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-5 flex-1">
-          {paymentSuccess ? (
+          {!user ? (
+            /* Authentication Required Screen */
+            <div className="text-center space-y-5 py-6 px-2">
+              <div className="w-16 h-16 mx-auto rounded-full bg-[#FFF0EA] border border-[#E8CFC5] flex items-center justify-center text-3xl shadow-inner">
+                🔒
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-serif text-2xl font-bold text-[#7C1B2A]">
+                  Authentication Required
+                </h3>
+                <p className="text-xs text-[#6F4A4A] leading-relaxed max-w-sm mx-auto">
+                  Aapko buy karne ke liye pehle login karna zaroori hai. Please sign in to your account to complete your purchase.
+                </p>
+              </div>
+              <div className="pt-2 flex flex-col gap-2.5 sm:flex-row sm:gap-3 justify-center">
+                <Link
+                  href={`/login?redirect=${encodeURIComponent(typeof window !== "undefined" ? window.location.pathname : "/")}&msg=${encodeURIComponent("Please sign in to buy this product.")}`}
+                  onClick={onClose}
+                  className="w-full sm:w-auto py-3 px-6 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all text-center"
+                >
+                  Sign In to Account →
+                </Link>
+                <Link
+                  href={`/signup?redirect=${encodeURIComponent(typeof window !== "undefined" ? window.location.pathname : "/")}&msg=${encodeURIComponent("Create an account to complete your purchase.")}`}
+                  onClick={onClose}
+                  className="w-full sm:w-auto py-3 px-6 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] border border-[#E8CFC5] font-bold text-xs uppercase tracking-wider rounded-xl transition-all text-center"
+                >
+                  Create Account
+                </Link>
+              </div>
+            </div>
+          ) : paymentSuccess ? (
             /* Success Screen */
             <div className="text-center space-y-4 py-4">
               <div className="w-20 h-20 mx-auto rounded-full bg-[#E8F5E9] border-2 border-[#2E7D32] flex items-center justify-center text-4xl shadow-inner animate-bounce">
