@@ -162,4 +162,69 @@ export async function verifyRazorpayPaymentApi(paymentPayload: Record<string, an
   return await safePost("/api/payment/verify", paymentPayload);
 }
 
+export async function getOrderByIdApi(id: string) {
+  if (!id) return null;
+  const primaryUrl = `${API_BASE_URL}/api/orders/${encodeURIComponent(id)}`;
+  const fallbackUrl = `${DEFAULT_RENDER_BACKEND}/api/orders/${encodeURIComponent(id)}`;
+
+  const data = await safeFetch(primaryUrl, fallbackUrl);
+  if (data && data.success && data.order) {
+    return data.order;
+  }
+  return null;
+}
+
+export async function searchOrdersApi(query: string) {
+  if (!query) return [];
+  const primaryUrl = `${API_BASE_URL}/api/orders/search?q=${encodeURIComponent(query)}`;
+  const fallbackUrl = `${DEFAULT_RENDER_BACKEND}/api/orders/search?q=${encodeURIComponent(query)}`;
+
+  const data = await safeFetch(primaryUrl, fallbackUrl);
+  if (data && data.success && Array.isArray(data.orders)) {
+    return data.orders;
+  }
+  return [];
+}
+
+export async function getAllOrdersApi() {
+  const primaryUrl = `${API_BASE_URL}/api/orders`;
+  const fallbackUrl = `${DEFAULT_RENDER_BACKEND}/api/orders`;
+
+  const data = await safeFetch(primaryUrl, fallbackUrl);
+  if (data && data.success && Array.isArray(data.orders)) {
+    return data.orders;
+  }
+  return [];
+}
+
+export async function getOrderTrackingApi(orderId: string) {
+  if (!orderId) return null;
+  const primaryUrl = `${API_BASE_URL}/api/tracking/${encodeURIComponent(orderId)}`;
+  const fallbackUrl = `${DEFAULT_RENDER_BACKEND}/api/tracking/${encodeURIComponent(orderId)}`;
+
+  const data = await safeFetch(primaryUrl, fallbackUrl);
+  if (data && data.success && data.tracking) {
+    return data.tracking;
+  }
+  return null;
+}
+
+export async function updateOrderTrackingApi(payload: Record<string, any>) {
+  return await safePost("/api/tracking/update", payload);
+}
+
+export async function searchOrderTrackingApi(query: string) {
+  if (!query) return [];
+  const primaryUrl = `${API_BASE_URL}/api/tracking/search?q=${encodeURIComponent(query)}`;
+  const fallbackUrl = `${DEFAULT_RENDER_BACKEND}/api/tracking/search?q=${encodeURIComponent(query)}`;
+
+  const data = await safeFetch(primaryUrl, fallbackUrl);
+  if (data && data.success && Array.isArray(data.trackings)) {
+    return data.trackings;
+  }
+  return [];
+}
+
+
+
 

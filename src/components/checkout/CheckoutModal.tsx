@@ -148,6 +148,19 @@ export default function CheckoutModal({
             if (verifyRes && verifyRes.success) {
               setPaymentSuccess(true);
               setConfirmedOrder(verifyRes.order);
+              
+              // Save created order into localStorage for local user history tracking
+              try {
+                const existing = localStorage.getItem("kj_user_orders");
+                const ordersArr = existing ? JSON.parse(existing) : [];
+                if (Array.isArray(ordersArr) && verifyRes.order) {
+                  const updatedArr = [verifyRes.order, ...ordersArr.filter((o: any) => o.id !== verifyRes.order.id)];
+                  localStorage.setItem("kj_user_orders", JSON.stringify(updatedArr));
+                }
+              } catch (e) {
+                console.warn("Error saving order to localStorage", e);
+              }
+
               if (onSuccess) onSuccess();
             } else {
               setErrorMsg(verifyRes?.error || "Payment signature verification failed.");
@@ -267,12 +280,22 @@ export default function CheckoutModal({
                 </div>
               </div>
 
-              <button
-                onClick={onClose}
-                className="w-full py-3 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all"
-              >
-                Close & Continue Shopping
-              </button>
+              <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
+                <Link
+                  href={confirmedOrder?.id ? `/orders/${confirmedOrder.id}` : "/orders"}
+                  onClick={onClose}
+                  className="flex-1 py-3 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all text-center flex items-center justify-center gap-1.5"
+                >
+                  <span>🚚 Track Order Now</span>
+                  <span>→</span>
+                </Link>
+                <button
+                  onClick={onClose}
+                  className="px-4 py-3 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] border border-[#E8CFC5] font-bold text-xs uppercase tracking-wider rounded-xl transition-all"
+                >
+                  Close Window
+                </button>
+              </div>
             </div>
           ) : (
             /* Checkout Form */

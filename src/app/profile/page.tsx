@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { searchOrdersApi } from "@/lib/api";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -22,10 +23,46 @@ export default function ProfilePage() {
   const [passwordMessage, setPasswordMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [updatingPassword, setUpdatingPassword] = useState(false);
 
+  // User Orders State
+  const [userOrders, setUserOrders] = useState<any[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+
   useEffect(() => {
     if (user) {
       setName(user.name || "");
       setPhone(user.phone || "");
+
+      // Fetch user orders by email or phone
+      const fetchOrders = async () => {
+        setLoadingOrders(true);
+        try {
+          const query = user.email || user.phone || user.name;
+          let orders = await searchOrdersApi(query);
+
+          // Merge with local storage orders
+          try {
+            const local = localStorage.getItem("kj_user_orders");
+            if (local) {
+              const parsed = JSON.parse(local);
+              if (Array.isArray(parsed)) {
+                const map = new Map();
+                [...orders, ...parsed].forEach((o) => map.set(o.id, o));
+                orders = Array.from(map.values());
+              }
+            }
+          } catch (e) {
+            // ignore parse error
+          }
+
+          setUserOrders(orders);
+        } catch (e) {
+          console.warn("Could not fetch user orders", e);
+        } finally {
+          setLoadingOrders(false);
+        }
+      };
+
+      fetchOrders();
     }
   }, [user]);
 
@@ -341,6 +378,90 @@ export default function ProfilePage() {
             </form>
           </div>
 
+        </div>
+
+        {/* Section: My Orders & Shipment Tracking */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E8CFC5] shadow-sm space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E8CFC5]/60">
+            <div className="flex items-center gap-2">
+              <span className="text-[#D4AF37] text-2xl">🚚</span>
+              <div>
+                <h2 className="text-xl font-serif font-bold text-[#7C1B2A]">
+                  My Orders & Live Tracking
+                </h2>
+                <p className="text-xs text-[#6F4A4A]">View recent purchases and live courier status</p>
+              </div>
+            </div>
+
+            <Link
+              href="/orders"
+              className="px-4 py-2 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] border border-[#E8CFC5] text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 self-start sm:self-auto"
+            >
+              <span>🔍 Track by Order ID</span>
+              <span>→</span>
+            </Link>
+          </div>
+
+          {loadingOrders ? (
+            <div className="py-8 text-center space-y-2">
+              <div className="w-8 h-8 border-2 border-[#D4AF37] border-t-[#7C1B2A] rounded-full animate-spin mx-auto"></div>
+              <p className="text-xs text-[#6F4A4A]">Loading your orders...</p>
+            </div>
+          ) : userOrders.length > 0 ? (
+            <div className="divide-y divide-[#E8CFC5]/50">
+              {userOrders.map((order) => (
+                <div key={order.id} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-serif font-bold text-sm text-[#7C1B2A]">
+                        Order #{order.id.substring(0, 10)}
+                      </span>
+                      <span className={`text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full ${
+                        order.status === "delivered"
+                          ? "bg-[#E8F5E9] text-[#2E7D32]"
+                          : order.status === "shipped"
+                          ? "bg-[#EBF5FF] text-[#1E40AF]"
+                          : "bg-[#FFF0EA] text-[#7C1B2A]"
+                      }`}>
+                        {order.status}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-[#6F4A4A]">
+                      {order.items?.length || 1} {order.items?.length === 1 ? "Item" : "Items"} • Total: <strong className="text-[#35191C]">₹{order.totalAmount?.toLocaleString("en-IN")}</strong>
+                    </p>
+                    <p className="text-[11px] text-[#6F4A4A]/80">
+                      Date: {new Date(order.createdAt || Date.now()).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    </p>
+                  </div>
+
+                  <Link
+                    href={`/orders/${order.id}`}
+                    className="px-4 py-2 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] text-xs font-bold rounded-xl transition-all shadow-sm text-center self-start sm:self-auto flex items-center gap-1.5"
+                  >
+                    <span>Track Status</span>
+                    <span>→</span>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-8 text-center space-y-3 bg-[#FFFBF7] rounded-2xl border border-[#E8CFC5]/60 p-6">
+              <span className="text-3xl block">🛍️</span>
+              <p className="text-xs text-[#6F4A4A] font-semibold">No recent orders found for {user.name}.</p>
+              <p className="text-[11px] text-[#6F4A4A]/80 max-w-xs mx-auto">
+                Once you purchase jewellery items, your orders and live shipment status will appear here.
+              </p>
+              <div className="pt-1">
+                <Link
+                  href="/products/all"
+                  className="inline-block px-4 py-2 bg-[#7C1B2A] text-white text-xs font-bold rounded-xl shadow-sm"
+                >
+                  Start Shopping Now
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Quick Footer Actions */}

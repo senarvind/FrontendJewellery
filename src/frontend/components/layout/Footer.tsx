@@ -103,6 +103,8 @@ export default function Footer() {
           <p>© {new Date().getFullYear()} Keshar Jewellers. All Rights Reserved.</p>
           
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[#E6C766]/90">
+            <Link href="/orders" className="hover:text-[#FFF8F0] transition-colors font-bold text-[#FFE2D8] flex items-center gap-1">🚚 Track Order</Link>
+            <span>•</span>
             <Link href="/info" className="hover:text-[#FFF8F0] transition-colors font-medium">Store Info</Link>
             <span>•</span>
             <Link href="/policies#hallmark" className="hover:text-[#FFF8F0] transition-colors">BIS Hallmark</Link>
