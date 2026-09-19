@@ -1,12 +1,15 @@
 import HeroSection from "@/frontend/components/hero/HeroSection";
 import CategoryCarousel from "@/frontend/components/categories/CategoryCarousel";
+import FeaturedJewelleryCarousel from "@/frontend/components/categories/FeaturedJewelleryCarousel";
+import SpecialCollectionCarousel from "@/frontend/components/categories/SpecialCollectionCarousel";
 import CategoryProductsShowcase from "@/frontend/components/home/CategoryProductsShowcase";
 import ShopByPrice from "@/frontend/components/pricing/ShopByPrice";
 import TrustSection from "@/frontend/components/home/TrustSection";
 import WhatsAppButton from "@/frontend/components/layout/WhatsAppButton";
-import { CATEGORIES, CategoryItem } from "@/frontend/data/categories";
+import { CATEGORIES } from "@/frontend/data/categories";
 import { getAllProducts } from "@/lib/api";
 
+<<<<<<< HEAD
 export const revalidate = 60; // Revalidate every 60 seconds for production speed
 
 function normalizeCategorySlug(slug: string): string {
@@ -61,9 +64,14 @@ async function getUniqueCategories(): Promise<CategoryItem[]> {
 
   return Array.from(uniqueCategories.values());
 }
+=======
+// force-dynamic: Build time pe heavy data fetch avoid karo (Base64 images ~44MB)
+// Jab images URL-based ho jaaye tab ISR (revalidate=60) pe switch karein
+export const dynamic = "force-dynamic";
+>>>>>>> 7fec2451a8e278a0263f2c87cb1e75d688ca4e95
 
 export default async function Home() {
-  const categories = await getUniqueCategories();
+  const allProducts = await getAllProducts();
 
   return (
     <main className="min-h-screen bg-[#FFF8F0] flex flex-col">
@@ -71,16 +79,22 @@ export default async function Home() {
       {/* 1. Hero Slider Banner */}
       <HeroSection />
 
-      {/* 2. Horizontal Category Carousel */}
-      <CategoryCarousel categories={categories} />
+      {/* 2. Shop by Category — Sirf fixed CATEGORIES dikhao, database se koi naya category nahi */}
+      <CategoryCarousel categories={CATEGORIES} />
 
-      {/* 3. Category Products Showcase (Real Admin Created Products) */}
-      <CategoryProductsShowcase />
+      {/* 3. Featured Jewellery Carousel (Mangalsutra, Chains, Pendants, Bridal, Necklaces) */}
+      <FeaturedJewelleryCarousel categories={CATEGORIES} />
 
-      {/* 4. Shop by Price Section */}
+      {/* 4. Divine Articles, Gifts & Lifestyle — SPECIAL_COLLECTIONS se aata hai */}
+      <SpecialCollectionCarousel />
+
+      {/* 5. Products Showcase (Real Admin Products) */}
+      <CategoryProductsShowcase initialProducts={allProducts} />
+
+      {/* 6. Shop by Price Section */}
       <ShopByPrice />
 
-      {/* 5. Trust & USP Section */}
+      {/* 7. Trust & USP Section */}
       <TrustSection />
 
       {/* Floating WhatsApp Button */}
@@ -89,4 +103,3 @@ export default async function Home() {
     </main>
   );
 }
-

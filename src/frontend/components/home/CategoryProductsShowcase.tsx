@@ -6,17 +6,26 @@ import { Product } from "@/frontend/types/product";
 import ProductCard from "@/frontend/components/products/ProductCard";
 import { getAllProducts } from "@/lib/api";
 
-export default function CategoryProductsShowcase() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+interface CategoryProductsShowcaseProps {
+  initialProducts?: Product[];
+}
+
+export default function CategoryProductsShowcase({ initialProducts }: CategoryProductsShowcaseProps) {
+  const [products, setProducts] = useState<Product[]>(initialProducts || []);
+  const [isLoading, setIsLoading] = useState<boolean>(!initialProducts || initialProducts.length === 0);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [itemsPerView, setItemsPerView] = useState<number>(4);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(true);
   const touchStartXRef = useRef<number | null>(null);
 
-  // Fetch products
+  // Fetch products only if not provided via props
   useEffect(() => {
+    if (initialProducts && initialProducts.length > 0) {
+      setProducts(initialProducts);
+      setIsLoading(false);
+      return;
+    }
     async function loadProducts() {
       try {
         setIsLoading(true);
@@ -29,7 +38,7 @@ export default function CategoryProductsShowcase() {
       }
     }
     loadProducts();
-  }, []);
+  }, [initialProducts]);
 
   // Update visible items count on screen resize
   useEffect(() => {
@@ -93,7 +102,7 @@ export default function CategoryProductsShowcase() {
     setCurrentIndex(Math.min(Math.max(0, index), maxSlide));
   };
 
-  // Auto-slide animation interval (every 1.6 seconds, pauses on hover)
+  // Auto-slide animation interval (every 1.6 seconds, pauses on hover/touch)
   useEffect(() => {
     if (isPaused || totalItems <= itemsPerView) return;
 
@@ -104,12 +113,35 @@ export default function CategoryProductsShowcase() {
     return () => clearInterval(interval);
   }, [isPaused, nextSlide, totalItems, itemsPerView]);
 
+  // Pause auto-sliding for 5 seconds when user hovers or taps on phone
+  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const triggerFiveSecondPause = useCallback(() => {
+    setIsPaused(true);
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+    }
+    pauseTimeoutRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 5000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (pauseTimeoutRef.current) {
+        clearTimeout(pauseTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Touch handlers for mobile swiping
   const handleTouchStart = (e: React.TouchEvent) => {
+    triggerFiveSecondPause();
     touchStartXRef.current = e.touches[0].clientX;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    triggerFiveSecondPause();
     if (touchStartXRef.current === null) return;
     const touchEndX = e.changedTouches[0].clientX;
     const diff = touchStartXRef.current - touchEndX;
@@ -164,8 +196,7 @@ export default function CategoryProductsShowcase() {
         ) : products.length > 0 ? (
           <div
             className="relative group/slider"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
+            onMouseEnter={triggerFiveSecondPause}
           >
             {/* ANIMATED SLIDER VIEWPORT & TRACK */}
             <div

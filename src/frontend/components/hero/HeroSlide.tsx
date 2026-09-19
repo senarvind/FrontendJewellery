@@ -119,7 +119,7 @@ export default function HeroSlide({ slide }: HeroSlideProps) {
 
         {/* Right Side: Visual Showcase of Jewellery */}
         <div className="flex-1 relative w-full flex items-center justify-center mt-1 sm:mt-2 md:mt-0">
-          <div className="relative w-28 h-28 xs:w-36 xs:h-36 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-76 lg:h-76 rounded-full bg-gradient-to-br from-[#FFF8F0]/90 via-[#FFE2D8]/80 to-[#FFF0EA]/70 border-2 border-[#E8A58A] shadow-[0_10px_30px_rgba(122,16,33,0.12)] flex items-center justify-center p-2 sm:p-4">
+          <div className="relative w-28 h-28 xs:w-36 xs:h-36 sm:w-52 sm:h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 xl:w-80 xl:h-80 rounded-full bg-gradient-to-br from-[#FFF8F0]/90 via-[#FFE2D8]/80 to-[#FFF0EA]/70 border-2 border-[#E8A58A] shadow-[0_10px_30px_rgba(122,16,33,0.12)] flex items-center justify-center p-2 sm:p-4">
             <div className="w-full h-full rounded-full border border-dashed border-[#D4AF37] flex items-center justify-center text-center relative overflow-hidden">
               {slide.image ? (
                 <Image src={slide.image} alt={slide.alt} fill className="object-cover p-1.5 sm:p-2 rounded-full" priority />

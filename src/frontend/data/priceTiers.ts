@@ -18,26 +18,26 @@ export const PRICE_TIERS: PriceTier[] = [
     priceLabel: "Under ₹999",
     itemsDescription: "Pure 92.5% Silver Rings, Studs & Hoops",
     icon: "✨",
-    href: "/products/earrings"
+    href: "/products/price/under-999"
   },
   {
     id: 2,
-    badge: "💎 PREMIUM",
+    badge: "🪔 FESTIVE SPECIAL",
     badgeType: "premium",
-    title: "Flora Mangalsutras & Sets",
-    priceLabel: "Under ₹1,999",
-    itemsDescription: "Designer Mangalsutras & Pendants",
-    icon: "💎",
-    href: "/products/mangalsutras"
+    title: "Auspicious Festive Jewellery",
+    priceLabel: "Festival Collection",
+    itemsDescription: "Pure 92.5 Silver & Gold Festive Pieces",
+    icon: "🪔",
+    href: "/products/festival-collection"
   },
   {
     id: 3,
-    badge: "🎁 LUXE",
+    badge: "👑 CUSTOM MADE",
     badgeType: "luxe",
-    title: "Evil Eye & Bridal Luxe Sets",
-    priceLabel: "Under ₹2,999",
-    itemsDescription: "Handcrafted Bracelets, Chains & Sets",
-    icon: "🎁",
-    href: "/products"
+    title: "Customized & Bespoke Jewellery",
+    priceLabel: "Customer On Demand",
+    itemsDescription: "Personalized Designs, Custom Engravings & Bespoke Orders",
+    icon: "👑",
+    href: "/products/customized-jewellery"
   }
 ];

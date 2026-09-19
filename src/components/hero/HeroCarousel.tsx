@@ -39,10 +39,18 @@ export default function HeroCarousel({
     return () => clearInterval(timer);
   }, [autoPlayInterval, isPaused, nextSlide, slides.length]);
 
+  // Pause auto-sliding for 5 seconds when user hovers or taps on phone
+  const triggerFiveSecondPause = useCallback(() => {
+    setIsPaused(true);
+    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+    pauseTimerRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 5000);
+  }, []);
+
   // Touch Swipe Handlers for mobile & tablet
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
-    setIsPaused(true);
+    triggerFiveSecondPause();
     touchStartX.current = e.targetTouches[0].clientX;
   };
 
@@ -65,16 +73,13 @@ export default function HeroCarousel({
     touchStartX.current = null;
     touchEndX.current = null;
 
-    // Resume auto-sliding after 1.5 seconds on mobile touch end
-    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
-    pauseTimerRef.current = setTimeout(() => {
-      setIsPaused(false);
-    }, 1500);
+    // Pause for 5 seconds after touch/swipe
+    triggerFiveSecondPause();
   };
 
   const handleSlideSelect = (idx: number) => {
     setCurrentSlide(idx);
-    setIsPaused(false);
+    triggerFiveSecondPause();
   };
 
   return (
@@ -83,8 +88,7 @@ export default function HeroCarousel({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      onMouseEnter={triggerFiveSecondPause}
     >
       <div className="relative w-full overflow-hidden shadow-[0_8px_30px_rgba(122,16,33,0.12)] rounded-xl sm:rounded-2xl border border-[#E8CFC5] bg-[#FFE2D8]">
 

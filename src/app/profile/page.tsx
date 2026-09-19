@@ -225,14 +225,39 @@ export default function ProfilePage() {
 
             {/* Admin Action shortcut */}
             {user.role === "admin" && (
-              <Link
-                href="/admin"
+              <a
+                href={process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001"}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-4 py-2 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-1.5"
               >
-                <span>👑 Open Admin Panel</span>
-              </Link>
+                <span>👑 Open Admin Panel ↗</span>
+              </a>
             )}
           </div>
+        </div>
+
+        {/* Orders Shortcut Card */}
+        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#E8CFC5] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4 text-center sm:text-left">
+            <div className="w-12 h-12 rounded-2xl bg-[#FFF0EA] border border-[#E8CFC5] flex items-center justify-center text-2xl flex-shrink-0">
+              📦
+            </div>
+            <div>
+              <h2 className="font-serif text-lg font-bold text-[#7C1B2A]">
+                My Orders & Live Tracking
+              </h2>
+              <p className="text-xs text-[#6F4A4A]">
+                Track current jewellery orders, view delivery progress, or cancel within 3 hours
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/orders"
+            className="px-6 py-3 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] text-xs font-bold rounded-xl transition-all shadow-sm flex items-center gap-2 flex-shrink-0"
+          >
+            <span>View All Orders →</span>
+          </Link>
         </div>
 
         {/* Two Column Section: Info Edit & Password Change */}

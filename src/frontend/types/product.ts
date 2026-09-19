@@ -37,7 +37,6 @@ export const STORE_CATEGORIES: CategoryMeta[] = [
   { slug: "anklets", name: "Anklets", hallmarkText: "✦ BIS 92.5 STERLING HALLMARK CERTIFIED ✦" },
   { slug: "toe-rings", name: "Toe Rings", hallmarkText: "✦ PURE 92.5 STERLING SILVER ✦" },
   { slug: "kada", name: "Kada", hallmarkText: "✦ 22K GOLD & 92.5 STERLING SILVER ✦" },
-  { slug: "haram", name: "Haram", hallmarkText: "✦ 22K 916 HALLMARKED GOLD ✦" },
   { slug: "waist-jewellery", name: "Waist Jewellery", hallmarkText: "✦ TRADITIONAL HANDCRAFTED 925 SILVER ✦" },
   { slug: "bajuband-armlets", name: "Bajuband / Armlets", hallmarkText: "✦ ROYAL TRADITIONAL JEWELLERY ✦" },
   { slug: "hair-jewellery", name: "Hair Jewellery", hallmarkText: "✦ BRIDAL HANDCRAFTED JEWELLERY ✦" },
@@ -47,4 +46,9 @@ export const STORE_CATEGORIES: CategoryMeta[] = [
   { slug: "kids", name: "Kids/Baby", hallmarkText: "✦ SKIN SAFE 92.5 PURE SILVER ✦" },
   { slug: "pens", name: "Pens", hallmarkText: "✦ 92.5 STERLING SILVER LUXURY GIFTS ✦" },
   { slug: "utensils", name: "Utensils", hallmarkText: "✦ 999 PURE SILVER UTENSILS & ARTIFACTS ✦" },
+  { slug: "artifacts", name: "Artifacts & Idols", hallmarkText: "✦ 999 PURE SILVER ARTIFACTS & IDOLS ✦" },
+  { slug: "coins-bars", name: "Coins & Bars", hallmarkText: "✦ 24K 999 PURE GOLD & 999 SILVER COINS ✦" },
+  { slug: "pooja-articles", name: "Pooja Articles", hallmarkText: "✦ AUTHENTIC SACRED SILVER ARTICLES ✦" },
+  { slug: "festival-collection", name: "Festival Collection", hallmarkText: "✦ AUSPICIOUS FESTIVE 91.6 GOLD & 92.5 SILVER ✦" },
+  { slug: "customized-jewellery", name: "Customized Jewellery (Customer On Demand)", hallmarkText: "✦ BESPOKE HANDCRAFTED 91.6 GOLD & 92.5 SILVER ✦" },
 ];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CATEGORIES } from "@/data/categories";
@@ -106,28 +106,28 @@ export default function Navbar() {
       setTimeout(() => {
         mobileSearchInputRef.current?.focus();
       }, 100);
+      fetchProducts();
     }
   }, [isMobileSearchOpen]);
 
-  // Fetch all products for live search filter
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch("/api/products");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.products && Array.isArray(data.products)) {
-            setAllProducts(data.products);
-            return;
-          }
+  // Fetch all products for live search filter (deferred on-demand)
+  const hasFetchedProductsRef = useRef(false);
+  const fetchProducts = useCallback(async () => {
+    if (hasFetchedProductsRef.current) return;
+    hasFetchedProductsRef.current = true;
+    try {
+      const res = await fetch("/api/products");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.products && Array.isArray(data.products)) {
+          setAllProducts(data.products);
+          return;
         }
-      } catch (e) {
-        console.warn("Live search product fetch note:", e);
       }
-      setAllProducts(SAMPLE_PRODUCTS);
-    };
-
-    fetchProducts();
+    } catch (e) {
+      console.warn("Live search product fetch note:", e);
+    }
+    setAllProducts(SAMPLE_PRODUCTS);
   }, []);
 
   // Filter products when user types in search input
@@ -407,7 +407,10 @@ export default function Navbar() {
                   placeholder="Search Gold, Silver, Rings..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => searchQuery.trim() && setIsSearchOpen(true)}
+                  onFocus={() => {
+                    fetchProducts();
+                    if (searchQuery.trim()) setIsSearchOpen(true);
+                  }}
                   suppressHydrationWarning
                   className="pl-4 pr-10 py-1.5 rounded-full border border-[#E8CFC5] bg-[#FFFDFC] focus:outline-none focus:border-[#B82E44] focus:ring-1 focus:ring-[#B82E44] text-xs xl:text-sm w-44 xl:w-64 text-[#35191C] placeholder-[#6F4A4A]/60 shadow-inner"
                 />
@@ -509,21 +512,22 @@ export default function Navbar() {
                       >
                         👤 My Profile
                       </Link>
-                      {hasPurchasedOrders && (
-                        <Link
-                          href="/orders"
-                          className="block px-3 py-1.5 text-xs text-[#35191C] hover:bg-[#FFF0EA] hover:text-[#B82E44] rounded-lg transition-colors font-medium mb-1"
-                        >
-                          🚚 Track My Orders
-                        </Link>
-                      )}
+                      <Link
+                        href="/orders"
+                        className="block px-3 py-1.5 text-xs text-[#35191C] hover:bg-[#FFF0EA] hover:text-[#B82E44] rounded-lg transition-colors font-medium mb-1"
+                      >
+                        🚚 Track My Orders
+                      </Link>
+
                       {user.role === "admin" && (
-                        <Link
-                          href="/admin"
+                        <a
+                          href={process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001"}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="block px-3 py-1.5 text-xs text-[#35191C] hover:bg-[#FFF0EA] hover:text-[#B82E44] rounded-lg transition-colors font-medium mb-1"
                         >
-                          👑 Admin Panel
-                        </Link>
+                          👑 Admin Panel ↗
+                        </a>
                       )}
                       <button
                         onClick={logout}
@@ -611,7 +615,7 @@ export default function Navbar() {
         </div>
 
         {/* 3. Horizontal Mobile Sub-Category Scroll Bar (`lg:hidden`) */}
-        <div className="lg:hidden bg-[#FFF3E8] border-b border-[#E8CFC5]/80 py-2 px-3 overflow-x-auto scrollbar-none flex items-center gap-2 text-xs font-semibold text-[#35191C] shadow-inner">
+        <div className="lg:hidden bg-[#FFF3E8] border-b border-[#E8CFC5]/80 py-2 px-3 overflow-x-auto scrollbar-none scroll-touch flex items-center gap-2 text-xs font-semibold text-[#35191C] shadow-inner">
           <Link
             href="/products/all"
             className="flex items-center gap-1 bg-[#FFE2D8] text-[#7C1B2A] hover:bg-[#B82E44] hover:text-white px-3 py-1 rounded-full border border-[#E8CFC5] whitespace-nowrap transition-colors shadow-sm"
@@ -633,7 +637,7 @@ export default function Navbar() {
 
       {/* 4. Instant Mobile Search Overlay Modal (`lg:hidden`) */}
       {isMobileSearchOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-start">
+        <div className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-start pt-safe pb-safe">
           <div className="bg-[#FFF8F0] border-b border-[#E8CFC5] p-4 shadow-xl flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-[#7C1B2A] flex items-center gap-1">
@@ -713,7 +717,7 @@ export default function Navbar() {
           />
 
           {/* Right-Side Drawer Container */}
-          <div className="relative w-[85%] sm:w-80 max-w-xs sm:max-w-sm bg-[#FFFBF7] h-full shadow-2xl flex flex-col z-[102] overflow-y-auto border-l border-[#E8CFC5] ml-auto px-4 py-4 gap-4">
+          <div className="relative w-[85%] sm:w-80 max-w-xs sm:max-w-sm bg-[#FFFBF7] h-full h-dvh max-h-dvh shadow-2xl flex flex-col z-[102] overflow-y-auto scroll-touch border-l border-[#E8CFC5] ml-auto px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] gap-4">
 
             {/* Drawer Brand Header with Close Button */}
             <div className="bg-[#7C1B2A] text-[#FFF8F0] p-3 rounded-2xl flex items-center justify-between shadow-sm sticky top-0 z-20">

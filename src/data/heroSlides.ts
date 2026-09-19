@@ -37,5 +37,14 @@ export const heroSlides: HeroSlideData[] = [
     alt: "Bridal Necklace Set",
     href: "/products/necklace-sets",
     image: "/images/categories/Necklace.png"
+  },
+  {
+    id: 4,
+    title: "Festival Collection",
+    subtitle: "Pure Gold & Silver Masterpieces for Dhanteras, Diwali & Festivities",
+    category: "AUSPICIOUS CELEBRATIONS",
+    alt: "Festival Collection - Keshar Jewellers",
+    href: "/products/festival-collection",
+    image: "/images/categories/08-pendants.jpg"
   }
 ];

@@ -3,7 +3,7 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { CATEGORIES, CategoryItem } from "@/frontend/data/categories";
+import { CATEGORIES, CategoryItem, FEATURED_JEWELLERY_SLUGS } from "@/frontend/data/categories";
 
 interface CategoryCarouselProps {
   categories?: CategoryItem[];
@@ -13,22 +13,19 @@ export default function CategoryCarousel({ categories = CATEGORIES }: CategoryCa
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Strictly deduplicate categories and ONLY include categories with real images
+  // Strictly deduplicate categories and exclude featured jewellery categories
   const uniqueCategories = useMemo(() => {
     const seen = new Set<string>();
+    const excludedSlugs = new Set(FEATURED_JEWELLERY_SLUGS.map((s) => s.toLowerCase().trim()));
     const result: CategoryItem[] = [];
 
-    // Filter categories that have images
-    const imageOnlyCategories = categories.filter((cat) => Boolean(cat.image));
-
-    for (const cat of imageOnlyCategories) {
-      const normalizedKey = (cat.name || cat.slug || "")
+    for (const cat of categories) {
+      const normalizedKey = (cat.slug || cat.name || "")
         .toLowerCase()
         .trim()
-        .replace(/[^a-z0-9]/g, "")
-        .replace(/s$/, ""); // normalize plural
+        .replace(/\s+/g, "-");
 
-      if (!seen.has(normalizedKey)) {
+      if (normalizedKey && !seen.has(normalizedKey) && !excludedSlugs.has(normalizedKey)) {
         seen.add(normalizedKey);
         result.push(cat);
       }
@@ -68,14 +65,34 @@ export default function CategoryCarousel({ categories = CATEGORIES }: CategoryCa
     return () => cancelAnimationFrame(animId);
   }, [isPaused, displayList]);
 
+  // Pause auto-sliding for 5 seconds when user hovers or taps on phone
+  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const triggerFiveSecondPause = () => {
+    setIsPaused(true);
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+    }
+    pauseTimeoutRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 5000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (pauseTimeoutRef.current) {
+        clearTimeout(pauseTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <section className="w-full bg-[#FFF8F0] py-8 sm:py-12 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
+    <section className="w-full bg-[#FFF8F0] pt-8 sm:pt-12 pb-3 sm:pb-4 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
       <div
         className="max-w-[1400px] mx-auto relative group"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-        onTouchStart={() => setIsPaused(true)}
-        onTouchEnd={() => setIsPaused(false)}
+        onMouseEnter={triggerFiveSecondPause}
+        onTouchStart={triggerFiveSecondPause}
+        onTouchEnd={triggerFiveSecondPause}
       >
         {/* Section Heading */}
         <div className="text-center mb-6 sm:mb-8 select-none">
@@ -95,7 +112,7 @@ export default function CategoryCarousel({ categories = CATEGORIES }: CategoryCa
         {/* Continuous Auto-sliding Categories Track */}
         <div
           ref={scrollRef}
-          className="flex items-center gap-4 sm:gap-6 lg:gap-7 overflow-x-auto scrollbar-none px-2 sm:px-4 py-2 select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex items-center gap-3.5 sm:gap-6 lg:gap-7 overflow-x-auto scrollbar-none scroll-touch px-2 sm:px-4 py-2 select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {displayList.map((cat, idx) => (
             <Link

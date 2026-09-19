@@ -8,7 +8,12 @@ import { Product } from "@/frontend/types/product";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
-import CheckoutModal, { CheckoutItem } from "@/components/checkout/CheckoutModal";
+import dynamic from "next/dynamic";
+import type { CheckoutItem } from "@/components/checkout/CheckoutModal";
+
+const CheckoutModal = dynamic(() => import("@/components/checkout/CheckoutModal"), {
+  ssr: false,
+});
 
 interface ProductCardProps {
   product: Product;
@@ -218,13 +223,15 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Razorpay Checkout Modal */}
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-        items={checkoutItems}
-        totalAmount={product.sellingPrice}
-      />
+      {/* Razorpay Checkout Modal (loaded on demand) */}
+      {isCheckoutOpen && (
+        <CheckoutModal
+          isOpen={isCheckoutOpen}
+          onClose={() => setIsCheckoutOpen(false)}
+          items={checkoutItems}
+          totalAmount={product.sellingPrice}
+        />
+      )}
     </div>
   );
 }

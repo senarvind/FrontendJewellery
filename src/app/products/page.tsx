@@ -6,8 +6,25 @@ import { STORE_CATEGORIES } from "@/frontend/types/product";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default async function AllProductsPage() {
-  const products = await getAllProducts();
+export default async function AllProductsPage(props: {
+  searchParams?: Promise<{ maxPrice?: string }>;
+}) {
+  const searchParams = props.searchParams ? await props.searchParams : {};
+  const maxPriceNum = searchParams?.maxPrice ? parseFloat(searchParams.maxPrice) : null;
+  const allProducts = await getAllProducts();
+  const safeAllProducts = Array.isArray(allProducts) ? allProducts : [];
+
+  const products =
+    maxPriceNum && !isNaN(maxPriceNum)
+      ? safeAllProducts.filter((p) => {
+          const raw = p.sellingPrice;
+          const price =
+            typeof raw === "number"
+              ? raw
+              : parseFloat(String(raw || "").replace(/[^0-9.]/g, ""));
+          return !isNaN(price) && price > 0 && price < maxPriceNum;
+        })
+      : safeAllProducts;
 
   // Extract unique category names from products
   const categoryCounts = products.reduce((acc: Record<string, number>, p) => {
