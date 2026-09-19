@@ -7,9 +7,9 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AllProductsPage(props: {
-  searchParams?: Promise<{ maxPrice?: string }> | { maxPrice?: string };
+  searchParams?: Promise<{ maxPrice?: string }>;
 }) {
-  const searchParams = props.searchParams ? await Promise.resolve(props.searchParams) : {};
+  const searchParams = props.searchParams ? await props.searchParams : {};
   const maxPriceNum = searchParams?.maxPrice ? parseFloat(searchParams.maxPrice) : null;
   const allProducts = await getAllProducts();
   const safeAllProducts = Array.isArray(allProducts) ? allProducts : [];

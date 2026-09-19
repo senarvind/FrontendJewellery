@@ -9,8 +9,9 @@ import WhatsAppButton from "@/frontend/components/layout/WhatsAppButton";
 import { CATEGORIES } from "@/frontend/data/categories";
 import { getAllProducts } from "@/lib/api";
 
-// 60 second ISR cache — products update hone ke 60s baad page refresh hoga
-export const revalidate = 60;
+// force-dynamic: Build time pe heavy data fetch avoid karo (Base64 images ~44MB)
+// Jab images URL-based ho jaaye tab ISR (revalidate=60) pe switch karein
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const allProducts = await getAllProducts();
