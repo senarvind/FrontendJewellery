@@ -3,11 +3,15 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import CheckoutModal, { CheckoutItem } from "@/components/checkout/CheckoutModal";
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity, clearCart, subtotal, totalItemsCount } = useCart();
+  const { user } = useAuth();
+  const router = useRouter();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   // Map cart items for CheckoutModal
@@ -241,7 +245,14 @@ export default function CartPage() {
               {/* Action Buttons */}
               <div className="space-y-3 pt-2">
                 <button
-                  onClick={() => setIsCheckoutOpen(true)}
+                  onClick={() => {
+                    if (!user) {
+                      const msg = encodeURIComponent("Please sign in to proceed with payment.");
+                      router.push(`/login?redirect=/cart&msg=${msg}`);
+                      return;
+                    }
+                    setIsCheckoutOpen(true);
+                  }}
                   className="w-full py-3.5 px-5 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-center"
                 >
                   <span className="text-base">💳</span>

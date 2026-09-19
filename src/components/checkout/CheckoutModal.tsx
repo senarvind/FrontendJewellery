@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { createRazorpayOrderApi, verifyRazorpayPaymentApi } from "@/lib/api";
 import { saveOrder, generateOrderId } from "@/lib/orders";
+import { useAuth } from "@/context/AuthContext";
+
 
 export interface CheckoutItem {
   productId?: string;
@@ -48,6 +50,7 @@ export default function CheckoutModal({
   totalAmount,
   onSuccess,
 }: CheckoutModalProps) {
+  const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -64,6 +67,14 @@ export default function CheckoutModal({
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      if (user.name) setCustomerName(user.name);
+      if (user.email) setCustomerEmail(user.email);
+      if (user.phone) setCustomerPhone(user.phone);
+    }
+  }, [user]);
 
   if (!isOpen || !mounted) return null;
 
@@ -140,7 +151,7 @@ export default function CheckoutModal({
             if (verifyRes && verifyRes.success) {
               setPaymentSuccess(true);
               setConfirmedOrder(verifyRes.order);
-              const newOrderId = generateOrderId();
+              const newOrderId = verifyRes.order?.id || generateOrderId();
               setSavedOrderId(newOrderId);
               saveOrder({
                 id: newOrderId,
@@ -156,6 +167,19 @@ export default function CheckoutModal({
                 orderedAt: new Date().toISOString(),
                 isCancelled: false,
               });
+              
+              // Save created order into localStorage for local user history tracking
+              try {
+                const existing = localStorage.getItem("kj_user_orders");
+                const ordersArr = existing ? JSON.parse(existing) : [];
+                if (Array.isArray(ordersArr) && verifyRes.order) {
+                  const updatedArr = [verifyRes.order, ...ordersArr.filter((o: any) => o.id !== verifyRes.order.id)];
+                  localStorage.setItem("kj_user_orders", JSON.stringify(updatedArr));
+                }
+              } catch (e) {
+                console.warn("Error saving order to localStorage", e);
+              }
+
               if (onSuccess) onSuccess();
             } else {
               setErrorMsg(verifyRes?.error || "Payment signature verification failed.");
@@ -205,7 +229,39 @@ export default function CheckoutModal({
 
         {/* Modal Body */}
         <div className="p-4 sm:p-6 overflow-y-auto scroll-touch space-y-4 sm:space-y-5 flex-1">
-          {paymentSuccess ? (
+          {!user ? (
+            /* Authentication Required Screen */
+            <div className="text-center space-y-5 py-6 px-2">
+              <div className="w-16 h-16 mx-auto rounded-full bg-[#FFF0EA] border border-[#E8CFC5] flex items-center justify-center text-3xl shadow-inner">
+                🔒
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-serif text-2xl font-bold text-[#7C1B2A]">
+                  Authentication Required
+                </h3>
+                <p className="text-xs text-[#6F4A4A] leading-relaxed max-w-sm mx-auto">
+                  Aapko buy karne ke liye pehle login karna zaroori hai. Please sign in to your account to complete your purchase.
+                </p>
+              </div>
+              <div className="pt-2 flex flex-col gap-2.5 sm:flex-row sm:gap-3 justify-center">
+                <Link
+                  href={`/login?redirect=${encodeURIComponent(typeof window !== "undefined" ? window.location.pathname : "/")}&msg=${encodeURIComponent("Please sign in to buy this product.")}`}
+                  onClick={onClose}
+                  className="w-full sm:w-auto py-3 px-6 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all text-center"
+                >
+                  Sign In to Account →
+                </Link>
+                <Link
+                  href={`/signup?redirect=${encodeURIComponent(typeof window !== "undefined" ? window.location.pathname : "/")}&msg=${encodeURIComponent("Create an account to complete your purchase.")}`}
+                  onClick={onClose}
+                  className="w-full sm:w-auto py-3 px-6 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] border border-[#E8CFC5] font-bold text-xs uppercase tracking-wider rounded-xl transition-all text-center"
+                >
+                  Create Account
+                </Link>
+              </div>
+            </div>
+          ) : paymentSuccess ? (
+
             /* Success Screen */
             <div className="text-center space-y-4 py-4">
               <div className="w-20 h-20 mx-auto rounded-full bg-[#E8F5E9] border-2 border-[#2E7D32] flex items-center justify-center text-4xl shadow-inner animate-bounce">
@@ -244,25 +300,25 @@ export default function CheckoutModal({
                 </div>
               </div>
 
-              <div className="space-y-2 pt-1">
-                {savedOrderId && (
-                  <Link
-                    href={`/orders/${savedOrderId}`}
-                    onClick={onClose}
-                    className="w-full py-3.5 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
-                  >
-                    <span>📍 Track Your Order Live</span>
-                  </Link>
-                )}
+              <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
+                <Link
+                  href={savedOrderId || confirmedOrder?.id ? `/orders/${savedOrderId || confirmedOrder?.id}` : "/orders"}
+                  onClick={onClose}
+                  className="flex-1 py-3 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all text-center flex items-center justify-center gap-1.5"
+                >
+                  <span>🚚 Track Order Live</span>
+                  <span>→</span>
+                </Link>
                 <button
                   onClick={onClose}
-                  className="w-full py-2.5 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] border border-[#E8CFC5] font-bold text-xs rounded-xl transition-all"
+                  className="px-4 py-3 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] border border-[#E8CFC5] font-bold text-xs uppercase tracking-wider rounded-xl transition-all"
                 >
                   Continue Shopping
                 </button>
               </div>
             </div>
           ) : (
+
             /* Checkout Form */
             <form onSubmit={handlePayNow} className="space-y-4">
               

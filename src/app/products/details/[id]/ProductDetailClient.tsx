@@ -3,8 +3,10 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Product } from "@/frontend/types/product";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import CheckoutModal, { CheckoutItem } from "@/components/checkout/CheckoutModal";
 
 interface ProductDetailClientProps {
@@ -12,6 +14,8 @@ interface ProductDetailClientProps {
 }
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
+  const router = useRouter();
+  const { user } = useAuth();
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [addedToCart, setAddedToCart] = useState<boolean>(false);
@@ -267,7 +271,15 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             <div className="space-y-3 pt-2">
               {/* ⚡ Primary Buy Now via Razorpay */}
               <button
-                onClick={() => setIsCheckoutOpen(true)}
+                onClick={() => {
+                  if (!user) {
+                    const redirectUrl = encodeURIComponent(`/products/details/${product.id}`);
+                    const msg = encodeURIComponent("Please sign in to buy this product.");
+                    router.push(`/login?redirect=${redirectUrl}&msg=${msg}`);
+                    return;
+                  }
+                  setIsCheckoutOpen(true);
+                }}
                 className="w-full py-4 px-5 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2"
               >
                 <span className="text-base">💳</span>

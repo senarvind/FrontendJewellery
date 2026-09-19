@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Product } from "@/frontend/types/product";
+import { useAuth } from "./AuthContext";
 
 interface WishlistContextType {
   wishlistItems: Product[];
@@ -15,37 +16,13 @@ interface WishlistContextType {
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
-function safeSetItem(key: string, value: string) {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(key, value);
-  } catch (e: any) {
-    if (
-      e.name === "QuotaExceededError" ||
-      e.code === 22 ||
-      e.number === -2147024882 ||
-      (e.message && e.message.includes("quota"))
-    ) {
-      console.warn(`localStorage quota exceeded for key "${key}". Clearing stored cache.`);
-      try {
-        localStorage.removeItem("keshar_wishlist_items");
-        localStorage.removeItem("keshar_cart_items");
-        localStorage.setItem(key, value);
-      } catch (retryErr) {
-        console.warn(`Unable to write to localStorage for "${key}". App will use in-memory state.`);
-      }
-    } else {
-      console.warn(`Failed to save "${key}" to localStorage:`, e);
-    }
-  }
-}
 
 function getOrCreateSessionId(): string {
   if (typeof window === "undefined") return "";
   let sessionId = localStorage.getItem("keshar_guest_cart_session");
   if (!sessionId) {
     sessionId = "guest_" + Math.random().toString(36).substring(2, 9) + "_" + Date.now();
-    safeSetItem("keshar_guest_cart_session", sessionId);
+    try { localStorage.setItem("keshar_guest_cart_session", sessionId); } catch(e){}
   }
   return sessionId;
 }
@@ -60,21 +37,11 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
   const [wishlistItems, setWishlistItems] = useState<Product[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const { token } = useAuth();
 
-  // Restore wishlist from localStorage & sync from MongoDB on mount
+  // Restore wishlist from localStorage & sync from MongoDB on mount or token change
   useEffect(() => {
     const initWishlist = async () => {
-      let localItems: Product[] = [];
-      try {
-        const saved = localStorage.getItem("keshar_wishlist_items");
-        if (saved) {
-          localItems = JSON.parse(saved);
-          setWishlistItems(localItems);
-        }
-      } catch (e) {
-        console.error("Failed to load wishlist from localStorage", e);
-      }
-
       const sessionId = getOrCreateSessionId();
 
       try {
@@ -97,18 +64,6 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
 
           if (dbItems.length > 0) {
             setWishlistItems(dbItems);
-            safeSetItem("keshar_wishlist_items", JSON.stringify(dbItems));
-          } else if (localItems.length > 0) {
-            // Sync local wishlist to DB
-            const formatted = localItems.map((p) => ({ productId: p.id, product: p }));
-            await fetch("/api/wishlist", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                ...getAuthHeaders(),
-              },
-              body: JSON.stringify({ items: formatted, sessionId }),
-            });
           }
         }
       } catch (err) {
@@ -120,13 +75,10 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     };
 
     initWishlist();
-  }, []);
+  }, [token]);
 
-  // Save wishlist to localStorage & MongoDB whenever wishlistItems changes
   useEffect(() => {
     if (!isLoaded) return;
-
-    safeSetItem("keshar_wishlist_items", JSON.stringify(wishlistItems));
 
     const sessionId = getOrCreateSessionId();
     const syncTimeout = setTimeout(async () => {

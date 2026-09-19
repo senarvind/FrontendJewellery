@@ -1,7 +1,8 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { Product } from "@/frontend/types/product";
+import { useAuth } from "./AuthContext";
 
 export interface CartItem {
   product: Product;
@@ -66,8 +67,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const { token } = useAuth();
 
-  // Restore cart from localStorage & sync from MongoDB API on mount
+  // Restore cart from localStorage & sync from MongoDB API on mount or token change
   useEffect(() => {
     const initCart = async () => {
       let localItems: CartItem[] = [];
@@ -111,6 +113,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             safeSetItem("keshar_cart_items", JSON.stringify(dbItems));
           } else if (localItems.length > 0) {
             // If DB cart is empty but local cart has items, sync local items to DB
+            setCartItems(localItems);
             await fetch("/api/cart", {
               method: "POST",
               headers: {
@@ -130,7 +133,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     };
 
     initCart();
-  }, []);
+  }, [token]);
 
   // Save cart to localStorage & MongoDB whenever cartItems changes
   useEffect(() => {

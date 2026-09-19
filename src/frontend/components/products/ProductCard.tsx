@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Product } from "@/frontend/types/product";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useAuth } from "@/context/AuthContext";
 import CheckoutModal, { CheckoutItem } from "@/components/checkout/CheckoutModal";
 
 interface ProductCardProps {
@@ -19,6 +21,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { user } = useAuth();
+  const router = useRouter();
 
   const isLiked = isInWishlist(product.id);
 
@@ -199,6 +203,12 @@ export default function ProductCard({ product }: ProductCardProps) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              if (!user) {
+                const redirectUrl = encodeURIComponent(detailUrl);
+                const msg = encodeURIComponent("Please sign in to buy this product.");
+                router.push(`/login?redirect=${redirectUrl}&msg=${msg}`);
+                return;
+              }
               setIsCheckoutOpen(true);
             }}
             className="flex-1 py-1.5 sm:py-2.5 px-1.5 sm:px-3 bg-[#B82E44] hover:bg-[#7C1B2A] text-[#FFF8F0] text-[9px] sm:text-[11px] font-bold uppercase tracking-wider rounded-xl shadow-xs active:scale-[0.98] transition-all text-center flex items-center justify-center gap-1"

@@ -1,13 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
-export default function SignupPage() {
+function SignupContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signup } = useAuth();
+
+  const redirectUrl = searchParams.get("redirect") || "/";
+  const noticeMsg = searchParams.get("msg");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -42,11 +46,13 @@ export default function SignupPage() {
     setLoading(false);
 
     if (res.success) {
-      router.push("/");
+      router.push(redirectUrl);
     } else {
       setError(res.error || "Signup failed. Please try again.");
     }
   };
+
+  const loginLinkWithRedirect = `/login?redirect=${encodeURIComponent(redirectUrl)}${noticeMsg ? `&msg=${encodeURIComponent(noticeMsg)}` : ""}`;
 
   return (
     <div className="min-h-[85vh] bg-[#FFF8F0] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -62,6 +68,14 @@ export default function SignupPage() {
             Create an account to explore hallmark certified gold & silver jewellery
           </p>
         </div>
+
+        {/* Notice Message Banner (e.g., when redirected from Buy Now) */}
+        {noticeMsg && (
+          <div className="bg-[#FFF0EA] border border-[#D4AF37]/50 text-[#7C1B2A] px-4 py-3 rounded-2xl text-xs font-semibold flex items-center gap-2.5 shadow-xs animate-fadeIn">
+            <span className="text-lg">🔒</span>
+            <span>{noticeMsg}</span>
+          </div>
+        )}
 
         {/* Error Alert */}
         {error && (
@@ -180,7 +194,7 @@ export default function SignupPage() {
           <p className="text-sm text-[#6F4A4A]">
             Already have an account?{" "}
             <Link
-              href="/login"
+              href={loginLinkWithRedirect}
               className="font-bold text-[#7C1B2A] hover:text-[#D4AF37] transition-colors"
             >
               Sign In Here
@@ -190,5 +204,17 @@ export default function SignupPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[85vh] bg-[#FFF8F0] flex items-center justify-center">
+        <div className="animate-spin text-[#7C1B2A] text-2xl">💎</div>
+      </div>
+    }>
+      <SignupContent />
+    </Suspense>
   );
 }

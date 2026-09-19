@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { Product } from "@/frontend/types/product";
-import { SAMPLE_PRODUCTS } from "@/lib/api";
+import { SAMPLE_PRODUCTS, searchOrdersApi } from "@/lib/api";
 
 const CATEGORY_NAV_ITEMS = CATEGORIES.map(({ name, href, icon, slug }) => ({ name, href, icon, slug }));
 
@@ -27,6 +27,46 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { totalItemsCount } = useCart();
   const { wishlistCount } = useWishlist();
+
+  // Track Order conditional visibility: User must be logged in AND have purchased at least 1 order
+  const [hasPurchasedOrders, setHasPurchasedOrders] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setHasPurchasedOrders(false);
+      return;
+    }
+
+    const checkPurchases = async () => {
+      // 1. Check local saved orders
+      try {
+        const stored = localStorage.getItem("kj_user_orders");
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setHasPurchasedOrders(true);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      // 2. Check Backend API orders
+      try {
+        const query = user.email || user.phone;
+        if (query) {
+          const res = await searchOrdersApi(query);
+          if (res && res.length > 0) {
+            setHasPurchasedOrders(true);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      setHasPurchasedOrders(false);
+    };
+
+    checkPurchases();
+  }, [user]);
 
   // Product Live Search Filter State
   const [searchQuery, setSearchQuery] = useState("");
@@ -473,8 +513,9 @@ export default function Navbar() {
                         href="/orders"
                         className="block px-3 py-1.5 text-xs text-[#35191C] hover:bg-[#FFF0EA] hover:text-[#B82E44] rounded-lg transition-colors font-medium mb-1"
                       >
-                        📦 My Orders
+                        🚚 Track My Orders
                       </Link>
+
                       {user.role === "admin" && (
                         <a
                           href={process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001"}
@@ -534,6 +575,18 @@ export default function Navbar() {
                   {totalItemsCount}
                 </span>
               </Link>
+
+              {/* Order Tracker Button (Moved to right side) */}
+              {user && hasPurchasedOrders && (
+                <Link
+                  href="/orders"
+                  className="text-[#B82E44] hover:text-[#7C1B2A] transition-all relative bg-[#FFE2D8] hover:bg-[#FFD6C9] p-2 sm:p-2.5 sm:px-3 rounded-lg border border-[#E8CFC5] hover:scale-105 active:scale-95 flex items-center justify-center gap-1 animate-fadeIn"
+                  aria-label="Track Order"
+                >
+                  <span className="text-sm sm:text-base leading-none">🚚</span>
+                  <span className="hidden lg:inline text-xs font-semibold">Track</span>
+                </Link>
+              )}
 
               {/* Mobile Sidebar Menu Toggle Button (Right Side) */}
               <button
@@ -805,6 +858,20 @@ export default function Navbar() {
               >
                 <span>Religious &amp; Gift Items</span>
               </Link>
+
+              {/* Track Order (Only visible if user logged in AND has purchased products) */}
+              {user && hasPurchasedOrders && (
+                <Link
+                  href="/orders"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="py-2 px-1 text-base font-bold text-[#8B1E2D] hover:text-[#B82E44] transition-colors border-t border-[#E8CFC5]/40 flex items-center justify-between bg-[#FFF0EA] rounded-xl px-2 my-1"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <span>🚚</span> Track Order
+                  </span>
+                  <span className="text-xs bg-[#7C1B2A] text-white px-2 py-0.5 rounded-full font-sans font-semibold">Live</span>
+                </Link>
+              )}
 
               {/* Info (Maroon text) */}
               <div className="border-t border-[#E8CFC5]/40 pt-1">
