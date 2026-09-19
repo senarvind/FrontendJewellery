@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Product } from "@/frontend/types/product";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useAuth } from "@/context/AuthContext";
 import dynamic from "next/dynamic";
 import type { CheckoutItem } from "@/components/checkout/CheckoutModal";
 
