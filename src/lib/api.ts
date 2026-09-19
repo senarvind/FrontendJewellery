@@ -111,6 +111,90 @@ export async function getProductById(id: string): Promise<Product | null> {
   return found || SAMPLE_PRODUCTS[0];
 }
 
+export async function getProductsByPriceRange(
+  maxPrice: number,
+  strictlyLess: boolean = true
+): Promise<Product[]> {
+  const allProducts = await getAllProducts();
+  return allProducts.filter((p) => {
+    const rawPrice = p.sellingPrice;
+    const price =
+      typeof rawPrice === "number"
+        ? rawPrice
+        : parseFloat(String(rawPrice || "").replace(/[^0-9.]/g, ""));
+    if (isNaN(price) || price <= 0) return false;
+    return strictlyLess ? price < maxPrice : price <= maxPrice;
+  });
+}
+
+export async function getFestivalProducts(): Promise<Product[]> {
+  // Try direct category endpoints first
+  const [catProducts, altCatProducts, allProducts] = await Promise.all([
+    getProductsByCategory("festival-collection"),
+    getProductsByCategory("festival"),
+    getAllProducts(),
+  ]);
+
+  const map = new Map<string, Product>();
+
+  // 1. Add direct category products
+  catProducts.forEach((p) => map.set(p.id, p));
+  altCatProducts.forEach((p) => map.set(p.id, p));
+
+  // 2. Add products from allProducts where category or title matches festive keywords
+  allProducts.forEach((p) => {
+    const cat = (p.category || "").toLowerCase();
+    const type = (p.productType || "").toLowerCase();
+    const desc = (p.description || "").toLowerCase();
+    if (
+      cat.includes("festival") ||
+      cat.includes("festive") ||
+      type.includes("festival") ||
+      type.includes("festive") ||
+      desc.includes("festival") ||
+      desc.includes("festive")
+    ) {
+      map.set(p.id, p);
+    }
+  });
+
+  return Array.from(map.values());
+}
+
+export async function getCustomizedProducts(): Promise<Product[]> {
+  const [directProducts, altProducts, allProducts] = await Promise.all([
+    getProductsByCategory("customized-jewellery"),
+    getProductsByCategory("customer-on-demand"),
+    getAllProducts(),
+  ]);
+
+  const map = new Map<string, Product>();
+
+  // 1. Add direct category matches
+  directProducts.forEach((p) => map.set(p.id, p));
+  altProducts.forEach((p) => map.set(p.id, p));
+
+  // 2. Add matching items from general catalog
+  allProducts.forEach((p) => {
+    const cat = (p.category || "").toLowerCase();
+    const type = (p.productType || "").toLowerCase();
+    const desc = (p.description || "").toLowerCase();
+    if (
+      cat.includes("custom") ||
+      cat.includes("demand") ||
+      type.includes("custom") ||
+      type.includes("demand") ||
+      desc.includes("custom") ||
+      desc.includes("on demand") ||
+      desc.includes("bespoke")
+    ) {
+      map.set(p.id, p);
+    }
+  });
+
+  return Array.from(map.values());
+}
+
 async function safePost(endpoint: string, bodyData: any) {
   const urlsToTry = [
     `${API_BASE_URL}${endpoint}`,
@@ -162,4 +246,31 @@ export async function verifyRazorpayPaymentApi(paymentPayload: Record<string, an
   return await safePost("/api/payment/verify", paymentPayload);
 }
 
+export async function updateProductApi(id: string, updatedData: Partial<Product>) {
+  const urlsToTry = [
+    `${API_BASE_URL}/api/products/${id}`,
+    `http://localhost:5000/api/products/${id}`,
+    `${DEFAULT_RENDER_BACKEND}/api/products/${id}`,
+  ];
+  const uniqueUrls = Array.from(new Set(urlsToTry));
+
+  for (const url of uniqueUrls) {
+    try {
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+      const contentType = res.headers.get("content-type") || "";
+      const text = await res.text();
+      if (contentType.includes("application/json") || text.trim().startsWith("{")) {
+        try {
+          const data = JSON.parse(text);
+          if (res.ok || data.success !== undefined) return data;
+        } catch {}
+      }
+    } catch {}
+  }
+  return { success: false, error: "Backend unreachable. Could not update product." };
+}
 

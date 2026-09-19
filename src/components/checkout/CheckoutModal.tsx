@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { createRazorpayOrderApi, verifyRazorpayPaymentApi } from "@/lib/api";
+import { saveOrder, generateOrderId } from "@/lib/orders";
 
 export interface CheckoutItem {
   productId?: string;
@@ -57,6 +59,7 @@ export default function CheckoutModal({
   const [errorMsg, setErrorMsg] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState<any>(null);
+  const [savedOrderId, setSavedOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -137,6 +140,22 @@ export default function CheckoutModal({
             if (verifyRes && verifyRes.success) {
               setPaymentSuccess(true);
               setConfirmedOrder(verifyRes.order);
+              const newOrderId = generateOrderId();
+              setSavedOrderId(newOrderId);
+              saveOrder({
+                id: newOrderId,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                customerName,
+                customerPhone,
+                customerEmail,
+                customerAddress,
+                notes,
+                items,
+                totalAmount,
+                orderedAt: new Date().toISOString(),
+                isCancelled: false,
+              });
               if (onSuccess) onSuccess();
             } else {
               setErrorMsg(verifyRes?.error || "Payment signature verification failed.");
@@ -165,14 +184,14 @@ export default function CheckoutModal({
   };
 
   const modalContent = (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-md overflow-y-auto animate-fadeIn">
-      <div className="bg-[#FFF8F0] border border-[#E8CFC5] w-full max-w-lg rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.4)] overflow-hidden flex flex-col max-h-[90vh] my-auto relative z-[100000] animate-scaleUp">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-md overflow-y-auto animate-fadeIn pt-safe pb-safe">
+      <div className="bg-[#FFF8F0] border border-[#E8CFC5] w-full max-w-lg rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.4)] overflow-hidden flex flex-col max-h-[90vh] max-h-[90dvh] my-auto relative z-[100000] animate-scaleUp">
         
         {/* Modal Header */}
-        <div className="bg-[#7C1B2A] text-[#FFF8F0] px-6 py-5 flex items-center justify-between shadow-md flex-shrink-0">
+        <div className="bg-[#7C1B2A] text-[#FFF8F0] px-5 sm:px-6 py-4 sm:py-5 flex items-center justify-between shadow-md flex-shrink-0">
           <div className="flex items-center gap-2">
             <span className="text-xl">💳</span>
-            <h2 className="font-serif text-xl font-bold tracking-wide">
+            <h2 className="font-serif text-lg sm:text-xl font-bold tracking-wide">
               {paymentSuccess ? "Payment Successful! 🎉" : "Razorpay Checkout"}
             </h2>
           </div>
@@ -185,7 +204,7 @@ export default function CheckoutModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto space-y-5 flex-1">
+        <div className="p-4 sm:p-6 overflow-y-auto scroll-touch space-y-4 sm:space-y-5 flex-1">
           {paymentSuccess ? (
             /* Success Screen */
             <div className="text-center space-y-4 py-4">
@@ -205,7 +224,7 @@ export default function CheckoutModal({
               <div className="bg-[#FFFDFC] border border-[#E8CFC5] rounded-2xl p-4 text-left text-xs space-y-2 text-[#35191C]">
                 <div className="flex justify-between border-b border-[#E8CFC5]/60 pb-2">
                   <span className="text-[#6F4A4A]">Order ID:</span>
-                  <span className="font-mono font-bold text-[#7C1B2A]">{confirmedOrder?.id || "Saved"}</span>
+                  <span className="font-mono font-bold text-[#7C1B2A]">{savedOrderId || confirmedOrder?.id || "Saved"}</span>
                 </div>
                 <div className="flex justify-between border-b border-[#E8CFC5]/60 pb-2">
                   <span className="text-[#6F4A4A]">Razorpay Payment ID:</span>
@@ -225,12 +244,23 @@ export default function CheckoutModal({
                 </div>
               </div>
 
-              <button
-                onClick={onClose}
-                className="w-full py-3 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all"
-              >
-                Close & Continue Shopping
-              </button>
+              <div className="space-y-2 pt-1">
+                {savedOrderId && (
+                  <Link
+                    href={`/orders/${savedOrderId}`}
+                    onClick={onClose}
+                    className="w-full py-3.5 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                  >
+                    <span>📍 Track Your Order Live</span>
+                  </Link>
+                )}
+                <button
+                  onClick={onClose}
+                  className="w-full py-2.5 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] border border-[#E8CFC5] font-bold text-xs rounded-xl transition-all"
+                >
+                  Continue Shopping
+                </button>
+              </div>
             </div>
           ) : (
             /* Checkout Form */
@@ -276,7 +306,7 @@ export default function CheckoutModal({
                     placeholder="Enter your full name"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8CFC5] rounded-xl text-xs text-[#35191C] focus:outline-none focus:ring-2 focus:ring-[#7C1B2A]/40"
+                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8CFC5] rounded-xl text-base sm:text-xs text-[#35191C] focus:outline-none focus:ring-2 focus:ring-[#7C1B2A]/40"
                   />
                 </div>
 
@@ -291,7 +321,7 @@ export default function CheckoutModal({
                       placeholder="+91 9876543210"
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white border border-[#E8CFC5] rounded-xl text-xs text-[#35191C] focus:outline-none focus:ring-2 focus:ring-[#7C1B2A]/40"
+                      className="w-full px-3.5 py-2.5 bg-white border border-[#E8CFC5] rounded-xl text-base sm:text-xs text-[#35191C] focus:outline-none focus:ring-2 focus:ring-[#7C1B2A]/40"
                     />
                   </div>
 
@@ -304,7 +334,7 @@ export default function CheckoutModal({
                       placeholder="your@email.com"
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-white border border-[#E8CFC5] rounded-xl text-xs text-[#35191C] focus:outline-none focus:ring-2 focus:ring-[#7C1B2A]/40"
+                      className="w-full px-3.5 py-2.5 bg-white border border-[#E8CFC5] rounded-xl text-base sm:text-xs text-[#35191C] focus:outline-none focus:ring-2 focus:ring-[#7C1B2A]/40"
                     />
                   </div>
                 </div>
@@ -319,7 +349,7 @@ export default function CheckoutModal({
                     placeholder="House/Flat No., Street, Landmark, City, State, Pincode"
                     value={customerAddress}
                     onChange={(e) => setCustomerAddress(e.target.value)}
-                    className="w-full px-3.5 py-2 bg-white border border-[#E8CFC5] rounded-xl text-xs text-[#35191C] focus:outline-none focus:ring-2 focus:ring-[#7C1B2A]/40 resize-none"
+                    className="w-full px-3.5 py-2 bg-white border border-[#E8CFC5] rounded-xl text-base sm:text-xs text-[#35191C] focus:outline-none focus:ring-2 focus:ring-[#7C1B2A]/40 resize-none"
                   />
                 </div>
 
@@ -332,7 +362,7 @@ export default function CheckoutModal({
                     placeholder="e.g. Ring size 14, Gift wrap requested"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8CFC5] rounded-xl text-xs text-[#35191C] focus:outline-none focus:ring-2 focus:ring-[#7C1B2A]/40"
+                    className="w-full px-3.5 py-2.5 bg-white border border-[#E8CFC5] rounded-xl text-base sm:text-xs text-[#35191C] focus:outline-none focus:ring-2 focus:ring-[#7C1B2A]/40"
                   />
                 </div>
               </div>

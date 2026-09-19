@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#5E121F] text-[#FFF8F0] border-t border-[rgba(212,175,55,0.35)] pt-8 pb-5 relative overflow-hidden">
+    <footer className="bg-[#5E121F] text-[#FFF8F0] border-t border-[rgba(212,175,55,0.35)] pt-8 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] relative overflow-hidden">
       {/* Subtle background ambient gold glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-16 bg-[#D4AF37]/10 blur-2xl pointer-events-none"></div>
 

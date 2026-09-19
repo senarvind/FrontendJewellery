@@ -469,13 +469,21 @@ export default function Navbar() {
                       >
                         👤 My Profile
                       </Link>
+                      <Link
+                        href="/orders"
+                        className="block px-3 py-1.5 text-xs text-[#35191C] hover:bg-[#FFF0EA] hover:text-[#B82E44] rounded-lg transition-colors font-medium mb-1"
+                      >
+                        📦 My Orders
+                      </Link>
                       {user.role === "admin" && (
-                        <Link
-                          href="/admin"
+                        <a
+                          href={process.env.NEXT_PUBLIC_ADMIN_URL || "http://localhost:3001"}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="block px-3 py-1.5 text-xs text-[#35191C] hover:bg-[#FFF0EA] hover:text-[#B82E44] rounded-lg transition-colors font-medium mb-1"
                         >
-                          👑 Admin Panel
-                        </Link>
+                          👑 Admin Panel ↗
+                        </a>
                       )}
                       <button
                         onClick={logout}
@@ -551,7 +559,7 @@ export default function Navbar() {
         </div>
 
         {/* 3. Horizontal Mobile Sub-Category Scroll Bar (`lg:hidden`) */}
-        <div className="lg:hidden bg-[#FFF3E8] border-b border-[#E8CFC5]/80 py-2 px-3 overflow-x-auto scrollbar-none flex items-center gap-2 text-xs font-semibold text-[#35191C] shadow-inner">
+        <div className="lg:hidden bg-[#FFF3E8] border-b border-[#E8CFC5]/80 py-2 px-3 overflow-x-auto scrollbar-none scroll-touch flex items-center gap-2 text-xs font-semibold text-[#35191C] shadow-inner">
           <Link
             href="/products/all"
             className="flex items-center gap-1 bg-[#FFE2D8] text-[#7C1B2A] hover:bg-[#B82E44] hover:text-white px-3 py-1 rounded-full border border-[#E8CFC5] whitespace-nowrap transition-colors shadow-sm"
@@ -573,7 +581,7 @@ export default function Navbar() {
 
       {/* 4. Instant Mobile Search Overlay Modal (`lg:hidden`) */}
       {isMobileSearchOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-start">
+        <div className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-start pt-safe pb-safe">
           <div className="bg-[#FFF8F0] border-b border-[#E8CFC5] p-4 shadow-xl flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-[#7C1B2A] flex items-center gap-1">
@@ -653,7 +661,7 @@ export default function Navbar() {
           />
 
           {/* Right-Side Drawer Container */}
-          <div className="relative w-[85%] sm:w-80 max-w-xs sm:max-w-sm bg-[#FFFBF7] h-full shadow-2xl flex flex-col z-[102] overflow-y-auto border-l border-[#E8CFC5] ml-auto px-4 py-4 gap-4">
+          <div className="relative w-[85%] sm:w-80 max-w-xs sm:max-w-sm bg-[#FFFBF7] h-full h-dvh max-h-dvh shadow-2xl flex flex-col z-[102] overflow-y-auto scroll-touch border-l border-[#E8CFC5] ml-auto px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] gap-4">
 
             {/* Drawer Brand Header with Close Button */}
             <div className="bg-[#7C1B2A] text-[#FFF8F0] p-3 rounded-2xl flex items-center justify-between shadow-sm sticky top-0 z-20">

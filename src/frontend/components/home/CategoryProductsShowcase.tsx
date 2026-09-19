@@ -93,7 +93,7 @@ export default function CategoryProductsShowcase() {
     setCurrentIndex(Math.min(Math.max(0, index), maxSlide));
   };
 
-  // Auto-slide animation interval (every 1.6 seconds, pauses on hover)
+  // Auto-slide animation interval (every 1.6 seconds, pauses on hover/touch)
   useEffect(() => {
     if (isPaused || totalItems <= itemsPerView) return;
 
@@ -104,12 +104,35 @@ export default function CategoryProductsShowcase() {
     return () => clearInterval(interval);
   }, [isPaused, nextSlide, totalItems, itemsPerView]);
 
+  // Pause auto-sliding for 5 seconds when user hovers or taps on phone
+  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const triggerFiveSecondPause = useCallback(() => {
+    setIsPaused(true);
+    if (pauseTimeoutRef.current) {
+      clearTimeout(pauseTimeoutRef.current);
+    }
+    pauseTimeoutRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 5000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (pauseTimeoutRef.current) {
+        clearTimeout(pauseTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Touch handlers for mobile swiping
   const handleTouchStart = (e: React.TouchEvent) => {
+    triggerFiveSecondPause();
     touchStartXRef.current = e.touches[0].clientX;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    triggerFiveSecondPause();
     if (touchStartXRef.current === null) return;
     const touchEndX = e.changedTouches[0].clientX;
     const diff = touchStartXRef.current - touchEndX;
@@ -164,8 +187,7 @@ export default function CategoryProductsShowcase() {
         ) : products.length > 0 ? (
           <div
             className="relative group/slider"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
+            onMouseEnter={triggerFiveSecondPause}
           >
             {/* ANIMATED SLIDER VIEWPORT & TRACK */}
             <div

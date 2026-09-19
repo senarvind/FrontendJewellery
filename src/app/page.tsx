@@ -1,5 +1,7 @@
 import HeroSection from "@/frontend/components/hero/HeroSection";
 import CategoryCarousel from "@/frontend/components/categories/CategoryCarousel";
+import FeaturedJewelleryCarousel from "@/frontend/components/categories/FeaturedJewelleryCarousel";
+import SpecialCollectionCarousel from "@/frontend/components/categories/SpecialCollectionCarousel";
 import CategoryProductsShowcase from "@/frontend/components/home/CategoryProductsShowcase";
 import ShopByPrice from "@/frontend/components/pricing/ShopByPrice";
 import TrustSection from "@/frontend/components/home/TrustSection";
@@ -74,6 +76,12 @@ export default async function Home() {
 
       {/* 2. Horizontal Category Carousel */}
       <CategoryCarousel categories={categories} />
+
+      {/* 2.5 Featured Jewellery Carousel (Exclusive Mangalsutra, Chains, Pendants, Bridal & Necklaces) */}
+      <FeaturedJewelleryCarousel categories={categories} />
+
+      {/* 2.8 Divine Articles, Gifts & Lifestyle Carousel */}
+      <SpecialCollectionCarousel />
 
       {/* 3. Category Products Showcase (Real Admin Created Products) */}
       <CategoryProductsShowcase />

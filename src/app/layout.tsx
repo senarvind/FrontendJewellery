@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Lato } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/frontend/components/layout/Navbar";
@@ -17,6 +17,15 @@ const lato = Lato({
   subsets: ["latin"],
   weight: ["300", "400", "700"],
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+  themeColor: "#7C1B2A",
+};
 
 export const metadata: Metadata = {
   title: "Keshar Jewellers | Best Jewellery Showroom in Sehore (Since 2003)",
