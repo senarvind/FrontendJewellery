@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { Product } from "@/frontend/types/product";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useWishlist } from "@/context/WishlistContext";
+import { IMAGE_PRESETS } from "@/lib/cloudinary";
 import CheckoutModal, { CheckoutItem } from "@/components/checkout/CheckoutModal";
 
 interface ProductDetailClientProps {
@@ -124,7 +126,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
               {/* Displayed Image */}
               <Image
-                src={currentImage}
+                src={IMAGE_PRESETS.productDetail(currentImage)}
                 alt={`${product.productType} - ${images[activeImageIndex].label}`}
                 fill
                 priority
@@ -146,9 +148,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   }`}
                 >
                   <Image
-                    src={img.src}
+                    src={IMAGE_PRESETS.categoryIcon(img.src)}
                     alt={img.label}
                     fill
+                    sizes="(max-width: 640px) 80px, 120px"
                     className="object-cover rounded-lg"
                   />
                   <span className="absolute bottom-1 left-1 right-1 bg-[#7C1B2A]/80 text-[#FFF8F0] text-[9px] font-bold text-center rounded py-0.5">

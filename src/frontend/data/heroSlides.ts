@@ -17,7 +17,7 @@ export const heroSlides: HeroSlideData[] = [
     category: "",
     alt: "Keshar Jewellers Wallpaper Banner",
     href: "/products",
-    image: "/images/whatsapp.jpeg",
+    image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844069/keshar-categories/whatsapp.jpg",
     isFullBanner: true,
   },
   {
@@ -27,7 +27,7 @@ export const heroSlides: HeroSlideData[] = [
     category: "SACRED SIGNATURE COLLECTION",
     alt: "Flora Mangalsutra - Pure Gold & Diamond",
     href: "/products/mangalsutra",
-    image: "/images/categories/Mangalsutra.png"
+    image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844035/keshar-categories/Mangalsutra.jpg"
   },
   {
     id: 3,
@@ -36,7 +36,7 @@ export const heroSlides: HeroSlideData[] = [
     category: "ROYAL HERITAGE COLLECTION",
     alt: "Bridal Necklace Set",
     href: "/products/necklace-sets",
-    image: "/images/categories/Necklace.png"
+    image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844000/keshar-categories/Necklace.png"
   },
   {
     id: 4,
@@ -45,6 +45,6 @@ export const heroSlides: HeroSlideData[] = [
     category: "AUSPICIOUS CELEBRATIONS",
     alt: "Festival Collection - Keshar Jewellers",
     href: "/products/festival-collection",
-    image: "/images/categories/08-pendants.jpg"
+    image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844039/keshar-categories/08-pendants.jpg"
   }
 ];

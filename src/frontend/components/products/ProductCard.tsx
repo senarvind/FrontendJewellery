@@ -8,6 +8,7 @@ import { Product } from "@/frontend/types/product";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
+import { IMAGE_PRESETS } from "@/lib/cloudinary";
 import dynamic from "next/dynamic";
 import type { CheckoutItem } from "@/components/checkout/CheckoutModal";
 
@@ -120,11 +121,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Current Displayed Image (Link to Details Page) */}
           <Link href={detailUrl} className="block w-full h-full relative">
             <Image
-              src={currentImage}
+              src={IMAGE_PRESETS.productCard(currentImage)}
               alt={`${product.productType} - ${images[activeImageIndex].label} View`}
               fill
               className="object-cover transition-all duration-500 group-hover:scale-105"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              loading="lazy"
             />
           </Link>
         </div>

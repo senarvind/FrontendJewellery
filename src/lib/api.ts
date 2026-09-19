@@ -43,27 +43,33 @@ export const SAMPLE_PRODUCTS: Product[] = [
   },
 ];
 
-async function safeFetch(url: string, fallbackUrl?: string) {
+async function fetchWithTimeout(url: string, timeoutMs = 5000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
   try {
-    const res = await fetch(url, { next: { revalidate: 60 } });
+    const res = await fetch(url, {
+      next: { revalidate: 60 },
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
     if (res.ok) {
-      const data = await res.json();
-      return data;
+      return await res.json();
     }
   } catch (err) {
-    // Primary request failed
+    clearTimeout(timeoutId);
   }
+  return null;
+}
 
+async function safeFetch(url: string, fallbackUrl?: string) {
+  // Try primary URL with 5-second timeout
+  const data = await fetchWithTimeout(url, 5000);
+  if (data) return data;
+
+  // If primary failed and fallback exists, try fallback
   if (fallbackUrl && fallbackUrl !== url) {
-    try {
-      const res = await fetch(fallbackUrl, { next: { revalidate: 60 } });
-      if (res.ok) {
-        const data = await res.json();
-        return data;
-      }
-    } catch (err) {
-      console.error(`Fallback fetch failed for ${fallbackUrl}:`, err);
-    }
+    return await fetchWithTimeout(fallbackUrl, 5000);
   }
   return null;
 }

@@ -4,6 +4,7 @@ import React, { useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CATEGORIES, CategoryItem, FEATURED_JEWELLERY_SLUGS } from "@/frontend/data/categories";
+import { IMAGE_PRESETS } from "@/lib/cloudinary";
 
 interface FeaturedJewelleryCarouselProps {
   categories?: CategoryItem[];
@@ -153,9 +154,11 @@ export default function FeaturedJewelleryCarousel({
               <div className="w-full aspect-square rounded-2xl bg-[#FFF0EA] shadow-sm border border-[#E8CFC5] hover:border-[#B82E44] group-hover/item:border-[#B82E44] hover:shadow-md flex items-center justify-center transition-all duration-300 group-hover/item:-translate-y-1 relative overflow-hidden">
                 {cat.image ? (
                   <Image
-                    src={cat.image}
+                    src={IMAGE_PRESETS.categoryIcon(cat.image)}
                     alt={cat.name}
                     fill
+                    sizes="(max-width: 640px) 96px, (max-width: 768px) 112px, 144px"
+                    loading="lazy"
                     className={`object-cover transition-transform duration-500 ease-out ${
                       cat.imageClassName ? cat.imageClassName : "group-hover/item:scale-110"
                     }`}
