@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { getProductById } from "@/lib/api";
 import ProductDetailClient from "./ProductDetailClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function ProductDetailPage({
   params,

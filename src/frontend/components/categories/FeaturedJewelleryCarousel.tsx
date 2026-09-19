@@ -81,18 +81,54 @@ export default function FeaturedJewelleryCarousel({
     ];
   }, [featuredCategories]);
 
-  // Smooth continuous 60fps auto-sliding animation
+  // Zero-layout-thrashing 60fps auto-scroll with IntersectionObserver
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || displayList.length === 0) return;
 
     let animId: number;
-    const speed = 1.1; // Smooth luxury scrolling speed
+    let isVisible = true;
+    let isUserInteracting = false;
+    const speed = 1.0; // Smooth luxury scrolling speed
+
+    // Cache halfWidth to eliminate forced synchronous reflow (layout thrashing)
+    let cachedHalfWidth = el.scrollWidth / 2;
+    const updateDimensions = () => {
+      if (el) {
+        cachedHalfWidth = el.scrollWidth / 2;
+      }
+    };
+
+    window.addEventListener("resize", updateDimensions);
+
+    // Pause animation completely when offscreen
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+
+    // Pause immediately on touch so auto-scroll never fights user's finger
+    let resumeTimeout: NodeJS.Timeout | null = null;
+    const onTouchStart = () => {
+      isUserInteracting = true;
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+    };
+    const onTouchEnd = () => {
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+      resumeTimeout = setTimeout(() => {
+        isUserInteracting = false;
+      }, 3000);
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
 
     const step = () => {
-      if (!isPaused && el) {
-        const halfWidth = el.scrollWidth / 2;
-        if (halfWidth > 0 && el.scrollLeft >= halfWidth) {
+      if (isVisible && !isPaused && !isUserInteracting && el) {
+        if (cachedHalfWidth > 0 && el.scrollLeft >= cachedHalfWidth) {
           el.scrollLeft = 0;
         } else {
           el.scrollLeft += speed;
@@ -103,29 +139,15 @@ export default function FeaturedJewelleryCarousel({
 
     animId = requestAnimationFrame(step);
 
-    return () => cancelAnimationFrame(animId);
-  }, [isPaused, displayList]);
-
-  // Pause auto-sliding for 5 seconds when user hovers or taps on phone
-  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const triggerFiveSecondPause = () => {
-    setIsPaused(true);
-    if (pauseTimeoutRef.current) {
-      clearTimeout(pauseTimeoutRef.current);
-    }
-    pauseTimeoutRef.current = setTimeout(() => {
-      setIsPaused(false);
-    }, 5000);
-  };
-
-  useEffect(() => {
     return () => {
-      if (pauseTimeoutRef.current) {
-        clearTimeout(pauseTimeoutRef.current);
-      }
+      cancelAnimationFrame(animId);
+      observer.disconnect();
+      window.removeEventListener("resize", updateDimensions);
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchend", onTouchEnd);
     };
-  }, []);
+  }, [isPaused, displayList]);
 
   if (featuredCategories.length === 0) return null;
 
@@ -134,9 +156,8 @@ export default function FeaturedJewelleryCarousel({
       {/* Container with left and right 1-box inset length */}
       <div
         className="max-w-[1180px] mx-auto relative group"
-        onMouseEnter={triggerFiveSecondPause}
-        onTouchStart={triggerFiveSecondPause}
-        onTouchEnd={triggerFiveSecondPause}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
       >
         {/* Continuous Auto-sliding Categories Track (Part of Shop by Category) */}
         <div

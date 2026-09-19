@@ -3,6 +3,7 @@ import { Playfair_Display, Lato } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/frontend/components/layout/Navbar";
 import Footer from "@/frontend/components/layout/Footer";
+import BottomNav from "@/frontend/components/layout/BottomNav";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
@@ -46,11 +47,12 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <WishlistProvider>
-              <div>
+              <div className="pb-16 md:pb-0">
                 <Navbar />
                 <main>{children}</main>
               </div>
               <Footer />
+              <BottomNav />
             </WishlistProvider>
           </CartProvider>
         </AuthProvider>
