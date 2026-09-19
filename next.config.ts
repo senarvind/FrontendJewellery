@@ -4,8 +4,11 @@ const backendUrl = process.env.NEXT_PUBLIC_API_URL || "https://my-jewellery-back
 
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: true,
     remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
       {
         protocol: "https",
         hostname: "**",

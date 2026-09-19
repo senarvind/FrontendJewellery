@@ -111,6 +111,7 @@ export default function CategoryCarousel({ categories = CATEGORIES }: CategoryCa
                     src={cat.image}
                     alt={cat.name}
                     fill
+                    priority={idx < 4}
                     className={`object-cover transition-transform duration-500 ease-out ${
                       cat.imageClassName ? cat.imageClassName : "group-hover/item:scale-110"
                     }`}

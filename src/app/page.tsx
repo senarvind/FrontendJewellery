@@ -7,8 +7,7 @@ import WhatsAppButton from "@/frontend/components/layout/WhatsAppButton";
 import { CATEGORIES, CategoryItem } from "@/frontend/data/categories";
 import { getAllProducts } from "@/lib/api";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60; // Revalidate every 60 seconds for production speed
 
 function normalizeCategorySlug(slug: string): string {
   const compactSlug = slug.toLowerCase().trim().replace(/[^a-z0-9]/g, "");

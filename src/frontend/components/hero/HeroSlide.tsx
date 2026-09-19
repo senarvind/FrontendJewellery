@@ -122,7 +122,7 @@ export default function HeroSlide({ slide }: HeroSlideProps) {
           <div className="relative w-28 h-28 xs:w-36 xs:h-36 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-76 lg:h-76 rounded-full bg-gradient-to-br from-[#FFF8F0]/90 via-[#FFE2D8]/80 to-[#FFF0EA]/70 border-2 border-[#E8A58A] shadow-[0_10px_30px_rgba(122,16,33,0.12)] flex items-center justify-center p-2 sm:p-4">
             <div className="w-full h-full rounded-full border border-dashed border-[#D4AF37] flex items-center justify-center text-center relative overflow-hidden">
               {slide.image ? (
-                <Image src={slide.image} alt={slide.alt} fill className="object-cover p-1.5 sm:p-2 rounded-full" />
+                <Image src={slide.image} alt={slide.alt} fill className="object-cover p-1.5 sm:p-2 rounded-full" priority />
               ) : (
                 <div className="relative z-10 flex flex-col items-center justify-center p-2 sm:p-6">
                   <span className="text-2xl sm:text-5xl md:text-6xl mb-1 filter drop-shadow-[0_10px_20px_rgba(212,175,55,0.4)]">

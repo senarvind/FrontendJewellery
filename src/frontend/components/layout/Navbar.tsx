@@ -579,7 +579,7 @@ export default function Navbar() {
               {user && hasPurchasedOrders && (
                 <Link
                   href="/orders"
-                  className="text-[#B82E44] hover:text-[#7C1B2A] transition-all relative bg-[#FFE2D8] hover:bg-[#FFD6C9] p-2 sm:p-2.5 sm:px-3 rounded-lg border border-[#E8CFC5] hover:scale-105 active:scale-95 flex items-center justify-center gap-1 animate-fadeIn"
+                  className="hidden md:flex text-[#B82E44] hover:text-[#7C1B2A] transition-all relative bg-[#FFE2D8] hover:bg-[#FFD6C9] p-2 sm:p-2.5 sm:px-3 rounded-lg border border-[#E8CFC5] hover:scale-105 active:scale-95 items-center justify-center gap-1 animate-fadeIn"
                   aria-label="Track Order"
                 >
                   <span className="text-sm sm:text-base leading-none">🚚</span>
