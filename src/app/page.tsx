@@ -9,8 +9,7 @@ import WhatsAppButton from "@/frontend/components/layout/WhatsAppButton";
 import { CATEGORIES, CategoryItem } from "@/frontend/data/categories";
 import { getAllProducts } from "@/lib/api";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 function normalizeCategorySlug(slug: string): string {
   const compactSlug = slug.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
@@ -34,14 +33,12 @@ function categoryName(slug: string): string {
     .join(" ");
 }
 
-async function getUniqueCategories(): Promise<CategoryItem[]> {
+async function getUniqueCategories(allProducts: any[]): Promise<CategoryItem[]> {
   const uniqueCategories = new Map<string, CategoryItem>();
 
   for (const category of CATEGORIES) {
     uniqueCategories.set(normalizeCategorySlug(category.slug || category.name), category);
   }
-
-  const allProducts = await getAllProducts();
 
   for (const product of allProducts) {
     if (!product.category) continue;
@@ -66,7 +63,8 @@ async function getUniqueCategories(): Promise<CategoryItem[]> {
 }
 
 export default async function Home() {
-  const categories = await getUniqueCategories();
+  const allProducts = await getAllProducts();
+  const categories = await getUniqueCategories(allProducts);
 
   return (
     <main className="min-h-screen bg-[#FFF8F0] flex flex-col">
@@ -84,7 +82,7 @@ export default async function Home() {
       <SpecialCollectionCarousel />
 
       {/* 3. Category Products Showcase (Real Admin Created Products) */}
-      <CategoryProductsShowcase />
+      <CategoryProductsShowcase initialProducts={allProducts} />
 
       {/* 4. Shop by Price Section */}
       <ShopByPrice />

@@ -6,17 +6,26 @@ import { Product } from "@/frontend/types/product";
 import ProductCard from "@/frontend/components/products/ProductCard";
 import { getAllProducts } from "@/lib/api";
 
-export default function CategoryProductsShowcase() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+interface CategoryProductsShowcaseProps {
+  initialProducts?: Product[];
+}
+
+export default function CategoryProductsShowcase({ initialProducts }: CategoryProductsShowcaseProps) {
+  const [products, setProducts] = useState<Product[]>(initialProducts || []);
+  const [isLoading, setIsLoading] = useState<boolean>(!initialProducts || initialProducts.length === 0);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [itemsPerView, setItemsPerView] = useState<number>(4);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(true);
   const touchStartXRef = useRef<number | null>(null);
 
-  // Fetch products
+  // Fetch products only if not provided via props
   useEffect(() => {
+    if (initialProducts && initialProducts.length > 0) {
+      setProducts(initialProducts);
+      setIsLoading(false);
+      return;
+    }
     async function loadProducts() {
       try {
         setIsLoading(true);
@@ -29,7 +38,7 @@ export default function CategoryProductsShowcase() {
       }
     }
     loadProducts();
-  }, []);
+  }, [initialProducts]);
 
   // Update visible items count on screen resize
   useEffect(() => {

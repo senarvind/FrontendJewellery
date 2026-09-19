@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CATEGORIES } from "@/data/categories";
@@ -106,28 +106,28 @@ export default function Navbar() {
       setTimeout(() => {
         mobileSearchInputRef.current?.focus();
       }, 100);
+      fetchProducts();
     }
   }, [isMobileSearchOpen]);
 
-  // Fetch all products for live search filter
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch("/api/products");
-        if (res.ok) {
-          const data = await res.json();
-          if (data.products && Array.isArray(data.products)) {
-            setAllProducts(data.products);
-            return;
-          }
+  // Fetch all products for live search filter (deferred on-demand)
+  const hasFetchedProductsRef = useRef(false);
+  const fetchProducts = useCallback(async () => {
+    if (hasFetchedProductsRef.current) return;
+    hasFetchedProductsRef.current = true;
+    try {
+      const res = await fetch("/api/products");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.products && Array.isArray(data.products)) {
+          setAllProducts(data.products);
+          return;
         }
-      } catch (e) {
-        console.warn("Live search product fetch note:", e);
       }
-      setAllProducts(SAMPLE_PRODUCTS);
-    };
-
-    fetchProducts();
+    } catch (e) {
+      console.warn("Live search product fetch note:", e);
+    }
+    setAllProducts(SAMPLE_PRODUCTS);
   }, []);
 
   // Filter products when user types in search input
@@ -407,7 +407,10 @@ export default function Navbar() {
                   placeholder="Search Gold, Silver, Rings..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => searchQuery.trim() && setIsSearchOpen(true)}
+                  onFocus={() => {
+                    fetchProducts();
+                    if (searchQuery.trim()) setIsSearchOpen(true);
+                  }}
                   suppressHydrationWarning
                   className="pl-4 pr-10 py-1.5 rounded-full border border-[#E8CFC5] bg-[#FFFDFC] focus:outline-none focus:border-[#B82E44] focus:ring-1 focus:ring-[#B82E44] text-xs xl:text-sm w-44 xl:w-64 text-[#35191C] placeholder-[#6F4A4A]/60 shadow-inner"
                 />

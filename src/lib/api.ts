@@ -45,7 +45,7 @@ export const SAMPLE_PRODUCTS: Product[] = [
 
 async function safeFetch(url: string, fallbackUrl?: string) {
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, { next: { revalidate: 60 } });
     if (res.ok) {
       const data = await res.json();
       return data;
@@ -56,7 +56,7 @@ async function safeFetch(url: string, fallbackUrl?: string) {
 
   if (fallbackUrl && fallbackUrl !== url) {
     try {
-      const res = await fetch(fallbackUrl, { cache: "no-store" });
+      const res = await fetch(fallbackUrl, { next: { revalidate: 60 } });
       if (res.ok) {
         const data = await res.json();
         return data;

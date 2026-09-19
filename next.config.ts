@@ -4,7 +4,7 @@ const backendUrl = process.env.NEXT_PUBLIC_API_URL || "https://my-jewellery-back
 
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: true,
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
