@@ -364,7 +364,7 @@ export interface Offer {
 
 export async function getActiveOffers(): Promise<Offer[]> {
   const base = process.env.NEXT_PUBLIC_API_URL || 'https://my-jewellery-backend.onrender.com';
-  const res = await fetch(${base}/api/offers, {
+  const res = await fetch(`${base}/api/offers`, {
     next: { revalidate: 60 },
   });
   if (!res.ok) return [];
