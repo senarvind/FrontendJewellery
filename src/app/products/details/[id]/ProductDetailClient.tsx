@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { Product } from "@/frontend/types/product";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useWishlist } from "@/context/WishlistContext";
+import { IMAGE_PRESETS } from "@/lib/cloudinary";
 import CheckoutModal, { CheckoutItem } from "@/components/checkout/CheckoutModal";
 
 interface ProductDetailClientProps {
@@ -68,18 +70,39 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
     <div className="min-h-screen bg-[#FFF8F0] py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
 
-        {/* Breadcrumb Navigation */}
-        <nav className="text-xs text-[#6F4A4A] flex items-center gap-2 tracking-wide font-medium">
-          <Link href="/" className="hover:text-[#7C1B2A] transition-colors">Home</Link>
-          <span>/</span>
-          <Link href={`/products/${product.category}`} className="capitalize hover:text-[#7C1B2A] transition-colors">
-            {product.category}
-          </Link>
-          <span>/</span>
-          <span className="text-[#7C1B2A] font-semibold truncate max-w-[200px] sm:max-w-none">
-            {product.productType}
-          </span>
-        </nav>
+        {/* Back & Breadcrumb Navigation */}
+        <div className="flex items-center justify-between gap-3 bg-[#FFF0EA] border border-[#E8CFC5] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-xs flex-wrap">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#FFE2D8] text-[#7C1B2A] transition-all text-xs font-bold border border-[#E8CFC5] shadow-xs active:scale-95"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span>Back</span>
+            </button>
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#9B1B30] hover:bg-[#7C1B2A] text-[#FFF8F0] transition-all text-xs font-bold shadow-xs active:scale-95"
+            >
+              <span>🏠</span> <span>Home</span>
+            </Link>
+          </div>
+
+          <nav className="text-xs text-[#6F4A4A] flex items-center gap-1.5 sm:gap-2 tracking-wide font-medium overflow-hidden">
+            <Link href="/" className="hover:text-[#7C1B2A] transition-colors">Home</Link>
+            <span>/</span>
+            <Link href={`/products/${product.category}`} className="capitalize hover:text-[#7C1B2A] transition-colors">
+              {product.category}
+            </Link>
+            <span>/</span>
+            <span className="text-[#7C1B2A] font-semibold truncate max-w-[140px] sm:max-w-none">
+              {product.productType}
+            </span>
+          </nav>
+        </div>
 
         {/* Toast Notification for Add to Cart */}
         {addedToCart && (
@@ -124,7 +147,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
               {/* Displayed Image */}
               <Image
-                src={currentImage}
+                src={IMAGE_PRESETS.productDetail(currentImage)}
                 alt={`${product.productType} - ${images[activeImageIndex].label}`}
                 fill
                 priority
@@ -146,9 +169,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   }`}
                 >
                   <Image
-                    src={img.src}
+                    src={IMAGE_PRESETS.categoryIcon(img.src)}
                     alt={img.label}
                     fill
+                    sizes="(max-width: 640px) 80px, 120px"
                     className="object-cover rounded-lg"
                   />
                   <span className="absolute bottom-1 left-1 right-1 bg-[#7C1B2A]/80 text-[#FFF8F0] text-[9px] font-bold text-center rounded py-0.5">

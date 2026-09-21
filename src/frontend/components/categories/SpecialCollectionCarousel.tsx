@@ -31,17 +31,54 @@ export default function SpecialCollectionCarousel({
     return [...items, ...items, ...items];
   }, [items]);
 
+  // Zero-layout-thrashing 60fps auto-scroll with IntersectionObserver
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || displayList.length === 0) return;
 
     let animId: number;
-    const speed = 0.9; // Smooth continuous floating scroll
+    let isVisible = true;
+    let isUserInteracting = false;
+    const speed = 0.9;
+
+    // Cache thirdWidth to eliminate forced synchronous reflow (layout thrashing)
+    let cachedThirdWidth = el.scrollWidth / 3;
+    const updateDimensions = () => {
+      if (el) {
+        cachedThirdWidth = el.scrollWidth / 3;
+      }
+    };
+
+    window.addEventListener("resize", updateDimensions);
+
+    // Pause animation completely when offscreen
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+
+    // Pause immediately on touch so auto-scroll never fights user's finger
+    let resumeTimeout: NodeJS.Timeout | null = null;
+    const onTouchStart = () => {
+      isUserInteracting = true;
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+    };
+    const onTouchEnd = () => {
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+      resumeTimeout = setTimeout(() => {
+        isUserInteracting = false;
+      }, 3000);
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
 
     const step = () => {
-      if (!isPaused && el) {
-        const thirdWidth = el.scrollWidth / 3;
-        if (thirdWidth > 0 && el.scrollLeft >= thirdWidth) {
+      if (isVisible && !isPaused && !isUserInteracting && el) {
+        if (cachedThirdWidth > 0 && el.scrollLeft >= cachedThirdWidth) {
           el.scrollLeft = 0;
         } else {
           el.scrollLeft += speed;
@@ -51,37 +88,23 @@ export default function SpecialCollectionCarousel({
     };
 
     animId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(animId);
-  }, [isPaused, displayList]);
 
-  // Pause auto-sliding for 5 seconds when user hovers or taps on phone
-  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const triggerFiveSecondPause = () => {
-    setIsPaused(true);
-    if (pauseTimeoutRef.current) {
-      clearTimeout(pauseTimeoutRef.current);
-    }
-    pauseTimeoutRef.current = setTimeout(() => {
-      setIsPaused(false);
-    }, 5000);
-  };
-
-  useEffect(() => {
     return () => {
-      if (pauseTimeoutRef.current) {
-        clearTimeout(pauseTimeoutRef.current);
-      }
+      cancelAnimationFrame(animId);
+      observer.disconnect();
+      window.removeEventListener("resize", updateDimensions);
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchend", onTouchEnd);
     };
-  }, []);
+  }, [isPaused, displayList]);
 
   return (
     <section className="w-full bg-[#FFF8F0] py-8 sm:py-12 px-3 sm:px-6 lg:px-8 border-y border-[#E8CFC5]/50 relative overflow-hidden">
       <div
         className="max-w-[1400px] mx-auto relative group"
-        onMouseEnter={triggerFiveSecondPause}
-        onTouchStart={triggerFiveSecondPause}
-        onTouchEnd={triggerFiveSecondPause}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
       >
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8 select-none">

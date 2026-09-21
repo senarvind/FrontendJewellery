@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { CATEGORIES } from "@/data/categories";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
@@ -13,6 +14,7 @@ import { SAMPLE_PRODUCTS, searchOrdersApi } from "@/lib/api";
 const CATEGORY_NAV_ITEMS = CATEGORIES.map(({ name, href, icon, slug }) => ({ name, href, icon, slug }));
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isCategoryOpenMobile, setIsCategoryOpenMobile] = useState(false);
@@ -262,7 +264,14 @@ export default function Navbar() {
 
             {/* Desktop Navigation Links */}
             <div className="hidden lg:flex items-center space-x-6 xl:space-x-8 text-[15px] font-medium">
-              <Link href="/" className="border-b-2 border-[#D4AF37] pb-1 text-[#B82E44] font-semibold">
+              <Link
+                href="/"
+                className={`pb-1 font-semibold transition-colors ${
+                  pathname === "/"
+                    ? "border-b-2 border-[#D4AF37] text-[#B82E44]"
+                    : "text-[#35191C] hover:text-[#B82E44]"
+                }`}
+              >
                 Home
               </Link>
 
@@ -616,22 +625,44 @@ export default function Navbar() {
 
         {/* 3. Horizontal Mobile Sub-Category Scroll Bar (`lg:hidden`) */}
         <div className="lg:hidden bg-[#FFF3E8] border-b border-[#E8CFC5]/80 py-2 px-3 overflow-x-auto scrollbar-none scroll-touch flex items-center gap-2 text-xs font-semibold text-[#35191C] shadow-inner">
+          {/* Prominent Home Button for Mobile */}
           <Link
-            href="/products/all"
-            className="flex items-center gap-1 bg-[#FFE2D8] text-[#7C1B2A] hover:bg-[#B82E44] hover:text-white px-3 py-1 rounded-full border border-[#E8CFC5] whitespace-nowrap transition-colors shadow-sm"
+            href="/"
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-full border whitespace-nowrap transition-colors shadow-xs font-bold flex-shrink-0 active:scale-95 ${
+              pathname === "/"
+                ? "bg-[#9B1B30] text-[#FFF8F0] border-[#9B1B30]"
+                : "bg-[#9B1B30]/10 text-[#9B1B30] border-[#9B1B30]/30 hover:bg-[#9B1B30] hover:text-white"
+            }`}
+          >
+            <span>🏠</span> <span>Home</span>
+          </Link>
+          <Link
+            href="/products"
+            className={`flex items-center gap-1 px-3 py-1 rounded-full border whitespace-nowrap transition-colors shadow-xs flex-shrink-0 ${
+              pathname === "/products"
+                ? "bg-[#B82E44] text-white border-[#B82E44]"
+                : "bg-[#FFE2D8] text-[#7C1B2A] hover:bg-[#B82E44] hover:text-white border-[#E8CFC5]"
+            }`}
           >
             <span>✨</span> <span>All</span>
           </Link>
-          {CATEGORY_NAV_ITEMS.slice(0, 10).map((cat) => (
-            <Link
-              key={cat.name}
-              href={cat.href}
-              className="flex items-center gap-1.5 bg-[#FFF8F0] text-[#35191C] hover:bg-[#B82E44] hover:text-white px-3 py-1 rounded-full border border-[#E8CFC5]/80 whitespace-nowrap transition-colors shadow-sm"
-            >
-              <span>{cat.icon || "✦"}</span>
-              <span>{cat.name}</span>
-            </Link>
-          ))}
+          {CATEGORY_NAV_ITEMS.slice(0, 10).map((cat) => {
+            const isActive = pathname === cat.href;
+            return (
+              <Link
+                key={cat.name}
+                href={cat.href}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full border whitespace-nowrap transition-colors shadow-xs flex-shrink-0 ${
+                  isActive
+                    ? "bg-[#B82E44] text-white border-[#B82E44]"
+                    : "bg-[#FFF8F0] text-[#35191C] hover:bg-[#B82E44] hover:text-white border-[#E8CFC5]/80"
+                }`}
+              >
+                <span>{cat.icon || "✦"}</span>
+                <span>{cat.name}</span>
+              </Link>
+            );
+          })}
         </div>
       </div>
 

@@ -3,8 +3,7 @@ import { getAllProducts } from "@/lib/api";
 import ProductCard from "@/frontend/components/products/ProductCard";
 import { STORE_CATEGORIES } from "@/frontend/types/product";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function AllProductsPage(props: {
   searchParams?: Promise<{ maxPrice?: string }>;
@@ -36,11 +35,22 @@ export default async function AllProductsPage(props: {
   return (
     <main className="min-h-screen bg-[#FFF8F0] text-[#35191C] px-2.5 sm:px-8 lg:px-12 py-4 sm:py-8">
       <div className="max-w-7xl mx-auto">
-        {/* Breadcrumbs */}
-        <div className="mb-4 sm:mb-6 flex items-center gap-2 text-[10px] sm:text-xs uppercase tracking-widest text-[#B82E44]">
-          <Link href="/" className="hover:underline transition-all">Home</Link>
-          <span className="text-[#6F4A4A]/40">/</span>
-          <span className="text-[#35191C] font-bold">All Products</span>
+        {/* Back Navigation Bar */}
+        <div className="mb-4 sm:mb-6 flex items-center justify-between gap-3 bg-[#FFF0EA] border border-[#E8CFC5] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-xs">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#9B1B30] hover:bg-[#7C1B2A] text-[#FFF8F0] transition-all text-xs font-bold shadow-xs active:scale-95 flex-shrink-0"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Back to Home</span>
+          </Link>
+          <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#6F4A4A] overflow-hidden">
+            <Link href="/" className="hover:text-[#9B1B30] font-medium hover:underline">Home</Link>
+            <span>/</span>
+            <span className="text-[#9B1B30] font-bold">All Products</span>
+          </div>
         </div>
 
         {/* Page Header */}

@@ -4,6 +4,7 @@ import React, { useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CATEGORIES, CategoryItem, FEATURED_JEWELLERY_SLUGS } from "@/frontend/data/categories";
+import { IMAGE_PRESETS } from "@/lib/cloudinary";
 
 interface CategoryCarouselProps {
   categories?: CategoryItem[];
@@ -40,18 +41,54 @@ export default function CategoryCarousel({ categories = CATEGORIES }: CategoryCa
     return [...uniqueCategories, ...uniqueCategories];
   }, [uniqueCategories]);
 
-  // Smooth continuous 60fps auto-sliding animation
+  // Zero-layout-thrashing 60fps auto-scroll with IntersectionObserver
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || displayList.length === 0) return;
 
     let animId: number;
-    const speed = 1.2; // Smooth scrolling speed in pixels per frame
+    let isVisible = true;
+    let isUserInteracting = false;
+    const speed = 1.0;
+
+    // Cache halfWidth to eliminate forced synchronous reflow (layout thrashing)
+    let cachedHalfWidth = el.scrollWidth / 2;
+    const updateDimensions = () => {
+      if (el) {
+        cachedHalfWidth = el.scrollWidth / 2;
+      }
+    };
+
+    window.addEventListener("resize", updateDimensions);
+
+    // Pause animation completely when offscreen to save 100% CPU/battery
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+
+    // Pause immediately on touch so auto-scroll never fights user's finger
+    let resumeTimeout: NodeJS.Timeout | null = null;
+    const onTouchStart = () => {
+      isUserInteracting = true;
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+    };
+    const onTouchEnd = () => {
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+      resumeTimeout = setTimeout(() => {
+        isUserInteracting = false;
+      }, 3000);
+    };
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
 
     const step = () => {
-      if (!isPaused && el) {
-        const halfWidth = el.scrollWidth / 2;
-        if (halfWidth > 0 && el.scrollLeft >= halfWidth) {
+      if (isVisible && !isPaused && !isUserInteracting && el) {
+        if (cachedHalfWidth > 0 && el.scrollLeft >= cachedHalfWidth) {
           el.scrollLeft = 0;
         } else {
           el.scrollLeft += speed;
@@ -62,37 +99,22 @@ export default function CategoryCarousel({ categories = CATEGORIES }: CategoryCa
 
     animId = requestAnimationFrame(step);
 
-    return () => cancelAnimationFrame(animId);
-  }, [isPaused, displayList]);
-
-  // Pause auto-sliding for 5 seconds when user hovers or taps on phone
-  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const triggerFiveSecondPause = () => {
-    setIsPaused(true);
-    if (pauseTimeoutRef.current) {
-      clearTimeout(pauseTimeoutRef.current);
-    }
-    pauseTimeoutRef.current = setTimeout(() => {
-      setIsPaused(false);
-    }, 5000);
-  };
-
-  useEffect(() => {
     return () => {
-      if (pauseTimeoutRef.current) {
-        clearTimeout(pauseTimeoutRef.current);
-      }
+      cancelAnimationFrame(animId);
+      observer.disconnect();
+      window.removeEventListener("resize", updateDimensions);
+      if (resumeTimeout) clearTimeout(resumeTimeout);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchend", onTouchEnd);
     };
-  }, []);
+  }, [isPaused, displayList]);
 
   return (
     <section className="w-full bg-[#FFF8F0] pt-8 sm:pt-12 pb-3 sm:pb-4 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
       <div
         className="max-w-[1400px] mx-auto relative group"
-        onMouseEnter={triggerFiveSecondPause}
-        onTouchStart={triggerFiveSecondPause}
-        onTouchEnd={triggerFiveSecondPause}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
       >
         {/* Section Heading */}
         <div className="text-center mb-6 sm:mb-8 select-none">
@@ -125,10 +147,11 @@ export default function CategoryCarousel({ categories = CATEGORIES }: CategoryCa
               <div className="w-full aspect-square rounded-2xl bg-[#FFF0EA] shadow-sm border border-[#E8CFC5] hover:border-[#B82E44] group-hover/item:border-[#B82E44] hover:shadow-md flex items-center justify-center transition-all duration-300 group-hover/item:-translate-y-1 relative overflow-hidden">
                 {cat.image ? (
                   <Image
-                    src={cat.image}
+                    src={IMAGE_PRESETS.categoryIcon(cat.image)}
                     alt={cat.name}
                     fill
-                    priority={idx < 4}
+                    sizes="(max-width: 640px) 96px, (max-width: 768px) 112px, 144px"
+                    loading="lazy"
                     className={`object-cover transition-transform duration-500 ease-out ${
                       cat.imageClassName ? cat.imageClassName : "group-hover/item:scale-110"
                     }`}
