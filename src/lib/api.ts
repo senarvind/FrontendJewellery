@@ -344,3 +344,30 @@ export async function searchOrderTrackingApi(query: string) {
 }
 
 
+
+// -- Offers ------------------------------------------------------------------
+export interface Offer {
+  _id: string;
+  title: string;
+  description: string;
+  discountPercent: number;
+  originalPrice: number;
+  offerPrice: number;
+  category: string;
+  image: string;
+  validFrom: string;
+  validTo: string;
+  isActive: boolean;
+  productLink: string;
+  createdAt: string;
+}
+
+export async function getActiveOffers(): Promise<Offer[]> {
+  const base = process.env.NEXT_PUBLIC_API_URL || 'https://my-jewellery-backend.onrender.com';
+  const res = await fetch(${base}/api/offers, {
+    next: { revalidate: 60 },
+  });
+  if (!res.ok) return [];
+  const data = await res.json();
+  return data.data || [];
+}
