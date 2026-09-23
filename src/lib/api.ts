@@ -1,10 +1,10 @@
 import { Product } from "@/frontend/types/product";
 
 const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000"
+  process.env.NEXT_PUBLIC_API_URL || "https://jewellery-backend-1ycr.onrender.com"
 ).trim().replace(/\/+$/, "");
 
-const DEFAULT_RENDER_BACKEND = "http://127.0.0.1:5000";
+const DEFAULT_RENDER_BACKEND = "https://jewellery-backend-1ycr.onrender.com";
 
 export const SAMPLE_PRODUCTS: Product[] = [
   {
