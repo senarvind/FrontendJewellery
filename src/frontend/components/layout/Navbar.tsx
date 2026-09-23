@@ -718,7 +718,7 @@ export default function Navbar() {
                       className="flex items-center gap-3 p-3 hover:bg-[#FFF0EA] transition-colors"
                     >
                       <div className="w-12 h-12 rounded-lg bg-[#FFE2D8] border border-[#E8CFC5] relative overflow-hidden flex-shrink-0">
-                        <Image src={p.frontImage || "/images/categories/ring.png"} alt={p.productType} fill className="object-cover" />
+                        <Image src={p.frontImage || "/images/categories/ring.png"} alt={p.productType} fill sizes="48px" className="object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-bold text-[#35191C] truncate">{p.productType}</p>
@@ -804,7 +804,7 @@ export default function Navbar() {
                         className="flex items-center gap-2.5 p-2.5 hover:bg-[#FFE2D8] transition-colors"
                       >
                         <div className="w-9 h-9 rounded-lg bg-[#FFE2D8] border border-[#E8CFC5] relative overflow-hidden flex-shrink-0">
-                          <Image src={p.frontImage || "/images/categories/ring.png"} alt={p.productType} fill className="object-cover" />
+                          <Image src={p.frontImage || "/images/categories/ring.png"} alt={p.productType} fill sizes="36px" className="object-cover" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-bold text-[#35191C] truncate">{p.productType}</p>

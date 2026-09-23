@@ -124,6 +124,7 @@ export default function CartPage() {
                         src={frontImage}
                         alt={product.productType || "Product Image"}
                         fill
+                        sizes="(max-width: 640px) 112px, 112px"
                         className="object-cover"
                       />
                       <span className="absolute top-1 left-1 bg-[#7C1B2A] text-[#FFF8F0] text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">

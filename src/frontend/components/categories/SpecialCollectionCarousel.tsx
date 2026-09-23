@@ -143,6 +143,7 @@ export default function SpecialCollectionCarousel({
                     src={item.image}
                     alt={item.name}
                     fill
+                    sizes="(max-width: 640px) 96px, (max-width: 768px) 112px, 144px"
                     className={`object-cover transition-transform duration-500 ease-out ${
                       item.imageClassName ? item.imageClassName : "group-hover/card:scale-110"
                     }`}
