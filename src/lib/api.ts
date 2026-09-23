@@ -1,10 +1,10 @@
 import { Product } from "@/frontend/types/product";
 
 const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL || "https://my-jewellery-backend.onrender.com"
+  process.env.NEXT_PUBLIC_API_URL || "https://jewellery-gfwd.onrender.com"
 ).trim().replace(/\/+$/, "");
 
-const DEFAULT_RENDER_BACKEND = "https://my-jewellery-backend.onrender.com";
+const DEFAULT_RENDER_BACKEND = "https://jewellery-gfwd.onrender.com";
 
 export const SAMPLE_PRODUCTS: Product[] = [
   {
@@ -204,7 +204,6 @@ export async function getCustomizedProducts(): Promise<Product[]> {
 async function safePost(endpoint: string, bodyData: any) {
   const urlsToTry = [
     `${API_BASE_URL}${endpoint}`,
-    `http://localhost:5000${endpoint}`,
     `${DEFAULT_RENDER_BACKEND}${endpoint}`,
   ];
 
@@ -240,7 +239,7 @@ async function safePost(endpoint: string, bodyData: any) {
 
   return {
     success: false,
-    error: "Backend payment service is unreachable. Please ensure the Express backend is running on http://localhost:5000",
+    error: "Backend payment service is unreachable. Please ensure the Express backend is running on https://jewellery-gfwd.onrender.com",
   };
 }
 
@@ -255,7 +254,6 @@ export async function verifyRazorpayPaymentApi(paymentPayload: Record<string, an
 export async function updateProductApi(id: string, updatedData: Partial<Product>) {
   const urlsToTry = [
     `${API_BASE_URL}/api/products/${id}`,
-    `http://localhost:5000/api/products/${id}`,
     `${DEFAULT_RENDER_BACKEND}/api/products/${id}`,
   ];
   const uniqueUrls = Array.from(new Set(urlsToTry));
@@ -363,7 +361,7 @@ export interface Offer {
 }
 
 export async function getActiveOffers(): Promise<Offer[]> {
-  const base = process.env.NEXT_PUBLIC_API_URL || 'https://my-jewellery-backend.onrender.com';
+  const base = process.env.NEXT_PUBLIC_API_URL || 'https://jewellery-gfwd.onrender.com';
   const res = await fetch(`${base}/api/offers`, {
     next: { revalidate: 60 },
   });
