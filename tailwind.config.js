@@ -41,6 +41,9 @@ module.exports = {
         serif: ["var(--font-playfair)", "Georgia", "serif"],
         sans: ["var(--font-lato)", "Arial", "sans-serif"],
       },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite',
+      },
     },
   },
   plugins: [],
