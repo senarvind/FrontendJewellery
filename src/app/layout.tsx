@@ -29,8 +29,27 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Keshar Jewellers | Best Jewellery Showroom in Sehore (Since 2003)",
-  description: "Keshar Jewellers - Charkha Line, Sarafa Bazar, Sehore. BIS Hallmarking Reg: HM/C-8290497727. Authentic Hallmark Certified Gold, Silver, and Natural Navratna Gemstones.",
+  metadataBase: new URL("https://www.kesharjewellers.com/"),
+  title: "Keshar Jewellers | Gold & Diamond Jewellery",
+  description: "Explore premium gold, diamond and jewellery collections at Keshar Jewellers. Discover beautiful jewellery for every occasion.",
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    title: "Keshar Jewellers | Gold & Diamond Jewellery",
+    description: "Explore premium gold, diamond and jewellery collections at Keshar Jewellers.",
+    url: "https://www.kesharjewellers.com/",
+    type: "website",
+    images: [
+      {
+        url: "https://www.kesharjewellers.com/og-image.jpg",
+      },
+    ],
+  },
   icons: {
     icon: "/logo-old.png",
   },
