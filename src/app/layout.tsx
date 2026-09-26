@@ -50,9 +50,6 @@ export const metadata: Metadata = {
       },
     ],
   },
-  icons: {
-    icon: "/logo-old.png",
-  },
 };
 
 export default function RootLayout({
