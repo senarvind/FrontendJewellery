@@ -22,6 +22,7 @@ export interface KesharOrder {
   notes?: string;
   items: OrderItem[];
   totalAmount: number;
+  giftId?: string;                // Optional gift packing ID
   orderedAt: string;              // ISO timestamp when order was placed
   isCancelled: boolean;
   cancelledAt?: string;
