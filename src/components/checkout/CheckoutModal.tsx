@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { createRazorpayOrderApi, verifyRazorpayPaymentApi } from "@/lib/api";
+import { createRazorpayOrderApi, verifyRazorpayPaymentApi, getAllGiftsApi, getGiftPackingPriceApi, Gift } from "@/lib/api";
 import { saveOrder, generateOrderId } from "@/lib/orders";
 import { useAuth } from "@/context/AuthContext";
 
@@ -64,6 +64,12 @@ export default function CheckoutModal({
   const [confirmedOrder, setConfirmedOrder] = useState<any>(null);
   const [savedOrderId, setSavedOrderId] = useState<string | null>(null);
 
+  const [wantsGiftPacking, setWantsGiftPacking] = useState(false);
+  const [gifts, setGifts] = useState<Gift[]>([]);
+  const [packingPrice, setPackingPrice] = useState<number>(0);
+  const [selectedGiftId, setSelectedGiftId] = useState<string>("");
+  const [loadingGifts, setLoadingGifts] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -76,7 +82,21 @@ export default function CheckoutModal({
     }
   }, [user]);
 
+  useEffect(() => {
+    if (isOpen && mounted) {
+      setLoadingGifts(true);
+      Promise.all([getAllGiftsApi(), getGiftPackingPriceApi()])
+        .then(([fetchedGifts, price]) => {
+          setGifts(fetchedGifts);
+          setPackingPrice(price);
+        })
+        .finally(() => setLoadingGifts(false));
+    }
+  }, [isOpen, mounted]);
+
   if (!isOpen || !mounted) return null;
+
+  const finalAmount = wantsGiftPacking && selectedGiftId ? totalAmount + packingPrice : totalAmount;
 
   const handlePayNow = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,7 +119,7 @@ export default function CheckoutModal({
       }
 
       // 2. Call backend to create Razorpay Order
-      const res = await createRazorpayOrderApi(totalAmount);
+      const res = await createRazorpayOrderApi(finalAmount);
       if (!res || !res.success || !res.orderId) {
         setErrorMsg(res?.error || "Failed to initiate Razorpay order. Please check your API credentials.");
         setLoading(false);
@@ -144,8 +164,9 @@ export default function CheckoutModal({
               customerEmail,
               customerAddress,
               items,
-              totalAmount,
+              totalAmount: finalAmount,
               notes,
+              giftId: wantsGiftPacking ? selectedGiftId : undefined,
             });
 
             if (verifyRes && verifyRes.success) {
@@ -163,7 +184,8 @@ export default function CheckoutModal({
                 customerAddress,
                 notes,
                 items,
-                totalAmount,
+                totalAmount: finalAmount,
+                giftId: wantsGiftPacking ? selectedGiftId : undefined,
                 orderedAt: new Date().toISOString(),
                 isCancelled: false,
               });
@@ -289,7 +311,7 @@ export default function CheckoutModal({
                 <div className="flex justify-between border-b border-[#E8CFC5]/60 pb-2">
                   <span className="text-[#6F4A4A]">Total Paid:</span>
                   <span className="font-serif text-base font-bold text-[#2E7D32]">
-                    ₹{totalAmount.toLocaleString("en-IN")}
+                    ₹{finalAmount.toLocaleString("en-IN")}
                   </span>
                 </div>
                 <div>
@@ -326,7 +348,7 @@ export default function CheckoutModal({
               <div className="bg-[#FFF0EA] border border-[#E8CFC5] rounded-2xl p-4 space-y-2">
                 <div className="flex items-center justify-between text-xs border-b border-[#E8CFC5]/60 pb-2 font-bold text-[#7C1B2A]">
                   <span>Order Summary ({items.length} {items.length === 1 ? "Item" : "Items"})</span>
-                  <span className="font-serif text-base">₹{totalAmount.toLocaleString("en-IN")}</span>
+                  <span className="font-serif text-base">₹{finalAmount.toLocaleString("en-IN")}</span>
                 </div>
                 <div className="space-y-1.5 max-h-28 overflow-y-auto pr-1">
                   {items.map((item, idx) => (
@@ -339,6 +361,16 @@ export default function CheckoutModal({
                       </span>
                     </div>
                   ))}
+                  {wantsGiftPacking && selectedGiftId && (
+                    <div className="flex justify-between text-[11px] text-[#35191C] mt-2 pt-2 border-t border-[#E8CFC5]/60">
+                      <span className="truncate max-w-[200px] text-[#7C1B2A] font-semibold">
+                        + Gift Packing
+                      </span>
+                      <span className="font-semibold text-[#7C1B2A]">
+                        ₹{packingPrice.toLocaleString("en-IN")}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -421,6 +453,49 @@ export default function CheckoutModal({
                     className="w-full px-3.5 py-2.5 bg-white border border-[#E8CFC5] rounded-xl text-base sm:text-xs text-[#35191C] focus:outline-none focus:ring-2 focus:ring-[#7C1B2A]/40"
                   />
                 </div>
+                
+                {/* Gift Option */}
+                <div className="bg-white border border-[#E8CFC5] rounded-xl p-3 sm:p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={wantsGiftPacking}
+                        onChange={(e) => {
+                          setWantsGiftPacking(e.target.checked);
+                          if (!e.target.checked) setSelectedGiftId("");
+                        }}
+                        className="w-4 h-4 text-[#7C1B2A] rounded border-[#E8CFC5] focus:ring-[#7C1B2A]"
+                      />
+                      <span className="text-xs font-bold text-[#35191C]">Add Gift Packing (₹{packingPrice})</span>
+                    </label>
+                  </div>
+                  
+                  {wantsGiftPacking && (
+                    <div className="space-y-3 mt-2">
+                      {loadingGifts ? (
+                        <p className="text-xs text-gray-500">Loading gift options...</p>
+                      ) : gifts.length === 0 ? (
+                        <p className="text-xs text-gray-500">No gift options available at the moment.</p>
+                      ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {gifts.map(gift => (
+                            <div 
+                              key={gift._id}
+                              onClick={() => setSelectedGiftId(gift._id)}
+                              className={`border rounded-lg p-2 cursor-pointer transition-all ${selectedGiftId === gift._id ? 'border-[#7C1B2A] bg-[#FFF0EA]' : 'border-[#E8CFC5] hover:border-[#7C1B2A]/50'}`}
+                            >
+                              <div className="aspect-square relative w-full mb-2 bg-gray-50 rounded overflow-hidden">
+                                <img src={gift.image.startsWith('http') ? gift.image : `${process.env.NEXT_PUBLIC_API_URL || 'https://jewellery-backend-1ycr.onrender.com'}${gift.image}`} alt={gift.name} className="object-cover w-full h-full" />
+                              </div>
+                              <p className="text-[10px] font-semibold text-center truncate text-[#35191C]">{gift.name}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Submit / Pay Button */}
@@ -437,7 +512,7 @@ export default function CheckoutModal({
                     </>
                   ) : (
                     <>
-                      <span>🔒 Pay ₹{totalAmount.toLocaleString("en-IN")} via Razorpay</span>
+                      <span>🔒 Pay ₹{finalAmount.toLocaleString("en-IN")} via Razorpay</span>
                     </>
                   )}
                 </button>

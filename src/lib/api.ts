@@ -369,3 +369,38 @@ export async function getActiveOffers(): Promise<Offer[]> {
   const data = await res.json();
   return data.data || [];
 }
+
+// -- Gifts -------------------------------------------------------------------
+export interface Gift {
+  _id: string;
+  name: string;
+  image: string;
+}
+
+export async function getAllGiftsApi(): Promise<Gift[]> {
+  const base = process.env.NEXT_PUBLIC_API_URL || 'https://jewellery-backend-1ycr.onrender.com';
+  try {
+    const res = await fetch(`${base}/api/gifts/all`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.data || [];
+  } catch (err) {
+    return [];
+  }
+}
+
+export async function getGiftPackingPriceApi(): Promise<number> {
+  const base = process.env.NEXT_PUBLIC_API_URL || 'https://jewellery-backend-1ycr.onrender.com';
+  try {
+    const res = await fetch(`${base}/api/gifts/packing-price`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return data.packingPrice || 0;
+  } catch (err) {
+    return 0;
+  }
+}
