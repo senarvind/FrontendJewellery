@@ -53,9 +53,9 @@ export default function KesharBrandPosterBanner() {
   ];
 
   return (
-    <div className="relative w-full h-full overflow-hidden select-none bg-[#F6D4D2] flex flex-col justify-between p-3 sm:p-6 lg:p-8">
-      {/* Soft subtle gradient overlay matching #F6D4D2 */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#FAECEB]/70 via-[#F6D4D2] to-[#EFC3C0]/90 pointer-events-none" />
+    <div className="relative w-full h-full overflow-hidden select-none bg-[#FFE2D8] flex flex-col justify-between p-3 sm:p-6 lg:p-8">
+      {/* Soft subtle gradient overlay matching #FFE2D8 */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FFF8F0]/80 via-[#FFE2D8] to-[#F3C2AE]/50 pointer-events-none" />
 
       {/* Decorative ambient gold glow */}
       <div className="absolute top-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-[#D4AF37]/15 rounded-full blur-3xl pointer-events-none" />
