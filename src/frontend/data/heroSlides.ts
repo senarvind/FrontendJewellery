@@ -7,6 +7,7 @@ export interface HeroSlideData {
   href: string;
   image?: string;
   isFullBanner?: boolean;
+  isBrandPoster?: boolean;
 }
 
 export const heroSlides: HeroSlideData[] = [
@@ -15,10 +16,9 @@ export const heroSlides: HeroSlideData[] = [
     title: "",
     subtitle: "",
     category: "",
-    alt: "Keshar Jewellers Wallpaper Banner",
+    alt: "Keshar Jewellers Brand Poster Banner",
     href: "/products",
-    image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844069/keshar-categories/whatsapp.jpg",
-    isFullBanner: true,
+    isBrandPoster: true,
   },
   {
     id: 2,

@@ -1,12 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { HeroSlideData } from "@/frontend/data/heroSlides";
+import KesharBrandPosterBanner from "./KesharBrandPosterBanner";
 
 interface HeroSlideProps {
   slide: HeroSlideData;
 }
 
 export default function HeroSlide({ slide }: HeroSlideProps) {
+  if (slide.isBrandPoster) {
+    return <KesharBrandPosterBanner />;
+  }
+
   const isFullBanner = slide.isFullBanner || slide.image?.includes("Banner.png") || slide.image?.includes("whatsapp");
   const hasText = Boolean(slide.title || slide.subtitle || slide.category);
 
