@@ -64,42 +64,17 @@ export default function KesharBrandPosterBanner() {
       {/* MAIN BANNER CONTAINER */}
       <div className="relative z-10 w-full max-w-[1350px] mx-auto flex-1 flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-6 md:gap-8">
         
-        {/* LEFT COLUMN: BRAND IDENTITY & LOGO */}
+        {/* LEFT COLUMN: EXACT USER BRAND LOGO IMAGE */}
         <div className="flex-1 flex flex-col items-center text-center justify-center py-2 md:py-4">
-          
-          {/* Crown & Lotus Diamond Logo Icon */}
-          <div className="relative w-16 h-16 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 mb-1 sm:mb-2 flex items-center justify-center">
-            <div className="relative w-full h-full filter drop-shadow-[0_4px_12px_rgba(124,27,42,0.15)]">
-              {/* Crown SVG Graphic */}
-              <svg className="w-full h-full text-[#D4AF37]" viewBox="0 0 100 100" fill="currentColor">
-                <path d="M50 15 L58 35 L78 20 L70 50 L30 50 L22 20 L42 35 Z" fill="#D4AF37" />
-                <circle cx="50" cy="15" r="4" fill="#FFF8F0" />
-                <circle cx="22" cy="20" r="3.5" fill="#FFF8F0" />
-                <circle cx="78" cy="20" r="3.5" fill="#FFF8F0" />
-                {/* Lotus Petals */}
-                <path d="M50 40 C30 55 15 70 30 85 C45 75 50 60 50 40 Z" fill="#B82E44" />
-                <path d="M50 40 C70 55 85 70 70 85 C55 75 50 60 50 40 Z" fill="#B82E44" />
-                <path d="M50 35 C40 50 35 70 50 90 C65 70 60 50 50 35 Z" fill="#7C1B2A" />
-                <circle cx="50" cy="62" r="7" fill="#FFFDFC" stroke="#D4AF37" strokeWidth="2" />
-              </svg>
-            </div>
-          </div>
-
-          {/* KESHAR Brand Title */}
-          <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#7C1B2A] tracking-wider leading-none mb-0.5 sm:mb-1 drop-shadow-sm">
-            KESHAR
-          </h1>
-
-          {/* by Amityamini Subtitle */}
-          <div className="font-serif italic text-base sm:text-2xl md:text-3xl text-[#5E121F] font-normal mb-1.5 sm:mb-3">
-            by <span className="font-serif font-bold text-[#9B1B30]">Amityamini</span>
-          </div>
-
-          {/* SINCE 2003 Ornamental Divider */}
-          <div className="flex items-center justify-center gap-2 sm:gap-3 text-[#A77C18] text-[10px] sm:text-xs md:text-sm font-semibold tracking-[0.2em] uppercase">
-            <span className="h-[1px] w-6 sm:w-12 bg-gradient-to-r from-transparent to-[#A77C18]" />
-            <span>✦ SINCE 2003 ✦</span>
-            <span className="h-[1px] w-6 sm:w-12 bg-gradient-to-l from-transparent to-[#A77C18]" />
+          <div className="relative w-48 sm:w-72 md:w-80 lg:w-[380px] aspect-[4/3] flex items-center justify-center filter drop-shadow-[0_6px_20px_rgba(124,27,42,0.15)]">
+            <Image
+              src="/images/keshar-brand-logo-poster.png"
+              alt="KESHAR by Amityamini - SINCE 2003 Logo"
+              fill
+              priority
+              className="object-contain"
+              sizes="(max-width: 640px) 200px, (max-width: 1024px) 320px, 380px"
+            />
           </div>
         </div>
 
