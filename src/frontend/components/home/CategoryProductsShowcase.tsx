@@ -42,13 +42,13 @@ export default function CategoryProductsShowcase({ initialProducts }: CategoryPr
     loadProducts();
   }, [initialProducts]);
 
-  // Show 4 product cards on mobile, 6 on desktop
+  // Show 2 product cards on mobile, 4 on tablet, 6 on desktop
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
-        setItemsPerView(4); // 4 cards on mobile
+        setItemsPerView(2); // 2 cards on mobile for optimal size & visibility
       } else if (window.innerWidth < 1024) {
-        setItemsPerView(5); // 5 cards on tablet/small laptop
+        setItemsPerView(4); // 4 cards on tablet/small laptop
       } else {
         setItemsPerView(6); // 6 cards on desktop
       }

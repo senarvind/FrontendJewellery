@@ -76,7 +76,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Visual Container (Clickable -> Detail Page) */}
         <div className="relative w-full aspect-square rounded-xl bg-[#FFF0EA] flex items-center justify-center border border-[#E8CFC5]/60 overflow-hidden mb-2">
           {/* Subtle Hallmark/Material Badge Top-Left */}
-          <span className="absolute top-1.5 left-1.5 z-10 px-1.5 py-0.5 rounded-md bg-[#5E121F]/80 backdrop-blur-md text-[8px] sm:text-[9px] font-bold text-[#E6C766] border border-[#D4AF37]/30 uppercase tracking-wider shadow-xs">
+          <span className="absolute top-1.5 left-1.5 z-10 px-2 py-0.5 rounded-md bg-[#5E121F]/85 backdrop-blur-md text-[9px] sm:text-[10px] font-bold text-[#E6C766] border border-[#D4AF37]/40 uppercase tracking-wider shadow-xs">
             ✨ {product.material ? product.material.replace(/Sterling Silver/i, "Silver") : "BIS 916"}
           </span>
 
@@ -85,7 +85,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             type="button"
             onClick={handleToggleWishlist}
             suppressHydrationWarning
-            className={`absolute top-1.5 right-1.5 z-20 p-1 sm:p-1.5 rounded-full border backdrop-blur-md transition-all cursor-pointer ${
+            className={`absolute top-1.5 right-1.5 z-20 p-1.5 rounded-full border backdrop-blur-md transition-all cursor-pointer ${
               isLiked
                 ? "bg-white border-[#F8B4B4] text-[#B82E44] shadow-md scale-110"
                 : "bg-[#35191C]/50 border-[#E8CFC5]/40 text-white hover:text-[#B82E44] hover:bg-white"
@@ -93,7 +93,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             aria-label="Wishlist Item"
           >
             <svg
-              className="w-3 h-3 sm:w-3.5 sm:h-3.5"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4"
               fill={isLiked ? "#B82E44" : "none"}
               stroke={isLiked ? "#B82E44" : "currentColor"}
               viewBox="0 0 24 24"
@@ -108,7 +108,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </button>
 
           {/* Sleek Floating Photo Switcher (Front, Back, Model) */}
-          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 bg-[#1E0508]/75 backdrop-blur-md px-1.5 py-0.5 rounded-full border border-[#D4AF37]/30 shadow-sm">
+          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 bg-[#1E0508]/80 backdrop-blur-md px-2 py-0.5 rounded-full border border-[#D4AF37]/30 shadow-sm">
             {images.map((img, idx) => (
               <button
                 key={idx}
@@ -119,7 +119,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   setActiveImageIndex(idx);
                 }}
                 onMouseEnter={() => setActiveImageIndex(idx)}
-                className={`px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-semibold transition-all cursor-pointer ${
+                className={`px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold transition-all cursor-pointer ${
                   activeImageIndex === idx
                     ? "bg-[#B82E44] text-white font-bold shadow-xs scale-105"
                     : "text-[#FFE2D8]/80 hover:text-white"
@@ -137,14 +137,14 @@ export default function ProductCard({ product }: ProductCardProps) {
               alt={`${product.productType} - ${images[activeImageIndex].label} View`}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width: 640px) 25vw, (max-width: 1024px) 20vw, 16vw"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
               loading="lazy"
             />
           </Link>
         </div>
 
         {/* Material & Weight Specs (Inline Badges) */}
-        <div className="flex items-center justify-between gap-1 text-[9px] sm:text-[10px] text-[#6F4A4A] font-medium mb-1">
+        <div className="flex items-center justify-between gap-1 text-[10px] sm:text-xs text-[#6F4A4A] font-medium mb-1">
           <span className="truncate font-semibold text-[#B82E44] bg-[#FFE2D8] px-1.5 py-0.5 rounded">
             {product.material}
           </span>
@@ -167,32 +167,32 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       {/* Pricing & Actions Section */}
-      <div className="pt-1 border-t border-[#E8CFC5]/50 mt-1">
+      <div className="pt-1.5 border-t border-[#E8CFC5]/50 mt-1">
         {/* Price Row: Simple, Bold, Visible Font */}
         <div className="flex items-baseline justify-between gap-1 my-1">
           <div className="flex items-baseline gap-1.5 flex-wrap">
-            <span className="font-sans font-extrabold text-sm sm:text-base md:text-lg text-[#9B1B30]">
+            <span className="font-sans font-extrabold text-base sm:text-lg text-[#9B1B30]">
               ₹{product.sellingPrice.toLocaleString("en-IN")}
             </span>
             {product.mrp && product.mrp > product.sellingPrice && (
-              <span className="text-[9px] sm:text-[11px] text-[#6F4A4A]/50 line-through font-normal">
+              <span className="text-[10px] sm:text-xs text-[#6F4A4A]/50 line-through font-normal">
                 ₹{product.mrp.toLocaleString("en-IN")}
               </span>
             )}
           </div>
           {discount > 0 && (
-            <span className="text-[8px] sm:text-[10px] font-bold text-[#2E7D32] bg-[#E8F5E9] px-1 py-0.5 rounded whitespace-nowrap">
+            <span className="text-[9px] sm:text-xs font-bold text-[#2E7D32] bg-[#E8F5E9] px-1.5 py-0.5 rounded whitespace-nowrap">
               {discount}% OFF
             </span>
           )}
         </div>
 
         {/* Action Buttons: Add to Cart & Buy Now */}
-        <div className="grid grid-cols-2 gap-1 sm:gap-1.5 mt-1.5">
+        <div className="grid grid-cols-2 gap-1.5 mt-1.5">
           <button
             type="button"
             onClick={handleAddToCart}
-            className={`w-full py-1.5 sm:py-2 px-1 rounded-lg text-[9px] sm:text-xs font-bold uppercase tracking-wide border transition-all flex items-center justify-center gap-1 cursor-pointer ${
+            className={`w-full py-2 px-1.5 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wide border transition-all flex items-center justify-center gap-1 cursor-pointer ${
               justAdded
                 ? "bg-[#2E7D32] text-white border-[#2E7D32]"
                 : "bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#B82E44] border-[#E8CFC5]"
@@ -214,7 +214,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               }
               setIsCheckoutOpen(true);
             }}
-            className="w-full py-1.5 sm:py-2 px-1 bg-[#B82E44] hover:bg-[#7C1B2A] text-[#FFF8F0] text-[9px] sm:text-xs font-bold uppercase tracking-wide rounded-lg shadow-xs active:scale-95 transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
+            className="w-full py-2 px-1.5 bg-[#B82E44] hover:bg-[#7C1B2A] text-[#FFF8F0] text-[10px] sm:text-xs font-bold uppercase tracking-wide rounded-lg shadow-xs active:scale-95 transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
           >
             <span>💳 Buy</span>
           </button>
