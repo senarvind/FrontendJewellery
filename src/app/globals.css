@@ -223,3 +223,16 @@ body {
 .animate-marquee-reverse:hover {
   animation-play-state: paused;
 }
+
+/* GPU ACCELERATION & LAYOUT OPTIMIZATION UTILITIES */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 400px;
+}
+

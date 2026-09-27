@@ -11,8 +11,8 @@ interface CategoryCarouselProps {
 }
 
 export default function CategoryCarousel({ categories = CATEGORIES }: CategoryCarouselProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const pauseTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Strictly deduplicate categories and exclude featured jewellery categories
   const uniqueCategories = useMemo(() => {
@@ -35,106 +35,82 @@ export default function CategoryCarousel({ categories = CATEGORIES }: CategoryCa
     return result;
   }, [categories]);
 
-  // Infinite seamless loop list
+  // Duplicate for infinite seamless marquee loop
   const displayList = useMemo(() => {
     if (uniqueCategories.length === 0) return [];
     return [...uniqueCategories, ...uniqueCategories];
   }, [uniqueCategories]);
 
-  // Zero-layout-thrashing 60fps auto-scroll with IntersectionObserver
+  // Pause for 5 seconds on touch or interaction
+  const trigger5SecondPause = () => {
+    setIsPaused(true);
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+    }
+    pauseTimerRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 5000);
+  };
+
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el || displayList.length === 0) return;
-
-    let animId: number;
-    let isVisible = true;
-    let isUserInteracting = false;
-    const speed = 1.0;
-
-    // Cache halfWidth to eliminate forced synchronous reflow (layout thrashing)
-    let cachedHalfWidth = el.scrollWidth / 2;
-    const updateDimensions = () => {
-      if (el) {
-        cachedHalfWidth = el.scrollWidth / 2;
-      }
-    };
-
-    window.addEventListener("resize", updateDimensions);
-
-    // Pause animation completely when offscreen to save 100% CPU/battery
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isVisible = entry.isIntersecting;
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(el);
-
-    // Pause immediately on touch so auto-scroll never fights user's finger
-    let resumeTimeout: NodeJS.Timeout | null = null;
-    const onTouchStart = () => {
-      isUserInteracting = true;
-      if (resumeTimeout) clearTimeout(resumeTimeout);
-    };
-    const onTouchEnd = () => {
-      if (resumeTimeout) clearTimeout(resumeTimeout);
-      resumeTimeout = setTimeout(() => {
-        isUserInteracting = false;
-      }, 3000);
-    };
-
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
-
-    const step = () => {
-      if (isVisible && !isPaused && !isUserInteracting && el) {
-        if (cachedHalfWidth > 0 && el.scrollLeft >= cachedHalfWidth) {
-          el.scrollLeft = 0;
-        } else {
-          el.scrollLeft += speed;
-        }
-      }
-      animId = requestAnimationFrame(step);
-    };
-
-    animId = requestAnimationFrame(step);
-
     return () => {
-      cancelAnimationFrame(animId);
-      observer.disconnect();
-      window.removeEventListener("resize", updateDimensions);
-      if (resumeTimeout) clearTimeout(resumeTimeout);
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchend", onTouchEnd);
+      if (pauseTimerRef.current) {
+        clearTimeout(pauseTimerRef.current);
+      }
     };
-  }, [isPaused, displayList]);
+  }, []);
 
   return (
-    <section className="w-full bg-[#FFF8F0] pt-8 sm:pt-12 pb-3 sm:pb-4 px-3 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div
-        className="max-w-[1400px] mx-auto relative group"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        {/* Section Heading */}
-        <div className="text-center mb-6 sm:mb-8 select-none">
-          <span className="text-[#C77D62] uppercase tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-1.5">
-            ✦ Explore By Category ✦
-          </span>
-          <h2 className="font-serif italic text-2xl sm:text-4xl font-semibold text-[#9B1B30] tracking-tight">
-            Shop by Category
-          </h2>
-          <div className="flex items-center justify-center gap-3 my-2 text-[#D4AF37]/60 w-32 sm:w-40 mx-auto">
-            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
-            <span className="text-[10px] sm:text-xs font-serif text-[#A77C18]">❖</span>
-            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
-          </div>
-        </div>
+    <section className="w-full bg-[#FFF8F0] pt-8 sm:pt-12 pb-3 sm:pb-4 relative overflow-hidden">
+      <style jsx>{`
+        @keyframes marqueeCategory {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          100% {
+            transform: translate3d(-50%, 0, 0);
+          }
+        }
+        .marquee-category-track {
+          display: flex;
+          width: max-content;
+          animation: marqueeCategory 45s linear infinite;
+          will-change: transform;
+        }
+      `}</style>
 
-        {/* Continuous Auto-sliding Categories Track */}
+      {/* Section Heading */}
+      <div className="max-w-[1400px] mx-auto px-4 text-center mb-6 sm:mb-8 select-none">
+        <span className="text-[#C77D62] uppercase tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-1.5">
+          ✦ Explore By Category ✦
+        </span>
+        <h2 className="font-serif italic text-2xl sm:text-4xl font-semibold text-[#9B1B30] tracking-tight">
+          Shop by Category
+        </h2>
+        <div className="flex items-center justify-center gap-3 my-2 text-[#D4AF37]/60 w-32 sm:w-40 mx-auto">
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
+          <span className="text-[10px] sm:text-xs font-serif text-[#A77C18]">❖</span>
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
+        </div>
+      </div>
+
+      {/* Full-width Edge-to-Edge Continuous Auto-sliding Track */}
+      <div
+        className="w-full relative group overflow-hidden"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => {
+          if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+          setIsPaused(false);
+        }}
+        onTouchStart={trigger5SecondPause}
+        onTouchMove={trigger5SecondPause}
+        onTouchEnd={trigger5SecondPause}
+      >
         <div
-          ref={scrollRef}
-          className="flex items-center gap-3.5 sm:gap-6 lg:gap-7 overflow-x-auto scrollbar-none scroll-touch px-2 sm:px-4 py-2 select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="marquee-category-track gap-3.5 sm:gap-6 lg:gap-7 py-2 select-none"
+          style={{
+            animationPlayState: isPaused ? "paused" : "running",
+          }}
         >
           {displayList.map((cat, idx) => (
             <Link
@@ -176,5 +152,3 @@ export default function CategoryCarousel({ categories = CATEGORIES }: CategoryCa
     </section>
   );
 }
-
-

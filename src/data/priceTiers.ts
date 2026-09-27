@@ -12,6 +12,16 @@ export interface PriceTier {
 export const PRICE_TIERS: PriceTier[] = [
   {
     id: 1,
+    badge: "💖 MOST POPULAR",
+    badgeType: "bestseller",
+    title: "Most Liked Products",
+    priceLabel: "Most Liked Products",
+    itemsDescription: "Customer Favorites & Trending Hallmarked Jewellery",
+    icon: "💖",
+    href: "/products/all"
+  },
+  {
+    id: 2,
     badge: "✨ BEST SELLER",
     badgeType: "bestseller",
     title: "Silver Earrings & Studs",
@@ -21,7 +31,7 @@ export const PRICE_TIERS: PriceTier[] = [
     href: "/products/price/under-999"
   },
   {
-    id: 2,
+    id: 3,
     badge: "🪔 FESTIVE SPECIAL",
     badgeType: "premium",
     title: "Auspicious Festive Jewellery",
@@ -31,7 +41,7 @@ export const PRICE_TIERS: PriceTier[] = [
     href: "/products/festival-collection"
   },
   {
-    id: 3,
+    id: 4,
     badge: "👑 CUSTOM MADE",
     badgeType: "luxe",
     title: "Customized & Bespoke Jewellery",

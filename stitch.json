@@ -1,0 +1,17 @@
+{
+  "projectId": "2587933479180895782",
+  "projectResource": "projects/2587933479180895782",
+  "projectTitle": "Keshar Jewellers - Premium E-Commerce Website",
+  "designSystem": "Heritage Royale",
+  "designSystemAsset": "assets/f6331bc0c87e41009871f841846c5062",
+  "connected": true,
+  "theme": {
+    "colorMode": "LIGHT",
+    "primaryColor": "#7a1021",
+    "secondaryColor": "#d4af37",
+    "tertiaryColor": "#ffc7b8",
+    "neutralColor": "#fff8f0",
+    "headlineFont": "Libre Caslon Text",
+    "bodyFont": "Hanken Grotesk"
+  }
+}
