@@ -7,6 +7,7 @@ import BottomNav from "@/frontend/components/layout/BottomNav";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import GlobalErrorBoundary from "@/components/common/GlobalErrorBoundary";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -59,22 +60,31 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Preconnect to asset and API domains for lightning fast loading */}
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        <link rel="preconnect" href="https://my-jewellery-backend.onrender.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://my-jewellery-backend.onrender.com" />
+      </head>
       <body
         suppressHydrationWarning
         className={`${playfair.variable} ${lato.variable} antialiased min-h-screen flex flex-col justify-between`}
       >
-        <AuthProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <div className="pb-16 md:pb-0">
-                <Navbar />
-                <main>{children}</main>
-              </div>
-              <Footer />
-              <BottomNav />
-            </WishlistProvider>
-          </CartProvider>
-        </AuthProvider>
+        <GlobalErrorBoundary>
+          <AuthProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <div className="pb-16 md:pb-0">
+                  <Navbar />
+                  <main>{children}</main>
+                </div>
+                <Footer />
+                <BottomNav />
+              </WishlistProvider>
+            </CartProvider>
+          </AuthProvider>
+        </GlobalErrorBoundary>
       </body>
     </html>
   );
