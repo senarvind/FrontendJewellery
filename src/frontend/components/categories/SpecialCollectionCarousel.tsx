@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { SPECIAL_COLLECTIONS, CategoryItem } from "@/frontend/data/categories";
@@ -9,125 +9,91 @@ interface SpecialCollectionCarouselProps {
   items?: CategoryItem[];
 }
 
-const COLLECTION_TAGS: Record<string, string> = {
-  "evil-eye": "Nazar Suraksha",
-  kids: "Baby & Children",
-  pens: "Luxury Silver Gifts",
-  utensils: "999 Pure Silver",
-  artifacts: "Sacred Idols & Decor",
-  "coins-bars": "24K & 999 Silver",
-  "pooja-articles": "Devotional & Mandir",
-};
-
 export default function SpecialCollectionCarousel({
   items = SPECIAL_COLLECTIONS,
 }: SpecialCollectionCarouselProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const pauseTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Duplicate for infinite seamless auto-scrolling loop
+  // Duplicate for infinite seamless marquee loop
   const displayList = useMemo(() => {
     if (items.length === 0) return [];
     return [...items, ...items, ...items];
   }, [items]);
 
-  // Zero-layout-thrashing 60fps auto-scroll with IntersectionObserver
+  // Pause for 5 seconds on touch or interaction
+  const trigger5SecondPause = () => {
+    setIsPaused(true);
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+    }
+    pauseTimerRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 5000);
+  };
+
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el || displayList.length === 0) return;
-
-    let animId: number;
-    let isVisible = true;
-    let isUserInteracting = false;
-    const speed = 0.9;
-
-    // Cache thirdWidth to eliminate forced synchronous reflow (layout thrashing)
-    let cachedThirdWidth = el.scrollWidth / 3;
-    const updateDimensions = () => {
-      if (el) {
-        cachedThirdWidth = el.scrollWidth / 3;
-      }
-    };
-
-    window.addEventListener("resize", updateDimensions);
-
-    // Pause animation completely when offscreen
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isVisible = entry.isIntersecting;
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(el);
-
-    // Pause immediately on touch so auto-scroll never fights user's finger
-    let resumeTimeout: NodeJS.Timeout | null = null;
-    const onTouchStart = () => {
-      isUserInteracting = true;
-      if (resumeTimeout) clearTimeout(resumeTimeout);
-    };
-    const onTouchEnd = () => {
-      if (resumeTimeout) clearTimeout(resumeTimeout);
-      resumeTimeout = setTimeout(() => {
-        isUserInteracting = false;
-      }, 3000);
-    };
-
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
-
-    const step = () => {
-      if (isVisible && !isPaused && !isUserInteracting && el) {
-        if (cachedThirdWidth > 0 && el.scrollLeft >= cachedThirdWidth) {
-          el.scrollLeft = 0;
-        } else {
-          el.scrollLeft += speed;
-        }
-      }
-      animId = requestAnimationFrame(step);
-    };
-
-    animId = requestAnimationFrame(step);
-
     return () => {
-      cancelAnimationFrame(animId);
-      observer.disconnect();
-      window.removeEventListener("resize", updateDimensions);
-      if (resumeTimeout) clearTimeout(resumeTimeout);
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchend", onTouchEnd);
+      if (pauseTimerRef.current) {
+        clearTimeout(pauseTimerRef.current);
+      }
     };
-  }, [isPaused, displayList]);
+  }, []);
 
   return (
-    <section className="w-full bg-[#FFF8F0] py-8 sm:py-12 px-3 sm:px-6 lg:px-8 border-y border-[#E8CFC5]/50 relative overflow-hidden">
-      <div
-        className="max-w-[1400px] mx-auto relative group"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        {/* Header */}
-        <div className="text-center mb-6 sm:mb-8 select-none">
-          <span className="text-[#C77D62] uppercase tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-1.5">
-            ✦ Silver Articles, Gifts & Lifestyle ✦
-          </span>
-          <h2 className="font-serif italic text-2xl sm:text-3xl lg:text-4xl font-semibold text-[#9B1B30] tracking-tight">
-            Divine Articles & Special Collections
-          </h2>
-          <div className="flex items-center justify-center gap-3 my-2 text-[#A77C18]/60 w-36 sm:w-44 mx-auto">
-            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/60 to-transparent flex-1" />
-            <span className="text-[10px] sm:text-xs font-serif text-[#A77C18]">❖</span>
-            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/60 to-transparent flex-1" />
-          </div>
-          <p className="text-xs text-[#6F4A4A] max-w-lg mx-auto font-sans">
-            Explore authentic 999 pure silver utensils, divine idols, hallmark coins, kids jewellery &amp; luxury silver pens.
-          </p>
-        </div>
+    <section className="w-full bg-[#FFF8F0] py-8 sm:py-12 border-y border-[#E8CFC5]/50 relative overflow-hidden">
+      <style jsx>{`
+        @keyframes marqueeSpecial {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          100% {
+            transform: translate3d(-33.333%, 0, 0);
+          }
+        }
+        .marquee-special-track {
+          display: flex;
+          width: max-content;
+          animation: marqueeSpecial 40s linear infinite;
+          will-change: transform;
+        }
+      `}</style>
 
-        {/* Continuous Auto-sliding Track */}
+      {/* Header */}
+      <div className="max-w-[1400px] mx-auto px-4 text-center mb-6 sm:mb-8 select-none">
+        <span className="text-[#C77D62] uppercase tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-1.5">
+          ✦ Silver Articles, Gifts & Lifestyle ✦
+        </span>
+        <h2 className="font-serif italic text-2xl sm:text-3xl lg:text-4xl font-semibold text-[#9B1B30] tracking-tight">
+          Divine Articles & Special Collections
+        </h2>
+        <div className="flex items-center justify-center gap-3 my-2 text-[#A77C18]/60 w-36 sm:w-44 mx-auto">
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/60 to-transparent flex-1" />
+          <span className="text-[10px] sm:text-xs font-serif text-[#A77C18]">❖</span>
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/60 to-transparent flex-1" />
+        </div>
+        <p className="text-xs text-[#6F4A4A] max-w-lg mx-auto font-sans">
+          Explore authentic 999 pure silver utensils, divine idols, hallmark coins, kids jewellery &amp; luxury silver pens.
+        </p>
+      </div>
+
+      {/* Full-width Edge-to-Edge Continuous Auto-sliding Track */}
+      <div
+        className="w-full relative group overflow-hidden"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => {
+          if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+          setIsPaused(false);
+        }}
+        onTouchStart={trigger5SecondPause}
+        onTouchMove={trigger5SecondPause}
+        onTouchEnd={trigger5SecondPause}
+      >
         <div
-          ref={scrollRef}
-          className="flex items-center gap-3.5 sm:gap-6 lg:gap-7 overflow-x-auto scrollbar-none scroll-touch px-2 sm:px-4 py-2 select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="marquee-special-track gap-3.5 sm:gap-6 lg:gap-7 py-2 select-none"
+          style={{
+            animationPlayState: isPaused ? "paused" : "running",
+          }}
         >
           {displayList.map((item, idx) => (
             <Link

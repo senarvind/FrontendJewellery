@@ -13,13 +13,15 @@ interface CategoryProductsShowcaseProps {
 export default function CategoryProductsShowcase({ initialProducts }: CategoryProductsShowcaseProps) {
   const [products, setProducts] = useState<Product[]>(initialProducts || []);
   const [isLoading, setIsLoading] = useState<boolean>(!initialProducts || initialProducts.length === 0);
+  const [itemsPerView, setItemsPerView] = useState<number>(6);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [itemsPerView, setItemsPerView] = useState<number>(4);
-  const [isPaused, setIsPaused] = useState<boolean>(false);
   const [isTransitioning, setIsTransitioning] = useState<boolean>(true);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+
+  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const touchStartXRef = useRef<number | null>(null);
 
-  // Fetch products only if not provided via props
+  // Fetch products if not provided
   useEffect(() => {
     if (initialProducts && initialProducts.length > 0) {
       setProducts(initialProducts);
@@ -32,7 +34,7 @@ export default function CategoryProductsShowcase({ initialProducts }: CategoryPr
         const data = await getAllProducts();
         setProducts(data || []);
       } catch (err) {
-        console.error("Failed to load products for home page showcase:", err);
+        console.error("Failed to load products for showcase:", err);
       } finally {
         setIsLoading(false);
       }
@@ -40,17 +42,15 @@ export default function CategoryProductsShowcase({ initialProducts }: CategoryPr
     loadProducts();
   }, [initialProducts]);
 
-  // Update visible items count on screen resize
+  // Show 2 product cards on mobile, 4 on tablet, 6 on desktop
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) {
-        setItemsPerView(1);
-      } else if (window.innerWidth < 768) {
-        setItemsPerView(2);
+        setItemsPerView(2); // 2 cards on mobile for optimal size & visibility
       } else if (window.innerWidth < 1024) {
-        setItemsPerView(3);
+        setItemsPerView(4); // 4 cards on tablet/small laptop
       } else {
-        setItemsPerView(4);
+        setItemsPerView(6); // 6 cards on desktop
       }
     };
 
@@ -59,63 +59,26 @@ export default function CategoryProductsShowcase({ initialProducts }: CategoryPr
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Build an extended product array so carousel ALWAYS has enough items to slide infinitely
+  const numProducts = products.length;
+
+  // Tripled array for seamless infinite looping
   const displayProducts = React.useMemo(() => {
-    if (products.length === 0) return [];
-    if (products.length <= 4) {
-      return [...products, ...products, ...products, ...products];
+    if (numProducts === 0) return [];
+    if (numProducts <= 3) {
+      return [...products, ...products, ...products, ...products, ...products, ...products];
     }
-    if (products.length <= 8) {
-      return [...products, ...products];
-    }
-    return [...products, ...products];
-  }, [products]);
+    return [...products, ...products, ...products];
+  }, [products, numProducts]);
 
-  const totalItems = displayProducts.length;
-  const maxSlide = Math.max(0, totalItems - itemsPerView);
-
-  // Slide controls
-  const nextSlide = useCallback(() => {
-    if (totalItems <= itemsPerView) return;
-
-    setCurrentIndex((prev) => {
-      if (prev >= maxSlide) {
-        // Reset smoothly to beginning
-        return 0;
-      }
-      return prev + 1;
-    });
-  }, [totalItems, itemsPerView, maxSlide]);
-
-  const prevSlide = useCallback(() => {
-    if (totalItems <= itemsPerView) return;
-
-    setCurrentIndex((prev) => {
-      if (prev <= 0) {
-        return maxSlide;
-      }
-      return prev - 1;
-    });
-  }, [totalItems, itemsPerView, maxSlide]);
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(Math.min(Math.max(0, index), maxSlide));
-  };
-
-  // Auto-slide animation interval (every 1.6 seconds, pauses on hover/touch)
+  // Start at middle chunk
   useEffect(() => {
-    if (isPaused || totalItems <= itemsPerView) return;
+    if (numProducts > 0) {
+      setIsTransitioning(false);
+      setCurrentIndex(numProducts);
+    }
+  }, [numProducts]);
 
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 1600);
-
-    return () => clearInterval(interval);
-  }, [isPaused, nextSlide, totalItems, itemsPerView]);
-
-  // Pause auto-sliding for 5 seconds when user hovers or taps on phone
-  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
+  // Pause for 5 seconds on touch or interaction
   const triggerFiveSecondPause = useCallback(() => {
     setIsPaused(true);
     if (pauseTimeoutRef.current) {
@@ -134,7 +97,72 @@ export default function CategoryProductsShowcase({ initialProducts }: CategoryPr
     };
   }, []);
 
-  // Touch handlers for mobile swiping
+  // Slide controls
+  const nextSlide = useCallback(() => {
+    if (numProducts === 0) return;
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => prev + 1);
+  }, [numProducts]);
+
+  const prevSlide = useCallback(() => {
+    if (numProducts === 0) return;
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => prev - 1);
+  }, [numProducts]);
+
+  // Seamless jump without backward rewinding
+  const handleTransitionEnd = () => {
+    if (numProducts === 0) return;
+
+    if (currentIndex >= numProducts * 2) {
+      setIsTransitioning(false);
+      setCurrentIndex(currentIndex - numProducts);
+    } else if (currentIndex < numProducts) {
+      setIsTransitioning(false);
+      setCurrentIndex(currentIndex + numProducts);
+    }
+  };
+
+  // Re-enable transition smoothly after seamless jump
+  useEffect(() => {
+    if (!isTransitioning) {
+      const raf = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsTransitioning(true);
+        });
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isTransitioning]);
+
+  const goToSlide = (dotIndex: number) => {
+    triggerFiveSecondPause();
+    setIsTransitioning(true);
+    setCurrentIndex(numProducts + dotIndex);
+  };
+
+  const handleManualNext = () => {
+    triggerFiveSecondPause();
+    nextSlide();
+  };
+
+  const handleManualPrev = () => {
+    triggerFiveSecondPause();
+    prevSlide();
+  };
+
+  // Auto-slide interval: 3.8s medium-slow
+  useEffect(() => {
+    if (isPaused || numProducts <= itemsPerView) return;
+
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 3800);
+
+    return () => clearInterval(interval);
+  }, [isPaused, nextSlide, numProducts, itemsPerView]);
+
+  // Touch swipe gestures
   const handleTouchStart = (e: React.TouchEvent) => {
     triggerFiveSecondPause();
     touchStartXRef.current = e.touches[0].clientX;
@@ -146,46 +174,46 @@ export default function CategoryProductsShowcase({ initialProducts }: CategoryPr
     const touchEndX = e.changedTouches[0].clientX;
     const diff = touchStartXRef.current - touchEndX;
 
-    if (diff > 40) {
+    if (diff > 35) {
       nextSlide();
-    } else if (diff < -40) {
+    } else if (diff < -35) {
       prevSlide();
     }
     touchStartXRef.current = null;
   };
 
-  // Original product dots
-  const activeDot = products.length > 0 ? currentIndex % products.length : 0;
-  const totalDots = Math.min(products.length, 8);
+  // Current active dot indicator
+  const activeDot = numProducts > 0 ? (currentIndex % numProducts) : 0;
+  const totalDots = Math.min(numProducts, 8);
 
   return (
-    <section className="py-12 sm:py-18 px-3 sm:px-8 lg:px-12 bg-[#FFF8F0] relative overflow-hidden">
-      {/* Decorative subtle background elements */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none opacity-40">
+    <section className="w-full py-10 sm:py-16 bg-[#FFF8F0] relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none opacity-40">
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#FFE2D8]/50 rounded-full blur-3xl" />
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#FFF0EA]/70 rounded-full blur-3xl" />
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-10">
-          <span className="text-[#C77D62] uppercase tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-2">
-            ✦ Authentic Hallmark Jewellery ✦
-          </span>
-          <h2 className="font-serif text-2xl sm:text-4xl lg:text-5xl text-[#9B1B30] tracking-tight mb-2 sm:mb-3">
-            Our Latest Products
-          </h2>
-          <div className="flex items-center justify-center gap-3 my-2 text-[#D4AF37]/60 w-36 sm:w-48 mx-auto">
-            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
-            <span className="text-[10px] sm:text-xs font-serif text-[#A77C18]">❖</span>
-            <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
-          </div>
-          <p className="font-light text-[#6F4A4A] text-xs sm:text-base leading-relaxed">
-            Discover our newest handcrafted 916 BIS Hallmarked gold and pure silver creations.
-          </p>
+      {/* Section Header */}
+      <div className="max-w-[1400px] mx-auto px-4 text-center mb-6 sm:mb-10 relative z-10 select-none">
+        <span className="text-[#C77D62] uppercase tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-2">
+          ✦ Authentic Hallmark Jewellery ✦
+        </span>
+        <h2 className="font-serif text-2xl sm:text-4xl lg:text-5xl text-[#9B1B30] tracking-tight mb-2 sm:mb-3">
+          Our Latest Products
+        </h2>
+        <div className="flex items-center justify-center gap-3 my-2 text-[#D4AF37]/60 w-36 sm:w-48 mx-auto">
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
+          <span className="text-[10px] sm:text-xs font-serif text-[#A77C18]">❖</span>
+          <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
         </div>
+        <p className="font-light text-[#6F4A4A] text-xs sm:text-base leading-relaxed max-w-2xl mx-auto">
+          Discover our newest handcrafted 916 BIS Hallmarked gold and pure silver creations.
+        </p>
+      </div>
 
-        {/* Loading Spinner */}
+      {/* Full-width Edge-to-Edge Slider Container */}
+      <div className="w-full px-2 sm:px-4 relative z-10">
         {isLoading ? (
           <div className="py-20 text-center">
             <div className="inline-block w-10 h-10 border-4 border-[#B82E44] border-t-transparent rounded-full animate-spin mb-3" />
@@ -193,27 +221,53 @@ export default function CategoryProductsShowcase({ initialProducts }: CategoryPr
               Loading latest jewellery collection...
             </p>
           </div>
-        ) : products.length > 0 ? (
+        ) : numProducts > 0 ? (
           <div
-            className="relative group/slider"
+            className="relative group/slider w-full"
             onMouseEnter={triggerFiveSecondPause}
           >
-            {/* ANIMATED SLIDER VIEWPORT & TRACK */}
+            {/* Desktop Left Nav Button */}
+            <button
+              onClick={handleManualPrev}
+              aria-label="Previous Products"
+              className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/95 text-[#9B1B30] border border-[#E8CFC5] shadow-lg items-center justify-center hover:bg-[#9B1B30] hover:text-white hover:border-[#9B1B30] transition-all duration-300 opacity-0 group-hover/slider:opacity-100 cursor-pointer"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            {/* Desktop Right Nav Button */}
+            <button
+              onClick={handleManualNext}
+              aria-label="Next Products"
+              className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/95 text-[#9B1B30] border border-[#E8CFC5] shadow-lg items-center justify-center hover:bg-[#9B1B30] hover:text-white hover:border-[#9B1B30] transition-all duration-300 opacity-0 group-hover/slider:opacity-100 cursor-pointer"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            {/* ANIMATED FULL-WIDTH SLIDER VIEWPORT & TRACK */}
             <div
-              className="overflow-hidden w-full py-4 -my-4"
+              className="overflow-hidden w-full py-4 -my-4 touch-pan-y"
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
             >
               <div
-                className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] will-change-transform"
+                onTransitionEnd={handleTransitionEnd}
+                className="flex will-change-transform"
                 style={{
-                  transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
+                  transform: `translate3d(-${currentIndex * (100 / itemsPerView)}%, 0, 0)`,
+                  transition: isTransitioning
+                    ? "transform 800ms cubic-bezier(0.16, 1, 0.3, 1)"
+                    : "none",
                 }}
               >
                 {displayProducts.map((product, idx) => (
                   <div
                     key={`${product.id}-${idx}`}
-                    className="flex-shrink-0 px-2 sm:px-3 box-border"
+                    className="flex-shrink-0 px-1.5 sm:px-2 md:px-2.5 box-border"
                     style={{
                       width: `${100 / itemsPerView}%`,
                     }}

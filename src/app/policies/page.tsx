@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Metadata } from "next";
 
 export default function PoliciesPage() {
   const [activeTab, setActiveTab] = useState<string>("all");
@@ -17,184 +16,203 @@ export default function PoliciesPage() {
       badge: "BIS Reg: HM/C-8290497727",
       content: [
         {
-          heading: "Authenticity Guarantee",
-          text: "Every piece of gold jewellery sold at Keshar Jewellers is certified 100% BIS Hallmarked (91.6 / 22K Gold and 75.0 / 18K Gold). We strictly adhere to the standards prescribed by the Bureau of Indian Standards (BIS).",
+          heading: "100% BIS Hallmarked Purity Guarantee",
+          text: "Every piece of gold jewellery sold at Keshar Jewellers is 100% BIS Hallmarked (91.6 / 22K Gold and 75.0 / 18K Gold), adhering strictly to the Bureau of Indian Standards (BIS) regulations.",
         },
         {
-          heading: "HUID (Hallmark Unique Identification)",
-          text: "Our gold ornaments feature a unique 6-digit HUID code stamped by government-approved hallmarking centers, guaranteeing metal purity, origin, and complete traceability.",
+          heading: "6-Digit Laser-Etched HUID Code",
+          text: "Our gold ornaments feature a unique 6-digit HUID (Hallmark Unique Identification) code stamped by government-approved hallmarking centers, ensuring complete traceability and genuine gold purity.",
         },
         {
-          heading: "Pure 92.5 Sterling Silver Certification",
-          text: "All silver ornaments and gift items carry a 92.5 / 925 sterling silver purity stamp to ensure long-lasting luster and absolute material integrity.",
+          heading: "Pure 92.5 Sterling Silver Stamp",
+          text: "All silver ornaments, utensils, and gift articles carry an official 92.5 / 925 sterling silver purity stamp for guaranteed material authenticity and long-lasting shine.",
         },
         {
-          heading: "Natural Gemstone Certificate",
-          text: "All precious & semi-precious stones (Navratna, Diamonds, Rubies, Emeralds) are accompanied by authentic laboratory test certificates upon request.",
+          heading: "Authenticity & Gemstone Certificate",
+          text: "Every purchase includes an official Keshar Jewellers Authenticity Tax Invoice. Precious & semi-precious stones (Diamonds, Navratna, Rubies) come with certified lab test reports.",
         },
       ],
       highlights: [
         "Official BIS Registration Number: HM/C-8290497727",
-        "Laser-etched HUID code on every gold item",
-        "Zero-tolerance on purity compromise",
+        "Unique 6-digit HUID laser code on all gold items",
+        "100% transparent purity testing on digital Karatometer",
       ],
     },
     {
       id: "exchange",
       icon: "🔄",
       title: "Lifetime Exchange & Buyback Policy",
-      subtitle: "Transparent Valuation & Maximum Value for Your Precious Metals",
+      subtitle: "100% Transparent Metal Value & Maximum Worth Guarantee",
       badge: "Lifetime Guarantee",
       content: [
         {
-          heading: "Gold Exchange & Buyback",
-          text: "We offer lifetime exchange and buyback for all gold ornaments purchased from Keshar Jewellers. Exchange value will be calculated based on the prevailing benchmark gold rate on the day of exchange.",
+          heading: "Lifetime Exchange (100% Net Weight Gold Value)",
+          text: "Exchange your Keshar gold ornaments anytime for new designs. You receive 100% value of net gold weight based on the prevailing benchmark gold rate on the day of exchange.",
         },
         {
-          heading: "Valuation & Deduction Terms",
-          text: "For gold items purchased from us with valid original invoice, 100% value of net gold weight will be credited at current gold market rate. Making charges, taxes, and stone weights are non-refundable during exchange.",
+          heading: "Lifetime Buyback Option",
+          text: "We offer lifetime cash/bank buyback at 95% of current market gold value and 90% of current silver value upon purity verification.",
         },
         {
-          heading: "Silver Exchange",
-          text: "Silver ornaments purchased from Keshar Jewellers can be exchanged or sold back based on net silver weight purity tests at current market bullion rates.",
+          heading: "Valuation & Making Charges Terms",
+          text: "Making charges, GST (3%), and stone weights are non-refundable during exchange or buyback, as per standard Indian jewellery industry guidelines.",
         },
         {
-          heading: "Old Gold Exchange (Non-Keshar Jewellery)",
-          text: "We accept old gold from other jewellers subject to purity verification using accurate karatometer testing in our showroom.",
+          heading: "Lab Purity & HUID Code Verification",
+          text: "Returned or exchanged items undergo instant digital Karatometer purity testing and HUID code verification at our showroom to ensure authentic evaluation.",
         },
       ],
       highlights: [
-        "100% net weight value on Keshar Gold ornaments",
-        "Instant digital karatometer purity testing",
-        "Hassle-free upgrade to modern designs",
+        "100% net gold weight credit for Keshar Jewellery exchange",
+        "95% Gold & 90% Silver Buyback cash value",
+        "Hassle-free upgrade to latest festival and bridal designs",
       ],
     },
     {
       id: "shipping",
       icon: "📦",
-      title: "Shipping & Delivery Policy",
-      subtitle: "100% Insured Nationwide Transit & Safe Delivery",
-      badge: "Free Nationwide Shipping",
+      title: "100% Insured Shipping & OTP Delivery Policy",
+      subtitle: "Fully Insured Transit & Secure OTP Verification at Doorstep",
+      badge: "100% Insured Shipping",
       content: [
         {
-          heading: "Fully Insured Transit",
-          text: "Every parcel shipped by Keshar Jewellers is 100% insured against loss, theft, or damage during transit until it reaches your doorstep.",
+          heading: "100% Insured Transit Protection",
+          text: "Every parcel shipped by Keshar Jewellers is fully insured against damage, loss, or theft during transit. You have zero risk while your package is in transit.",
         },
         {
-          heading: "Delivery Timelines",
-          text: "Standard orders are processed and dispatched within 24 to 48 hours. Estimated delivery time across India is 3 to 7 business days depending on pincode serviceability.",
+          heading: "Tamper-Evident Security Packaging",
+          text: "Orders are shipped in double-sealed tamper-evident security boxes. If the outer barcode seal appears broken or tampered with, please refuse delivery immediately.",
         },
         {
-          heading: "Secure Delivery & OTP Verification",
-          text: "High-value shipments require mandatory recipient signature and OTP verification upon delivery. Packages are delivered in tamper-evident sealed security packaging.",
+          heading: "Mandatory OTP Verified Handover",
+          text: "For your safety, the courier delivery agent will only hand over the parcel after verifying the One-Time Password (OTP) sent to your registered mobile number.",
         },
         {
-          heading: "In-Store Pickup Option",
-          text: "Customers in Sehore and surrounding regions can opt for free store pickup at our main showroom: Charkha Line, Sarafa Bazar, Sehore (M.P.).",
+          heading: "Delivery Timelines & Store Pickup",
+          text: "Orders are dispatched within 24-48 hours. Delivery takes 3 to 7 business days across India. Customers can also choose free store pickup at Sarafa Bazar, Sehore (M.P.).",
         },
       ],
       highlights: [
-        "Zero transit risk for customers",
-        "Tamper-proof tamper-evident packaging",
-        "Real-time SMS & WhatsApp tracking updates",
+        "100% transit insurance coverage on all parcels",
+        "Mandatory OTP verification required from customer phone",
+        "Tamper-evident double-sealed security box",
       ],
     },
     {
       id: "returns",
       icon: "🔁",
-      title: "7-Day Return & Refund Policy",
-      subtitle: "Simple, Transparent & Customer-First Return Rights",
-      badge: "7 Days Easy Returns",
+      title: "15-Day Return & Fraud-Proof Refund Policy",
+      subtitle: "Fair, Transparent & Fraud-Protected Return Guidelines",
+      badge: "15 Days Easy Returns",
       content: [
         {
-          heading: "Return Eligibility",
-          text: "Online purchases can be returned or exchanged within 7 days of delivery, provided the item is unworn, undamaged, in original condition with original tags, invoice, and authenticity certificates intact.",
+          heading: "15-Day Return Eligibility",
+          text: "Unused items in original condition with intact security tags, invoice, and BIS certificates can be returned or exchanged within 15 days of delivery.",
         },
         {
-          heading: "Custom & Altered Items",
-          text: "Custom-made jewellery, engraved items, or custom resized rings are not eligible for standard 7-day returns, but remain eligible under our Lifetime Exchange policy.",
+          heading: "Mandatory 360° Uncut Unboxing Video",
+          text: "To protect against fraudulent damage or missing item claims, a continuous uncut 360° unboxing video (starting before opening the sealed parcel box) is mandatory for any claim.",
         },
         {
-          heading: "Refund Process",
-          text: "Once the returned item passes quality inspection at our head office, refunds are processed within 5 to 7 business days to the original payment mode or bank account.",
+          heading: "Non-Returnable Items",
+          text: "Custom-made jewellery, engraved pieces, and Nose Pins (for hygiene reasons) are non-returnable, but remain eligible under our Lifetime Exchange policy.",
         },
         {
-          heading: "Damaged or Wrong Products Received",
-          text: "If you receive a package that is visibly damaged or tampered with, please record an unboxing video and contact us within 24 hours at +91 98274 15111 for immediate replacement.",
+          heading: "Non-Removable Security Seal Tag",
+          text: "Items feature a non-removable security tag. Returns or exchanges are strictly rejected if the security tag is broken, removed, or tampered with.",
         },
       ],
       highlights: [
-        "7-day hassle-free return window for online orders",
-        "Free pickup arranged for approved return requests",
-        "100% refund to original payment source upon verification",
+        "15-day return window for original unused jewellery",
+        "Mandatory 360° uncut unboxing video for transit claims",
+        "100% refund processed within 5-7 days after quality check",
+      ],
+    },
+    {
+      id: "cod",
+      icon: "💵",
+      title: "Cash on Delivery (COD) Security Policy",
+      subtitle: "Advance Verification to Prevent Fake & Unverified Orders",
+      badge: "Secure COD Terms",
+      content: [
+        {
+          heading: "Maximum COD Limit",
+          text: "Cash on Delivery (COD) is available for orders up to ₹20,000. Orders above ₹20,000 require 100% prepaid payment or partial advance deposit.",
+        },
+        {
+          heading: "Advance Token Deposit for COD Dispatch",
+          text: "To prevent fake/unverified orders and logistics wastage, COD orders require a nominal ₹500 or 10% advance deposit via UPI/card before dispatch.",
+        },
+        {
+          heading: "Phone OTP Order Verification",
+          text: "Our team will verify COD orders via phone call and SMS OTP before shipping to ensure valid customer identity and address details.",
+        },
+      ],
+      highlights: [
+        "COD available up to ₹20,000 limit across India",
+        "₹500 advance deposit required for COD order confirmation",
+        "Phone OTP verification prior to dispatch",
       ],
     },
     {
       id: "privacy",
       icon: "🔒",
       title: "Privacy & Data Security Policy",
-      subtitle: "Your Confidentiality & Payment Security Are Our Priority",
+      subtitle: "256-Bit SSL Encrypted Transactions & Complete Confidentiality",
       badge: "SSL Encrypted",
       content: [
         {
-          heading: "Data Protection Guarantee",
-          text: "Keshar Jewellers respects your privacy. We collect personal details (Name, Address, Phone, Email) solely for order fulfillment, billing, shipping updates, and customer support.",
+          heading: "Data Privacy & Confidentiality",
+          text: "We collect customer details (Name, Address, Phone, Email) strictly for billing, delivery updates, and customer support. We never sell or share your data.",
         },
         {
-          heading: "Secure Transactions",
-          text: "All payment transactions are processed using industry-standard SSL encryption and PCI-DSS compliant secure payment gateways. We never store credit card or debit card numbers on our servers.",
+          heading: "PCI-DSS Compliant Payment Gateway",
+          text: "All online payments (Razorpay, UPI, Cards, NetBanking) use 256-bit SSL encryption. Card numbers and UPI PINs are never stored on our servers.",
         },
         {
-          heading: "No Data Sharing",
-          text: "We do not sell, rent, or trade your personal information to third-party advertisers or external marketing organizations under any circumstances.",
+          heading: "No Third-Party Sharing",
+          text: "Your purchase history and contact records remain 100% confidential between you and Keshar Jewellers.",
         },
       ],
       highlights: [
-        "256-Bit SSL Secured Platform",
+        "256-Bit Bank-Grade SSL Encryption",
         "PCI-DSS Compliant Payment Gateways",
-        "Strict confidentiality of purchase records",
+        "100% confidential customer data protection",
       ],
     },
     {
       id: "terms",
       icon: "📜",
-      title: "Terms & Store Guidelines",
-      subtitle: "Transparent Pricing, Making Charges & Rate Lock Rules",
+      title: "Terms & Transparent Pricing Guidelines",
+      subtitle: "Real-Time Gold Rate Lock, Transparent Making Charges & GST Invoice",
       badge: "Store Guidelines",
       content: [
         {
-          heading: "Daily Bullion Rates",
-          text: "Gold and Silver prices are updated daily in accordance with international and national market rates. Orders are locked at the rate active at the moment of payment confirmation.",
+          heading: "Real-Time Bullion Rate Lock",
+          text: "Gold & Silver rates are updated daily based on national bullion market prices. Prices are locked at the moment your payment is confirmed.",
         },
         {
-          heading: "Transparent Making Charges",
-          text: "Our making charges start from as low as 6% on select gold and silver items. Every bill clearly breaks down metal weight, karat rate, making charges, GST (3%), and stone values.",
+          heading: "Transparent Making Charges from 6%",
+          text: "Making charges start from as low as 6% on select items. Every bill clearly itemizes gross weight, net metal weight, metal rate, making charges, and 3% GST.",
         },
         {
-          heading: "Custom Orders & Advance Payment",
-          text: "Custom jewellery designs require a minimum 25% advance booking amount. Final weight variance (+/- 5%) will be adjusted in the final bill upon completion.",
-        },
-        {
-          heading: "Jurisdiction & Legal Notice",
-          text: "Keshar Jewellers operates under the ownership of Amit Kumar Soni in Sarafa Bazar, Sehore. All disputes are subject to Sehore, Madhya Pradesh jurisdiction.",
+          heading: "Legal Jurisdiction",
+          text: "Keshar Jewellers operates under the ownership of Amit Kumar Soni in Sarafa Bazar, Sehore (M.P.). All disputes are subject to Sehore, Madhya Pradesh jurisdiction.",
         },
       ],
       highlights: [
-        "Making charges transparently itemized from 6%",
+        "Transparent making charges itemized from 6%",
         "Real-time gold rate locking upon order placement",
-        "Full GST tax invoice issued with every purchase",
+        "Official GST Tax Invoice provided with every order",
       ],
     },
   ];
 
-  // Filter sections based on search or active tab
   const filteredSections = useMemo(() => {
     return policySections.filter((section) => {
-      // Tab filter
       if (activeTab !== "all" && section.id !== activeTab) {
         return false;
       }
-      // Search query filter
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
       const matchTitle = section.title.toLowerCase().includes(q);
@@ -211,13 +229,12 @@ export default function PoliciesPage() {
     <div className="bg-[#FFF8F0] min-h-screen text-[#35191C] font-sans pb-16">
       {/* Top Banner Hero */}
       <section className="relative bg-[#5E121F] text-[#FFF8F0] py-14 px-4 sm:px-6 lg:px-8 border-b border-[#D4AF37]/30 overflow-hidden">
-        {/* Glow Effects */}
         <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#D4AF37]/15 blur-3xl rounded-full pointer-events-none"></div>
 
         <div className="max-w-5xl mx-auto text-center relative z-10 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#7C1B2A] border border-[#D4AF37]/40 text-[#E6C766] text-xs font-semibold uppercase tracking-[0.2em] shadow-sm">
             <span>✨</span>
-            <span>Trust • Transparency • Purity</span>
+            <span>Trust • Security • Purity</span>
           </div>
 
           <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-[#FFF8F0]">
@@ -225,7 +242,7 @@ export default function PoliciesPage() {
           </h1>
 
           <p className="text-sm sm:text-base text-[#FFE2D8]/80 max-w-2xl mx-auto font-light leading-relaxed">
-            Our commitment to 100% BIS Hallmarked Purity, Lifetime Exchange Guarantee, Insured Shipping, and Transparent Pricing since 2003.
+            Our commitment to 100% BIS Hallmarked Purity, Lifetime Exchange Guarantee, 100% Insured Shipping, OTP Delivery, and Transparent Pricing since 2003.
           </p>
 
           <div className="pt-2 flex flex-wrap justify-center items-center gap-3 text-xs">
@@ -244,11 +261,10 @@ export default function PoliciesPage() {
         {/* Search & Navigation Bar */}
         <div className="bg-[#FFF0EA] border border-[#E8CFC5] rounded-2xl p-4 sm:p-6 mb-8 shadow-sm space-y-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            {/* Live Policy Search Input */}
             <div className="relative w-full md:w-80">
               <input
                 type="text"
-                placeholder="Search policy (e.g., hallmark, exchange, return)..."
+                placeholder="Search policy (e.g., hallmark, exchange, return, COD)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-8 py-2 rounded-xl border border-[#E8CFC5] bg-[#FFFDFC] text-sm text-[#35191C] placeholder-[#6F4A4A]/60 focus:outline-none focus:border-[#B82E44] focus:ring-1 focus:ring-[#B82E44] shadow-inner"
@@ -276,13 +292,11 @@ export default function PoliciesPage() {
               )}
             </div>
 
-            {/* Quick Status / Item count */}
             <p className="text-xs text-[#6F4A4A] font-medium">
               Showing <span className="text-[#B82E44] font-bold">{filteredSections.length}</span> policy category sections
             </p>
           </div>
 
-          {/* Policy Category Filter Tabs */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-t border-[#E8CFC5]/60 pt-3">
             <button
               onClick={() => setActiveTab("all")}
@@ -320,7 +334,6 @@ export default function PoliciesPage() {
                 id={section.id}
                 className="bg-[#FFFDFC] border border-[#E8CFC5] rounded-3xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(72,12,20,0.04)] scroll-mt-24 transition-all hover:border-[#D4AF37]/50"
               >
-                {/* Header of Section */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[#E8CFC5]/60 gap-3">
                   <div className="flex items-start sm:items-center gap-3">
                     <span className="text-3xl bg-[#FFE2D8] p-2.5 rounded-2xl border border-[#E8CFC5]">
@@ -341,7 +354,6 @@ export default function PoliciesPage() {
                   </span>
                 </div>
 
-                {/* Body Content Blocks */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
                   {section.content.map((item, idx) => (
                     <div
@@ -359,7 +371,6 @@ export default function PoliciesPage() {
                   ))}
                 </div>
 
-                {/* Highlights / Key Takeaways Box */}
                 <div className="mt-6 p-4 bg-[#7C1B2A]/5 border border-[#D4AF37]/30 rounded-2xl">
                   <p className="text-[11px] uppercase tracking-[0.2em] font-bold text-[#7C1B2A] mb-2 flex items-center gap-1.5">
                     <span>✨ Key Highlights</span>

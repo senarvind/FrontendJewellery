@@ -13,8 +13,8 @@ interface FeaturedJewelleryCarouselProps {
 export default function FeaturedJewelleryCarousel({
   categories = CATEGORIES,
 }: FeaturedJewelleryCarouselProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const pauseTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Filter only the featured jewellery categories requested
   const featuredCategories = useMemo(() => {
@@ -70,7 +70,7 @@ export default function FeaturedJewelleryCarousel({
     });
   }, [categories]);
 
-  // Infinite seamless loop list (multiplied for continuous loop with 6 items)
+  // Infinite seamless loop list
   const displayList = useMemo(() => {
     if (featuredCategories.length === 0) return [];
     return [
@@ -81,89 +81,69 @@ export default function FeaturedJewelleryCarousel({
     ];
   }, [featuredCategories]);
 
-  // Zero-layout-thrashing 60fps auto-scroll with IntersectionObserver
+  // Pause for 5 seconds on touch or interaction
+  const trigger5SecondPause = () => {
+    setIsPaused(true);
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+    }
+    pauseTimerRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 5000);
+  };
+
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el || displayList.length === 0) return;
-
-    let animId: number;
-    let isVisible = true;
-    let isUserInteracting = false;
-    const speed = 1.0; // Smooth luxury scrolling speed
-
-    // Cache halfWidth to eliminate forced synchronous reflow (layout thrashing)
-    let cachedHalfWidth = el.scrollWidth / 2;
-    const updateDimensions = () => {
-      if (el) {
-        cachedHalfWidth = el.scrollWidth / 2;
-      }
-    };
-
-    window.addEventListener("resize", updateDimensions);
-
-    // Pause animation completely when offscreen
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isVisible = entry.isIntersecting;
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(el);
-
-    // Pause immediately on touch so auto-scroll never fights user's finger
-    let resumeTimeout: NodeJS.Timeout | null = null;
-    const onTouchStart = () => {
-      isUserInteracting = true;
-      if (resumeTimeout) clearTimeout(resumeTimeout);
-    };
-    const onTouchEnd = () => {
-      if (resumeTimeout) clearTimeout(resumeTimeout);
-      resumeTimeout = setTimeout(() => {
-        isUserInteracting = false;
-      }, 3000);
-    };
-
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
-
-    const step = () => {
-      if (isVisible && !isPaused && !isUserInteracting && el) {
-        if (cachedHalfWidth > 0 && el.scrollLeft >= cachedHalfWidth) {
-          el.scrollLeft = 0;
-        } else {
-          el.scrollLeft += speed;
-        }
-      }
-      animId = requestAnimationFrame(step);
-    };
-
-    animId = requestAnimationFrame(step);
-
     return () => {
-      cancelAnimationFrame(animId);
-      observer.disconnect();
-      window.removeEventListener("resize", updateDimensions);
-      if (resumeTimeout) clearTimeout(resumeTimeout);
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchend", onTouchEnd);
+      if (pauseTimerRef.current) {
+        clearTimeout(pauseTimerRef.current);
+      }
     };
-  }, [isPaused, displayList]);
+  }, []);
 
   if (featuredCategories.length === 0) return null;
 
   return (
-    <section className="w-full bg-[#FFF8F0] pt-2 sm:pt-3 pb-8 sm:pb-12 px-6 sm:px-14 md:px-20 lg:px-28 relative overflow-hidden">
-      {/* Container with left and right 1-box inset length */}
-      <div
-        className="max-w-[1180px] mx-auto relative group"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        {/* Continuous Auto-sliding Categories Track (Part of Shop by Category) */}
+    <section className="w-full bg-[#FFF8F0] pt-2 sm:pt-3 pb-8 sm:pb-12 relative overflow-hidden">
+      <style jsx>{`
+        @keyframes marqueeFeatured {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          100% {
+            transform: translate3d(-50%, 0, 0);
+          }
+        }
+        .marquee-featured-track {
+          display: flex;
+          width: max-content;
+          animation: marqueeFeatured 40s linear infinite;
+          will-change: transform;
+        }
+      `}</style>
+
+      {/* Stepped 1-Box Inset Continuous Auto-sliding Track */}
+      <div className="w-full px-6 sm:px-16 md:px-24 lg:px-[172px]">
         <div
-          ref={scrollRef}
-          className="flex items-center gap-3.5 sm:gap-6 lg:gap-7 overflow-x-auto scrollbar-none scroll-touch px-2 sm:px-4 py-2 select-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="w-full relative group overflow-hidden"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => {
+            if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
+            setIsPaused(false);
+          }}
+          onTouchStart={trigger5SecondPause}
+          onTouchMove={trigger5SecondPause}
+          onTouchEnd={trigger5SecondPause}
         >
+          {/* Subtle elegant fade edges at the 1-box boundary */}
+          <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-10 bg-gradient-to-r from-[#FFF8F0] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-6 sm:w-10 bg-gradient-to-l from-[#FFF8F0] to-transparent z-10 pointer-events-none" />
+
+          <div
+            className="marquee-featured-track gap-3.5 sm:gap-6 lg:gap-7 py-2 select-none"
+            style={{
+              animationPlayState: isPaused ? "paused" : "running",
+            }}
+          >
           {displayList.map((cat, idx) => (
             <Link
               key={`${cat.id || cat.slug}-featured-${idx}`}
@@ -201,6 +181,7 @@ export default function FeaturedJewelleryCarousel({
           ))}
         </div>
       </div>
-    </section>
+    </div>
+  </section>
   );
 }
