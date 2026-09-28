@@ -12,7 +12,9 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const { login, forgotPassword, resetPassword } = useAuth();
 
-  const redirectUrl = searchParams.get("redirect") || "/";
+  const rawRedirect = searchParams.get("redirect") || "/";
+  // Prevent Open Redirect: Only allow relative paths starting with a single '/'
+  const redirectUrl = (rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")) ? rawRedirect : "/";
   const noticeMsg = searchParams.get("msg");
 
   // Login form states

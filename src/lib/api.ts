@@ -210,16 +210,37 @@ async function safePost(endpoint: string, bodyData: any) {
   // Unique URLs preserving order
   const uniqueUrls = Array.from(new Set(urlsToTry));
 
+  // Get token from localStorage if on client side
+  let token = "";
+  if (typeof window !== "undefined") {
+    token = localStorage.getItem("keshar_auth_token") || "";
+  }
+
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   for (const url of uniqueUrls) {
     try {
       const res = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(bodyData),
       });
 
       const contentType = res.headers.get("content-type") || "";
       const text = await res.text();
+
+      // If the server responded (even with an error), DO NOT fallback to prevent duplicate orders
+      if (res.status >= 400 && res.status < 600) {
+        try {
+          const data = JSON.parse(text);
+          return data; // Return the backend error directly
+        } catch {
+          return { success: false, error: "Server returned an error" };
+        }
+      }
 
       // Check if response is JSON
       if (contentType.includes("application/json") || text.trim().startsWith("{") || text.trim().startsWith("[")) {
@@ -233,7 +254,8 @@ async function safePost(endpoint: string, bodyData: any) {
         }
       }
     } catch (err) {
-      // Fetch error for this URL, fallback to next URL
+      // Network fetch error, only then fallback to next URL
+      console.warn(`Fetch failed for ${url}, trying fallback if available...`);
     }
   }
 
@@ -258,22 +280,43 @@ export async function updateProductApi(id: string, updatedData: Partial<Product>
   ];
   const uniqueUrls = Array.from(new Set(urlsToTry));
 
+  let token = "";
+  if (typeof window !== "undefined") {
+    token = localStorage.getItem("keshar_auth_token") || "";
+  }
+
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   for (const url of uniqueUrls) {
     try {
       const res = await fetch(url, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(updatedData),
       });
       const contentType = res.headers.get("content-type") || "";
       const text = await res.text();
+      
+      if (res.status >= 400 && res.status < 600) {
+        try {
+          return JSON.parse(text);
+        } catch {
+          return { success: false, error: "Server error" };
+        }
+      }
+
       if (contentType.includes("application/json") || text.trim().startsWith("{")) {
         try {
           const data = JSON.parse(text);
           if (res.ok || data.success !== undefined) return data;
         } catch {}
       }
-    } catch {}
+    } catch (err) {
+       console.warn(`Fetch PUT failed for ${url}`);
+    }
   }
   return { success: false, error: "Backend unreachable. Could not update product." };
 }
