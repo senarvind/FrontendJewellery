@@ -31,8 +31,9 @@ function SignupContent() {
       return;
     }
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError("Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character.");
       return;
     }
 
@@ -136,7 +137,7 @@ function SignupContent() {
           {/* Password */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#35191C] mb-1">
-              Password * (Min 6 characters)
+              Password *
             </label>
             <div className="relative">
               <input

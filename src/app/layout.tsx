@@ -31,7 +31,10 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.kesharjewellers.com/"),
   title: "Keshar Jewellers | Gold & Diamond Jewellery",
-  description: "Explore premium gold, diamond and jewellery collections at Keshar Jewellers. Discover beautiful jewellery for every occasion.",
+  description: "Explore premium gold, diamond and jewellery collections at Keshar Jewellers.",
+  icons: {
+    icon: "/favicon.ico",
+  },
   alternates: {
     canonical: "/",
   },
