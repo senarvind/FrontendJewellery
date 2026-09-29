@@ -101,31 +101,49 @@ export default function PoliciesPage() {
     {
       id: "returns",
       icon: "🔁",
-      title: "15-Day Return & Fraud-Proof Refund Policy",
-      subtitle: "Fair, Transparent & Fraud-Protected Return Guidelines",
-      badge: "15 Days Easy Returns",
+      title: "7-Day Replacement Policy (Strictly No Cash Refund)",
+      subtitle: "Replacement Only for Damaged Ornaments or Wrong Design Delivered",
+      badge: "7 Days Replacement Only",
       content: [
         {
-          heading: "15-Day Return Eligibility",
-          text: "Unused items in original condition with intact security tags, invoice, and BIS certificates can be returned or exchanged within 15 days of delivery.",
+          heading: "Strict No Cash/Bank Refund Policy",
+          text: "Keshar Jewellers operates under a strict 'No Cash / No Bank Refund' policy. Monetary refunds into bank accounts or UPI are strictly not provided under any circumstances. Only product replacement or store exchange is offered.",
+        },
+        {
+          heading: "7-Day Replacement Window (Damage or Wrong Design Only)",
+          text: "Replacement is available within 7 days of delivery strictly under two valid conditions: (1) If the ornament is received in damaged / defective condition from transit, or (2) If a wrong design / wrong product was delivered. Replacement requests for personal change of mind, aesthetic preference, or without valid video proof will strictly not be accepted.",
+        },
+        {
+          heading: "50-50 Reverse Courier Shipping Charge Sharing",
+          text: "For any approved replacement, the reverse courier logistics charge will be shared equally (50-50) between the customer and Keshar Jewellers. 50% of the reverse courier fee must be paid by the customer, and the remaining 50% will be borne by Keshar Jewellers.",
+        },
+        {
+          heading: "Strict 24-Hour Damage & Wrong Design Reporting Window",
+          text: "Any transit damage, defect, or wrong design received must be reported within 24 hours of delivery. Claims submitted after 24 hours will strictly not be accepted as transit insurance and logistics claims expire immediately.",
+        },
+        {
+          heading: "48-Hour Missing Item or Empty Box Claim Deadline",
+          text: "In the rare event of a missing product or tampered outer box, the complaint must be raised within 48 hours of delivery accompanied by continuous unboxing video proof.",
         },
         {
           heading: "Mandatory 360° Uncut Unboxing Video",
-          text: "To protect against fraudulent damage or missing item claims, a continuous uncut 360° unboxing video (starting before opening the sealed parcel box) is mandatory for any claim.",
+          text: "To protect against fraudulent damage or wrong item claims, a continuous uncut 360° unboxing video (starting before opening the sealed parcel box and clearly showing the barcode label) is mandatory. Claims without an uncut video proof cannot be processed.",
         },
         {
           heading: "Non-Returnable Items",
-          text: "Custom-made jewellery, engraved pieces, and Nose Pins (for hygiene reasons) are non-returnable, but remain eligible under our Lifetime Exchange policy.",
+          text: "Custom-made jewellery, engraved pieces, and Nose Pins (for hygiene reasons) are non-replaceable, but remain eligible under our Lifetime Exchange & Buyback policy.",
         },
         {
           heading: "Non-Removable Security Seal Tag",
-          text: "Items feature a non-removable security tag. Returns or exchanges are strictly rejected if the security tag is broken, removed, or tampered with.",
+          text: "All ornaments are shipped with a tamper-evident security seal tag. Replacement requests are strictly rejected if the security tag is cut, removed, or altered.",
         },
       ],
       highlights: [
-        "15-day return window for original unused jewellery",
-        "Mandatory 360° uncut unboxing video for transit claims",
-        "100% refund processed within 5-7 days after quality check",
+        "Strict No Cash Refund — Only Product Replacement provided",
+        "Replacement eligible ONLY for Damaged items or Wrong Design received",
+        "Strict 7-Day replacement window from date of delivery",
+        "Reverse courier shipping charges shared 50% by customer & 50% by store",
+        "Mandatory 24-hour reporting & 360° uncut unboxing video proof",
       ],
     },
     {
@@ -166,6 +184,10 @@ export default function PoliciesPage() {
           text: "We collect customer details (Name, Address, Phone, Email) strictly for billing, delivery updates, and customer support. We never sell or share your data.",
         },
         {
+          heading: "TRAI & DND Exemption Consent",
+          text: "By placing an order or submitting your mobile number on Keshar Jewellers, you expressly agree and consent to receive order updates, delivery OTPs, and service alerts via WhatsApp, SMS, and Voice Calls, even if your number is registered on the National Do Not Disturb (DND / NCPR) registry under TRAI regulations.",
+        },
+        {
           heading: "PCI-DSS Compliant Payment Gateway",
           text: "All online payments (Razorpay, UPI, Cards, NetBanking) use 256-bit SSL encryption. Card numbers and UPI PINs are never stored on our servers.",
         },
@@ -177,6 +199,7 @@ export default function PoliciesPage() {
       highlights: [
         "256-Bit Bank-Grade SSL Encryption",
         "PCI-DSS Compliant Payment Gateways",
+        "Official TRAI & DND compliant order communication consent",
         "100% confidential customer data protection",
       ],
     },

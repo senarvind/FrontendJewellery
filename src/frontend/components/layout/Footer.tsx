@@ -139,7 +139,7 @@ export default function Footer() {
             <span>•</span>
             <Link href="/policies#shipping" className="hover:text-[#FFF8F0] transition-colors">Shipping Policy</Link>
             <span>•</span>
-            <Link href="/policies#returns" className="hover:text-[#FFF8F0] transition-colors">7-Day Returns</Link>
+            <Link href="/policies#returns" className="hover:text-[#FFF8F0] transition-colors">7-Day Replacement</Link>
             <span>•</span>
             <Link href="/policies#privacy" className="hover:text-[#FFF8F0] transition-colors">Privacy Policy</Link>
           </div>

@@ -292,7 +292,7 @@ export default function InfoPage() {
             Looking for Store Policies?
           </h3>
           <p className="text-xs text-[#6F4A4A] max-w-xl mx-auto">
-            Read details about our 100% BIS Hallmark Certification, Lifetime Exchange Guarantee, Insured Shipping, and 7-Day Returns on our policy page.
+            Read details about our 100% BIS Hallmark Certification, Lifetime Exchange Guarantee, Insured Shipping, and 7-Day Replacement on our policy page.
           </p>
           <Link
             href="/policies"
