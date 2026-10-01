@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,6 +26,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
   const [showLoginToast, setShowLoginToast] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>("");
+  const [mounted, setMounted] = useState<boolean>(false);
   const { addToCart } = useCart();
 
   const checkoutItems: CheckoutItem[] = [
@@ -61,6 +63,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 • Total Price: ₹${(product.sellingPrice * quantity).toLocaleString("en-IN")}
 • Item URL ID: ${product.id}`
   );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleAddToCart = () => {
     if (!user) {
@@ -113,20 +119,23 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
 
         {/* Toast Notification for Add to Cart */}
-        {addedToCart && (
-          <div className="fixed bottom-6 right-6 z-50 bg-[#7C1B2A] text-[#FFF8F0] px-5 py-4 rounded-2xl shadow-2xl border border-[#D4AF37]/50 flex items-center gap-4 animate-bounce">
-            <span className="text-2xl">🛍️</span>
-            <div>
-              <p className="text-xs font-bold text-[#E6C766]">Added to Bag!</p>
-              <p className="text-[11px] text-[#FFF8F0]/90">{product.productType} has been added to your cart.</p>
+        {mounted && addedToCart && createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center sm:items-end sm:justify-end pointer-events-none sm:p-6 px-4">
+            <div className="pointer-events-auto w-full max-w-[280px] sm:max-w-none sm:w-auto bg-[#7C1B2A] text-[#FFF8F0] p-5 sm:px-5 sm:py-4 rounded-3xl sm:rounded-2xl shadow-2xl border border-[#D4AF37]/50 flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-4 animate-bounce">
+              <span className="text-4xl sm:text-2xl shrink-0">🛍️</span>
+              <div className="flex-1 w-full">
+                <p className="text-sm sm:text-xs font-bold text-[#E6C766]">Added to Bag!</p>
+                <p className="text-[11px] sm:text-[11px] text-[#FFF8F0]/90 mt-1 sm:mt-0 line-clamp-2 sm:line-clamp-1">{product.productType} has been added to your cart.</p>
+              </div>
+              <Link
+                href="/cart"
+                className="w-full sm:w-auto sm:ml-1 px-4 py-2.5 sm:py-1.5 bg-[#E6C766] hover:bg-[#D4AF37] text-[#35191C] text-xs sm:text-[11px] font-bold rounded-xl transition-all whitespace-nowrap"
+              >
+                View Cart →
+              </Link>
             </div>
-            <Link
-              href="/cart"
-              className="ml-2 px-3 py-1.5 bg-[#E6C766] hover:bg-[#D4AF37] text-[#35191C] text-[11px] font-bold rounded-xl transition-all"
-            >
-              View Cart →
-            </Link>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Main Product Container */}
@@ -380,20 +389,23 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         />
 
         {/* Toast Notification for Login Required */}
-        {showLoginToast && (
-          <div className="fixed bottom-6 right-6 z-50 bg-[#7C1B2A] text-[#FFF8F0] px-5 py-4 rounded-2xl shadow-2xl border border-[#D4AF37]/50 flex items-center gap-4 animate-bounce">
-            <span className="text-2xl">⚠️</span>
-            <div>
-              <p className="text-xs font-bold text-[#E6C766]">Login Required</p>
-              <p className="text-[11px] text-[#FFF8F0]/90">{toastMessage}</p>
+        {mounted && showLoginToast && createPortal(
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center sm:items-end sm:justify-end pointer-events-none sm:p-6 px-4">
+            <div className="pointer-events-auto w-full max-w-[280px] sm:max-w-none sm:w-auto bg-[#7C1B2A] text-[#FFF8F0] p-5 sm:px-5 sm:py-4 rounded-3xl sm:rounded-2xl shadow-2xl border border-[#D4AF37]/50 flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 sm:gap-4 animate-bounce">
+              <span className="text-4xl sm:text-2xl shrink-0">⚠️</span>
+              <div className="flex-1 w-full">
+                <p className="text-sm sm:text-xs font-bold text-[#E6C766]">Login Required</p>
+                <p className="text-[11px] sm:text-[11px] text-[#FFF8F0]/90 mt-1 sm:mt-0 line-clamp-2 sm:line-clamp-1">{toastMessage}</p>
+              </div>
+              <Link
+                href="/login"
+                className="w-full sm:w-auto sm:ml-1 px-4 py-2.5 sm:py-1.5 bg-[#E6C766] hover:bg-[#D4AF37] text-[#35191C] text-xs sm:text-[11px] font-bold rounded-xl transition-all whitespace-nowrap"
+              >
+                Login →
+              </Link>
             </div>
-            <Link
-              href="/login"
-              className="ml-2 px-3 py-1.5 bg-[#E6C766] hover:bg-[#D4AF37] text-[#35191C] text-[11px] font-bold rounded-xl transition-all"
-            >
-              Login →
-            </Link>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </div>
