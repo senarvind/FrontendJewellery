@@ -393,7 +393,7 @@ export default function Navbar() {
                       <span>📦</span> <span>Insured Shipping</span>
                     </Link>
                     <Link href="/policies#returns" className="px-3 py-2 rounded-xl text-[#35191C] hover:bg-[#FFF0EA] hover:text-[#B82E44] transition-all flex items-center gap-2">
-                      <span>🔁</span> <span>7-Day Easy Returns</span>
+                      <span>🔁</span> <span>7-Day Replacement</span>
                     </Link>
                     <Link href="/policies#privacy" className="px-3 py-2 rounded-xl text-[#35191C] hover:bg-[#FFF0EA] hover:text-[#B82E44] transition-all flex items-center gap-2">
                       <span>🔒</span> <span>Privacy &amp; Security</span>
@@ -970,7 +970,7 @@ export default function Navbar() {
                       📦 Insured Shipping
                     </Link>
                     <Link href="/policies#returns" onClick={() => setIsMobileMenuOpen(false)} className="px-2.5 py-1.5 rounded-xl hover:bg-[#FFE2D8] hover:text-[#8B1E2D]">
-                      🔁 7-Day Easy Returns
+                      🔁 7-Day Replacement
                     </Link>
                     <Link href="/policies#privacy" onClick={() => setIsMobileMenuOpen(false)} className="px-2.5 py-1.5 rounded-xl hover:bg-[#FFE2D8] hover:text-[#8B1E2D]">
                       🔒 Privacy &amp; Security

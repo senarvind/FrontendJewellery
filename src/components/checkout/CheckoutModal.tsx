@@ -107,6 +107,13 @@ export default function CheckoutModal({
       return;
     }
 
+    // Strict Indian Phone Number Validation (10 digits)
+    const phoneRegex = /^[6-9]\d{9}$/;
+    if (!phoneRegex.test(customerPhone.replace(/\s+/g, "").replace(/^\+91/, ""))) {
+      setErrorMsg("Please enter a valid 10-digit Indian phone number.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -121,7 +128,8 @@ export default function CheckoutModal({
       // 2. Call backend to create Razorpay Order
       const res = await createRazorpayOrderApi(finalAmount);
       if (!res || !res.success || !res.orderId) {
-        setErrorMsg(res?.error || "Failed to initiate Razorpay order. Please check your API credentials.");
+        console.error("Order creation failed:", res?.error);
+        setErrorMsg("Failed to initiate Razorpay order. Please try again or contact support.");
         setLoading(false);
         return;
       }
@@ -204,10 +212,12 @@ export default function CheckoutModal({
 
               if (onSuccess) onSuccess();
             } else {
-              setErrorMsg(verifyRes?.error || "Payment signature verification failed.");
+              console.error("Payment verification failed:", verifyRes?.error);
+              setErrorMsg("Payment verification failed. Please contact support.");
             }
           } catch (err: any) {
-            setErrorMsg(err.message || "Error verifying payment signature.");
+            console.error("Verification error:", err);
+            setErrorMsg("Error verifying payment signature. Please contact support.");
           } finally {
             setLoading(false);
           }
