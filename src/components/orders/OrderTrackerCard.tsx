@@ -10,6 +10,10 @@ export interface OrderItem {
   category?: string;
   quantity: number;
   price: number;
+  isExchangeRequested?: boolean;
+  exchangeReason?: string;
+  exchangePhoto?: string;
+  exchangeStatus?: string;
 }
 
 export interface OrderData {
@@ -36,6 +40,57 @@ interface OrderTrackerCardProps {
 export default function OrderTrackerCard({ order }: OrderTrackerCardProps) {
   const [tracking, setTracking] = useState<TrackingData | null>(null);
   const [loadingTracking, setLoadingTracking] = useState(false);
+
+  const [exchangeDialogOpen, setExchangeDialogOpen] = useState(false);
+  const [selectedItemForExchange, setSelectedItemForExchange] = useState<OrderItem | null>(null);
+  const [exchangeReason, setExchangeReason] = useState("");
+  const [exchangePhoto, setExchangePhoto] = useState<File | null>(null);
+  const [submittingExchange, setSubmittingExchange] = useState(false);
+
+  const handleOpenExchange = (item: OrderItem) => {
+    setSelectedItemForExchange(item);
+    setExchangeDialogOpen(true);
+  };
+
+  const handleExchangeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedItemForExchange) return;
+    
+    setSubmittingExchange(true);
+    try {
+      // Create Base64 for simplicity
+      let photoUrl = "";
+      if (exchangePhoto) {
+        const reader = new FileReader();
+        photoUrl = await new Promise<string>((resolve) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(exchangePhoto);
+        });
+      }
+
+      const res = await fetch(`/api/orders/${order.id}/exchange/${selectedItemForExchange.productId || selectedItemForExchange.productName}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reason: exchangeReason, photoUrl }),
+      });
+
+      if (res.ok) {
+        alert("Exchange request submitted successfully! We will contact you soon.");
+        setExchangeDialogOpen(false);
+        // Soft refresh order object by window reload
+        window.location.reload();
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to submit exchange request.");
+      }
+    } catch (error) {
+      alert("Failed to submit request.");
+    } finally {
+      setSubmittingExchange(false);
+    }
+  };
 
   useEffect(() => {
     if (order?.id) {
@@ -280,6 +335,22 @@ export default function OrderTrackerCard({ order }: OrderTrackerCardProps) {
                       ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                     </span>
                   </div>
+                  {(order.status === "delivered" || tracking?.currentStatus === "delivered") && (
+                    <div className="mt-3 sm:mt-0 sm:ml-4 flex-shrink-0 flex items-center">
+                      {!item.isExchangeRequested ? (
+                        <button
+                          onClick={() => handleOpenExchange(item)}
+                          className="px-4 py-1.5 bg-[#FFF0EA] hover:bg-[#FFE2D8] border border-[#E8CFC5] text-[#7C1B2A] rounded-xl text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all"
+                        >
+                          Request Exchange
+                        </button>
+                      ) : (
+                        <span className="px-3 py-1.5 bg-[#FFF8E1] border border-[#FDE68A] text-[#B45309] rounded-xl text-[10px] sm:text-xs font-bold flex items-center gap-1">
+                          <span>🔄</span> Exchange {item.exchangeStatus}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))
             ) : (
@@ -322,6 +393,58 @@ export default function OrderTrackerCard({ order }: OrderTrackerCardProps) {
         </div>
 
       </div>
+
+      {/* Exchange Dialog */}
+      {exchangeDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative">
+            <button
+              onClick={() => setExchangeDialogOpen(false)}
+              className="absolute top-4 right-4 text-[#6F4A4A] hover:text-[#7C1B2A] transition-colors"
+            >
+              ✕
+            </button>
+            <h3 className="font-serif text-2xl font-bold text-[#7C1B2A] mb-2">Request Exchange</h3>
+            <p className="text-xs text-[#6F4A4A] mb-6">
+              Experiencing an issue with <strong>{selectedItemForExchange?.productName}</strong>? Let us know.
+            </p>
+
+            <form onSubmit={handleExchangeSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-[#35191C] uppercase tracking-wider mb-1">Issue Description *</label>
+                <textarea
+                  required
+                  value={exchangeReason}
+                  onChange={(e) => setExchangeReason(e.target.value)}
+                  placeholder="e.g. Received damaged product, missing parts..."
+                  className="w-full px-4 py-3 rounded-xl border border-[#E8CFC5] text-sm text-[#35191C] focus:outline-none focus:border-[#7C1B2A] focus:ring-1 focus:ring-[#7C1B2A]"
+                  rows={3}
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#35191C] uppercase tracking-wider mb-1">Product Photo (Optional)</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setExchangePhoto(e.target.files ? e.target.files[0] : null)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#E8CFC5] text-xs file:mr-4 file:py-1.5 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#FFF0EA] file:text-[#7C1B2A] hover:file:bg-[#FFE2D8] transition-all"
+                />
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={submittingExchange}
+                  className="w-full py-3 bg-[#7C1B2A] hover:bg-[#5C131F] text-white rounded-xl text-sm font-bold shadow-md disabled:opacity-50 transition-all"
+                >
+                  {submittingExchange ? "Submitting..." : "Submit Exchange Request"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

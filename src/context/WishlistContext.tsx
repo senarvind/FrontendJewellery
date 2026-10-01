@@ -77,33 +77,8 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     initWishlist();
   }, [token]);
 
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    const sessionId = getOrCreateSessionId();
-    const syncTimeout = setTimeout(async () => {
-      try {
-        setIsSyncing(true);
-        const formatted = wishlistItems.map((p) => ({ productId: p.id, product: p }));
-        await fetch("/api/wishlist", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...getAuthHeaders(),
-          },
-          body: JSON.stringify({ items: formatted, sessionId }),
-        });
-      } catch (err) {
-        console.warn("Failed to persist wishlist into database:", err);
-      } finally {
-        setIsSyncing(false);
-      }
-    }, 600);
-
-    return () => clearTimeout(syncTimeout);
-  }, [wishlistItems, isLoaded]);
-
-  const toggleWishlist = (product: Product) => {
+  const toggleWishlist = async (product: Product) => {
+    // Optimistic local update
     setWishlistItems((prev) => {
       const exists = prev.some((item) => item.id === product.id);
       if (exists) {
@@ -112,14 +87,67 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
         return [...prev, product];
       }
     });
+
+    const sessionId = getOrCreateSessionId();
+    try {
+      setIsSyncing(true);
+      const res = await fetch("/api/wishlist/toggle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify({ product, sessionId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.wishlist && Array.isArray(data.wishlist.items)) {
+          const dbItems: Product[] = data.wishlist.items
+            .map((item: any) => item.product)
+            .filter(Boolean);
+          setWishlistItems(dbItems);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to toggle wishlist item:", err);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const isInWishlist = (productId: string): boolean => {
     return wishlistItems.some((item) => item.id === productId);
   };
 
-  const removeFromWishlist = (productId: string) => {
+  const removeFromWishlist = async (productId: string) => {
+    // Optimistic local update
     setWishlistItems((prev) => prev.filter((item) => item.id !== productId));
+
+    const sessionId = getOrCreateSessionId();
+    try {
+      setIsSyncing(true);
+      const res = await fetch("/api/wishlist/toggle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify({ product: { id: productId }, sessionId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.wishlist && Array.isArray(data.wishlist.items)) {
+          const dbItems: Product[] = data.wishlist.items
+            .map((item: any) => item.product)
+            .filter(Boolean);
+          setWishlistItems(dbItems);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to remove from wishlist:", err);
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const clearWishlist = () => {
