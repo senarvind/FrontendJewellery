@@ -25,6 +25,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [justAdded, setJustAdded] = useState<boolean>(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
+  const [showLoginToast, setShowLoginToast] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string>("");
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { user } = useAuth();
@@ -59,6 +61,12 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!user) {
+      setToastMessage("Please login to add items to your cart.");
+      setShowLoginToast(true);
+      setTimeout(() => setShowLoginToast(false), 3000);
+      return;
+    }
     addToCart(product, 1);
     setJustAdded(true);
     setTimeout(() => setJustAdded(false), 2000);
@@ -67,6 +75,12 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!user) {
+      setToastMessage("Please login to add items to your wishlist.");
+      setShowLoginToast(true);
+      setTimeout(() => setShowLoginToast(false), 3000);
+      return;
+    }
     toggleWishlist(product);
   };
 
@@ -229,6 +243,23 @@ export default function ProductCard({ product }: ProductCardProps) {
           items={checkoutItems}
           totalAmount={product.sellingPrice}
         />
+      )}
+
+      {/* Toast Notification for Login Required */}
+      {showLoginToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-[#7C1B2A] text-[#FFF8F0] px-5 py-4 rounded-2xl shadow-2xl border border-[#D4AF37]/50 flex items-center gap-4 animate-bounce">
+          <span className="text-2xl">⚠️</span>
+          <div>
+            <p className="text-xs font-bold text-[#E6C766]">Login Required</p>
+            <p className="text-[11px] text-[#FFF8F0]/90">{toastMessage}</p>
+          </div>
+          <Link
+            href="/login"
+            className="ml-2 px-3 py-1.5 bg-[#E6C766] hover:bg-[#D4AF37] text-[#35191C] text-[11px] font-bold rounded-xl transition-all"
+          >
+            Login →
+          </Link>
+        </div>
       )}
     </div>
   );

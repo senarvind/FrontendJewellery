@@ -1,11 +1,30 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import ProductCard from "@/frontend/components/products/ProductCard";
 
 export default function WishlistPage() {
   const { wishlistItems, clearWishlist, wishlistCount } = useWishlist();
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login?msg=" + encodeURIComponent("Please login to view your wishlist."));
+    }
+  }, [user, isLoading, router]);
+
+  if (isLoading || !user) {
+    return (
+      <div className="min-h-screen bg-[#FFF8F0] flex items-center justify-center">
+        <div className="text-[#9B1B30] font-bold animate-pulse text-lg">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#FFF8F0] text-[#35191C] p-4 sm:p-8 lg:p-12">

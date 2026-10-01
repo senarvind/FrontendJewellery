@@ -23,6 +23,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [addedToCart, setAddedToCart] = useState<boolean>(false);
   const [quantity, setQuantity] = useState<number>(1);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
+  const [showLoginToast, setShowLoginToast] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string>("");
   const { addToCart } = useCart();
 
   const checkoutItems: CheckoutItem[] = [
@@ -61,6 +63,12 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   );
 
   const handleAddToCart = () => {
+    if (!user) {
+      setToastMessage("Please login to add items to your cart.");
+      setShowLoginToast(true);
+      setTimeout(() => setShowLoginToast(false), 3000);
+      return;
+    }
     addToCart(product, quantity);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 4000);
@@ -196,7 +204,15 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   
                   {/* ❤️ Like / Wishlist Button */}
                   <button
-                    onClick={() => setIsLiked(!isLiked)}
+                    onClick={() => {
+                      if (!user) {
+                        setToastMessage("Please login to add items to your wishlist.");
+                        setShowLoginToast(true);
+                        setTimeout(() => setShowLoginToast(false), 3000);
+                        return;
+                      }
+                      setIsLiked(!isLiked);
+                    }}
                     className={`p-2.5 rounded-full border transition-all duration-300 flex items-center justify-center ${
                       isLiked
                         ? "bg-[#FDF2F2] border-[#F8B4B4] text-[#C81E1E] scale-110 shadow-sm"
@@ -363,6 +379,22 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           totalAmount={product.sellingPrice * quantity}
         />
 
+        {/* Toast Notification for Login Required */}
+        {showLoginToast && (
+          <div className="fixed bottom-6 right-6 z-50 bg-[#7C1B2A] text-[#FFF8F0] px-5 py-4 rounded-2xl shadow-2xl border border-[#D4AF37]/50 flex items-center gap-4 animate-bounce">
+            <span className="text-2xl">⚠️</span>
+            <div>
+              <p className="text-xs font-bold text-[#E6C766]">Login Required</p>
+              <p className="text-[11px] text-[#FFF8F0]/90">{toastMessage}</p>
+            </div>
+            <Link
+              href="/login"
+              className="ml-2 px-3 py-1.5 bg-[#E6C766] hover:bg-[#D4AF37] text-[#35191C] text-[11px] font-bold rounded-xl transition-all"
+            >
+              Login →
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
