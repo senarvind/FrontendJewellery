@@ -29,13 +29,23 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [mounted, setMounted] = useState<boolean>(false);
   const { addToCart } = useCart();
 
+  const [ankletOption, setAnkletOption] = useState<"Single" | "Pair">("Single");
+
+  const activePrice = product.category === "anklets"
+    ? (ankletOption === "Single" ? (product.singlePrice || product.sellingPrice) : (product.pairPrice || product.sellingPrice * 2))
+    : product.sellingPrice;
+
+  const activeMrp = product.category === "anklets"
+    ? (ankletOption === "Single" ? (product.mrp || product.sellingPrice) : (product.mrp ? product.mrp * 2 : product.sellingPrice * 2))
+    : product.mrp;
+
   const checkoutItems: CheckoutItem[] = [
     {
       productId: product.id,
       productName: product.productType || product.description,
       category: product.category,
       quantity: quantity,
-      price: product.sellingPrice,
+      price: activePrice,
     },
   ];
 
@@ -48,8 +58,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const currentImage = images[activeImageIndex]?.src || product.frontImage;
 
   const discountPercent =
-    product.mrp && product.mrp > product.sellingPrice
-      ? Math.round(((product.mrp - product.sellingPrice) / product.mrp) * 100)
+    activeMrp && activeMrp > activePrice
+      ? Math.round(((activeMrp - activePrice) / activeMrp) * 100)
       : 0;
 
   const waMessage = encodeURIComponent(
@@ -60,7 +70,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 • Weight: ${product.weight}
 • Dimensions: L:${product.dimensionL} x W:${product.dimensionW} x H:${product.dimensionH}
 • Quantity: ${quantity}
-• Total Price: ₹${(product.sellingPrice * quantity).toLocaleString("en-IN")}
+• Total Price: ₹${(activePrice * quantity).toLocaleString("en-IN")}
 • Item URL ID: ${product.id}`
   );
 
@@ -75,7 +85,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
       setTimeout(() => setShowLoginToast(false), 3000);
       return;
     }
-    addToCart(product, quantity);
+    const cartProduct = { ...product };
+    if (product.category === "anklets") {
+      cartProduct.sellingPrice = activePrice;
+      cartProduct.mrp = activeMrp;
+      cartProduct.productType = `${product.productType} (${ankletOption})`;
+    }
+    addToCart(cartProduct, quantity);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 4000);
   };
@@ -251,15 +267,36 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 </h1>
               </div>
 
+              {/* Anklet Single/Pair Toggle */}
+              {product.category === "anklets" && (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-bold text-[#35191C]">Select Type:</span>
+                  <div className="flex p-1 bg-[#FFF0EA]/40 border border-[#E8CFC5] rounded-xl">
+                    <button
+                      onClick={() => setAnkletOption("Single")}
+                      className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${ankletOption === "Single" ? "bg-[#7C1B2A] text-white shadow-md" : "text-[#6F4A4A] hover:bg-[#FFE2D8]"}`}
+                    >
+                      Single
+                    </button>
+                    <button
+                      onClick={() => setAnkletOption("Pair")}
+                      className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${ankletOption === "Pair" ? "bg-[#7C1B2A] text-white shadow-md" : "text-[#6F4A4A] hover:bg-[#FFE2D8]"}`}
+                    >
+                      Pair
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Price Section */}
               <div className="bg-[#FFF0EA]/70 p-4 sm:p-5 rounded-2xl border border-[#E8CFC5] space-y-1">
                 <div className="flex items-baseline gap-3">
                   <span className="font-serif text-3xl sm:text-4xl font-bold text-[#7C1B2A]">
-                    ₹{product.sellingPrice.toLocaleString("en-IN")}
+                    ₹{activePrice.toLocaleString("en-IN")}
                   </span>
-                  {product.mrp && product.mrp > product.sellingPrice && (
+                  {activeMrp && activeMrp > activePrice && (
                     <span className="text-base text-[#6F4A4A]/60 line-through">
-                      ₹{product.mrp.toLocaleString("en-IN")} MRP
+                      ₹{activeMrp.toLocaleString("en-IN")} MRP
                     </span>
                   )}
                 </div>
