@@ -603,6 +603,7 @@ export default function Navbar() {
               {/* Mobile Sidebar Menu Toggle Button (Right Side) */}
               <button
                 type="button"
+                suppressHydrationWarning
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsMobileMenuOpen((prev) => !prev);

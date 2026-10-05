@@ -8,6 +8,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import GlobalErrorBoundary from "@/components/common/GlobalErrorBoundary";
+import SplashScreen from "@/frontend/components/layout/SplashScreen";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
   title: "Keshar Jewellers | Gold & Diamond Jewellery",
   description: "Explore premium gold, diamond and jewellery collections at Keshar Jewellers.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/logo-old.png",
   },
   alternates: {
     canonical: "/",
@@ -75,6 +76,7 @@ export default function RootLayout({
         className={`${playfair.variable} ${lato.variable} antialiased min-h-screen flex flex-col justify-between`}
       >
         <GlobalErrorBoundary>
+          <SplashScreen />
           <AuthProvider>
             <CartProvider>
               <WishlistProvider>
