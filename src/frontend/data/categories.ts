@@ -11,7 +11,6 @@ export interface CategoryItem {
 
 export const CATEGORIES: CategoryItem[] = [
   { id: 1, name: "Necklaces", slug: "necklaces", icon: "📿", image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844000/keshar-categories/Necklace.png", gradient: "from-[#FDE8E9] to-[#F7D2D6]", href: "/products/necklaces" },
-  { id: 2, name: "Necklace Sets", slug: "necklace-sets", icon: "✨", gradient: "from-[#FCE4E8] to-[#F5CBD2]", href: "/products/necklace-sets" },
   { id: 3, name: "Earrings", slug: "earrings", icon: "💎", image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844010/keshar-categories/earrings.png", imageClassName: "scale-[1.2] group-hover/item:scale-[1.3]", gradient: "from-[#FDE7EB] to-[#F8D4D9]", href: "/products/earrings" },
   { id: 4, name: "Bangles", slug: "bangles", icon: "⭕", image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844022/keshar-categories/bangels.png", gradient: "from-[#FDEBEF] to-[#F9DBE1]", href: "/products/bangles" },
   { id: 5, name: "Bracelets", slug: "bracelets", icon: "🔗", image: "/images/categories/bracelets.jpg", gradient: "from-[#FCE2E6] to-[#F6C6CD]", href: "/products/bracelets" },
@@ -25,7 +24,6 @@ export const CATEGORIES: CategoryItem[] = [
   { id: 13, name: "Toe Rings", slug: "toe-rings", icon: "👡", image: "/images/categories/toe-rings.png", gradient: "from-[#FCE4E8] to-[#F5CBD2]", href: "/products/toe-rings" },
   { id: 14, name: "Kada", slug: "kada", icon: "⭕", image: "/images/categories/kada.jpg", gradient: "from-[#FDE7EB] to-[#F8D4D9]", href: "/products/kada" },
   { id: 15, name: "Waist Jewellery", slug: "waist-jewellery", icon: "✨", image: "/images/categories/waist-jewellery.jpg", gradient: "from-[#FCE2E6] to-[#F6C6CD]", href: "/products/waist-jewellery" },
-  { id: 16, name: "Bajuband / Armlets", slug: "bajuband-armlets", icon: "💫", gradient: "from-[#FEE8ED] to-[#FAD4DB]", href: "/products/bajuband-armlets" },
   { id: 17, name: "Hair Jewellery", slug: "hair-jewellery", icon: "🌸", image: "/images/categories/hair-jewellery.jpg", gradient: "from-[#FDE5EA] to-[#F8CCD4]", href: "/products/hair-jewellery" },
   { id: 18, name: "Nath", slug: "nath", icon: "💎", image: "/images/categories/nath.jpg", gradient: "from-[#EAF2FE] to-[#D5E4FD]", href: "/products/nath" },
   { id: 19, name: "Bridal Jewellery Sets", slug: "bridal-jewellery-sets", icon: "👑", image: "/images/categories/bridal-jewellery-sets.png", gradient: "from-[#FDEBF1] to-[#F8D5E1]", href: "/products/bridal-jewellery-sets" },
@@ -47,5 +45,4 @@ export const FEATURED_JEWELLERY_SLUGS = [
   "pendants",
   "bridal-jewellery-sets",
   "necklaces",
-  "necklace-sets",
 ];

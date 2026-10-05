@@ -31,11 +31,11 @@ export const heroSlides: HeroSlideData[] = [
   },
   {
     id: 3,
-    title: "Bridal Necklace Sets",
+    title: "Bridal Jewellery Sets",
     subtitle: "Elegance for Your Special Day",
     category: "ROYAL HERITAGE COLLECTION",
-    alt: "Bridal Necklace Set",
-    href: "/products/necklace-sets",
+    alt: "Bridal Jewellery Set",
+    href: "/products/bridal-jewellery-sets",
     image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844000/keshar-categories/Necklace.png"
   },
   {
