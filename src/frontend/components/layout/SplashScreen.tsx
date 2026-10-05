@@ -32,7 +32,7 @@ export default function SplashScreen() {
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >
-      <div className="relative w-48 h-48 sm:w-64 sm:h-64 animate-spin-three-times">
+      <div className="relative w-48 h-48 sm:w-64 sm:h-64 animate-scale-up">
         <Image
           src="/logo-old.png"
           alt="Keshar Jewellers Logo"
