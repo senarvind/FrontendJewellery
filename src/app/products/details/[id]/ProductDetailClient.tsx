@@ -160,28 +160,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           {/* Left Column: Gallery */}
           <div className="space-y-4">
             {/* Active Image Container */}
-            <div className="relative w-full aspect-square rounded-2xl bg-[#FFF0EA] border border-[#E8CFC5] overflow-hidden group shadow-inner">
-              {/* Badges */}
-              <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-                <span className="bg-[#7C1B2A] text-[#FFF8F0] text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-wider shadow-md">
-                  {product.material}
-                </span>
-                {discountPercent > 0 && (
-                  <span className="bg-[#D4AF37] text-[#35191C] text-xs font-bold px-2.5 py-0.5 rounded-md tracking-wider shadow-sm">
-                    {discountPercent}% OFF
-                  </span>
-                )}
-              </div>
-
-              {/* View Label Badge */}
-              <span className="absolute top-4 right-4 bg-[#35191C]/80 backdrop-blur-md text-[#E6C766] text-xs font-semibold px-3 py-1 rounded-lg border border-[#D4AF37]/40 z-10">
-                {images[activeImageIndex].label}
-              </span>
-
+            <div className="relative w-full aspect-square sm:aspect-[4/5] rounded-2xl bg-[#FFF0EA] border border-[#E8CFC5] overflow-hidden group shadow-inner">
               {/* Displayed Image */}
               <Image
                 src={IMAGE_PRESETS.productDetail(currentImage)}
-                alt={`${product.productType} - ${images[activeImageIndex].label}`}
+                alt={`${product.productType}`}
                 fill
                 priority
                 className="object-cover group-hover:scale-105 transition-transform duration-500"

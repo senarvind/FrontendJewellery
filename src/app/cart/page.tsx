@@ -116,76 +116,85 @@ export default function CartPage() {
                 return (
                   <div
                     key={product.id}
-                    className="bg-[#FFFDFC] border border-[#E8CFC5] rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center relative"
+                    className="bg-[#FFFDFC] border border-[#E8CFC5] rounded-2xl p-3 sm:p-5 shadow-xs hover:shadow-md transition-all flex flex-row gap-3 sm:gap-5 items-start sm:items-center relative"
                   >
-                    {/* Item Image */}
-                    <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-[#FFF0EA] border border-[#E8CFC5] overflow-hidden flex-shrink-0">
+                    {/* Item Image (Clean, No Overlay) */}
+                    <Link
+                      href={`/products/details/${product.id}`}
+                      className="relative w-24 h-28 sm:w-28 sm:h-32 rounded-xl bg-[#FFF0EA] border border-[#E8CFC5] overflow-hidden flex-shrink-0 block group"
+                    >
                       <Image
                         src={frontImage}
                         alt={product.productType || "Product Image"}
                         fill
-                        sizes="(max-width: 640px) 112px, 112px"
-                        className="object-cover"
+                        sizes="(max-width: 640px) 96px, 112px"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                      <span className="absolute top-1 left-1 bg-[#7C1B2A] text-[#FFF8F0] text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
-                        {product.material}
-                      </span>
-                    </div>
+                    </Link>
 
                     {/* Item Info */}
-                    <div className="flex-1 space-y-1.5 w-full">
+                    <div className="flex-1 min-w-0 space-y-1.5 w-full">
                       <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#C77D62]">
-                            {product.productType}
-                          </span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#9B1B30] bg-[#FFE2D8] px-2 py-0.5 rounded-full">
+                              {product.productType}
+                            </span>
+                            {product.material && (
+                              <span className="text-[10px] font-medium text-[#6F4A4A] bg-[#FFF0EA] px-1.5 py-0.5 rounded border border-[#E8CFC5]/60">
+                                {product.material}
+                              </span>
+                            )}
+                          </div>
                           <Link
                             href={`/products/details/${product.id}`}
-                            className="font-serif text-base sm:text-lg font-bold text-[#35191C] hover:text-[#7C1B2A] transition-colors block line-clamp-1"
+                            className="font-sans text-sm sm:text-base font-bold text-[#1F1517] hover:text-[#9B1B30] transition-colors block line-clamp-1"
                           >
                             {product.description}
                           </Link>
                         </div>
 
-                        {/* Remove Button (Mobile & Desktop) */}
+                        {/* Remove Button */}
                         <button
                           onClick={() => removeFromCart(product.id)}
-                          className="text-[#6F4A4A] hover:text-[#B82E44] p-1 transition-colors"
+                          className="text-[#6F4A4A] hover:text-[#B82E44] p-1.5 transition-colors shrink-0 cursor-pointer"
                           title="Remove item"
                           aria-label="Remove item"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
                       </div>
 
                       {/* Specs */}
-                      <div className="text-xs text-[#6F4A4A] flex flex-wrap gap-x-4 gap-y-1">
-                        <span>Weight: <strong className="text-[#35191C]">{product.weight || "N/A"}</strong></span>
+                      <div className="text-[11px] sm:text-xs text-[#6F4A4A] flex flex-wrap gap-x-3 gap-y-0.5">
+                        {product.weight && <span>Weight: <strong className="text-[#1F1517]">{product.weight}</strong></span>}
                         {product.dimensionL && (
-                          <span>Dim: <strong className="text-[#35191C]">{product.dimensionL}x{product.dimensionW}x{product.dimensionH}</strong></span>
+                          <span>Dim: <strong className="text-[#1F1517]">{product.dimensionL}×{product.dimensionW}×{product.dimensionH}</strong></span>
                         )}
                       </div>
 
                       {/* Pricing & Quantity Row */}
-                      <div className="flex items-center justify-between pt-2 border-t border-[#E8CFC5]/50 mt-2">
+                      <div className="flex items-center justify-between pt-1.5 border-t border-[#E8CFC5]/60 mt-1.5 flex-wrap gap-2">
                         {/* Quantity Controls */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-bold text-[#6F4A4A] uppercase">Qty:</span>
-                          <div className="flex items-center border border-[#E8CFC5] rounded-lg bg-[#FFF0EA]/60">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[11px] font-bold text-[#6F4A4A]">Qty:</span>
+                          <div className="flex items-center border border-[#E8CFC5] rounded-lg bg-white shadow-xs">
                             <button
                               onClick={() => updateQuantity(product.id, item.quantity - 1)}
-                              className="px-2.5 py-1 text-xs font-bold text-[#7C1B2A] hover:bg-[#FFE2D8] rounded-l-lg transition-colors"
+                              className="px-2.5 py-1 text-xs font-bold text-[#9B1B30] hover:bg-[#FFE2D8] rounded-l-lg transition-colors cursor-pointer"
+                              aria-label="Decrease quantity"
                             >
-                              -
+                              −
                             </button>
-                            <span className="px-3 py-1 text-xs font-semibold text-[#35191C]">
+                            <span className="px-2.5 py-1 text-xs font-bold text-[#1F1517]">
                               {item.quantity}
                             </span>
                             <button
                               onClick={() => updateQuantity(product.id, item.quantity + 1)}
-                              className="px-2.5 py-1 text-xs font-bold text-[#7C1B2A] hover:bg-[#FFE2D8] rounded-r-lg transition-colors"
+                              className="px-2.5 py-1 text-xs font-bold text-[#9B1B30] hover:bg-[#FFE2D8] rounded-r-lg transition-colors cursor-pointer"
+                              aria-label="Increase quantity"
                             >
                               +
                             </button>
@@ -194,11 +203,11 @@ export default function CartPage() {
 
                         {/* Price */}
                         <div className="text-right">
-                          <span className="font-serif text-lg font-bold text-[#7C1B2A]">
+                          <span className="font-sans text-base sm:text-lg font-black text-[#9B1B30]">
                             ₹{itemTotal.toLocaleString("en-IN")}
                           </span>
                           {item.quantity > 1 && (
-                            <span className="block text-[10px] text-[#6F4A4A]">
+                            <span className="block text-[10px] text-[#6F4A4A]/80 font-medium">
                               (₹{unitPrice.toLocaleString("en-IN")} each)
                             </span>
                           )}

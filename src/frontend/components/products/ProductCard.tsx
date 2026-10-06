@@ -145,28 +145,26 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Visual Container (Clickable -> Detail Page) */}
         <div className="relative w-full aspect-[4/5] rounded-xl bg-[#FFF0EA] flex items-center justify-center border border-[#E8CFC5]/60 overflow-hidden mb-2">
 
-          {/* ❤️ Wishlist Button Top-Right */}
+          {/* ❤️ Wishlist Button Top-Right (No Background) */}
           <button
             type="button"
             onClick={handleToggleWishlist}
             suppressHydrationWarning
-            className={`absolute top-2 right-2 z-20 p-1.5 rounded-full border backdrop-blur-md transition-all cursor-pointer ${
-              isLiked
-                ? "bg-white border-[#F8B4B4] text-[#B82E44] shadow-md scale-110"
-                : "bg-[#35191C]/50 border-[#E8CFC5]/40 text-white hover:text-[#B82E44] hover:bg-white"
+            className={`absolute top-2 right-2 z-20 p-1 transition-transform duration-200 cursor-pointer active:scale-125 ${
+              isLiked ? "scale-110" : "hover:scale-110"
             }`}
             aria-label="Wishlist Item"
           >
             <svg
-              className="w-4 h-4"
-              fill={isLiked ? "#B82E44" : "none"}
-              stroke={isLiked ? "#B82E44" : "currentColor"}
+              className="w-5 h-5 sm:w-6 sm:h-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]"
+              fill={isLiked ? "#B82E44" : "rgba(0,0,0,0.15)"}
+              stroke={isLiked ? "#B82E44" : "#FFFFFF"}
+              strokeWidth="2"
               viewBox="0 0 24 24"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="2"
                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
               />
             </svg>
@@ -183,13 +181,6 @@ export default function ProductCard({ product }: ProductCardProps) {
               loading="lazy"
             />
           </Link>
-
-          {/* Discount badge bottom-left */}
-          {discount > 0 && (
-            <span className="absolute bottom-2 left-2 z-10 text-[9px] sm:text-[10px] font-bold text-[#2E7D32] bg-[#E8F5E9]/90 px-1.5 py-0.5 rounded-full border border-[#2E7D32]/30">
-              {discount}% OFF
-            </span>
-          )}
 
           {/* ● ○ ○ Dot Indicators (Bottom Center) */}
           {imageList.length > 1 && (
