@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "Conz4yEYQgt_f4asIcbXpcENeBFdAlv8PNr0wN11hyY",
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
   openGraph: {
     title: "Keshar Jewellers | Gold & Diamond Jewellery",
