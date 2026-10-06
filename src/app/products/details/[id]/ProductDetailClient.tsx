@@ -121,14 +121,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             </Link>
           </div>
 
-          <nav className="text-xs text-[#6F4A4A] flex items-center gap-1.5 sm:gap-2 tracking-wide font-medium overflow-hidden">
+          <nav className="font-sans text-xs sm:text-sm text-[#5C3838] flex items-center gap-1.5 sm:gap-2 tracking-normal font-medium overflow-hidden">
             <Link href="/" className="hover:text-[#7C1B2A] transition-colors">Home</Link>
-            <span>/</span>
+            <span className="text-[#C77D62]">/</span>
             <Link href={`/products/${product.category}`} className="capitalize hover:text-[#7C1B2A] transition-colors">
               {product.category}
             </Link>
-            <span>/</span>
-            <span className="text-[#7C1B2A] font-semibold truncate max-w-[140px] sm:max-w-none">
+            <span className="text-[#C77D62]">/</span>
+            <span className="text-[#9B1B30] font-bold truncate max-w-[140px] sm:max-w-none">
               {product.productType}
             </span>
           </nav>
@@ -223,7 +223,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               {/* Product Header */}
               <div>
                 <div className="flex items-center justify-between gap-4">
-                  <span className="text-xs font-bold uppercase tracking-widest text-[#C77D62]">
+                  <span className="inline-block px-3 py-1 rounded-full font-sans text-xs font-bold tracking-wide uppercase bg-[#FFE2D8] text-[#9B1B30] border border-[#E8CFC5]">
                     {product.productType}
                   </span>
                   
@@ -238,7 +238,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                       }
                       setIsLiked(!isLiked);
                     }}
-                    className={`p-2.5 rounded-full border transition-all duration-300 flex items-center justify-center ${
+                    className={`p-2.5 rounded-full border transition-all duration-300 flex items-center justify-center cursor-pointer ${
                       isLiked
                         ? "bg-[#FDF2F2] border-[#F8B4B4] text-[#C81E1E] scale-110 shadow-sm"
                         : "bg-[#FFF0EA] border-[#E8CFC5] text-[#6F4A4A] hover:text-[#C81E1E] hover:border-[#F8B4B4]"
@@ -247,7 +247,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     title={isLiked ? "Remove from Wishlist" : "Add to Wishlist"}
                   >
                     <svg
-                      className="w-6 h-6 transition-transform active:scale-125"
+                      className="w-5 h-5 transition-transform active:scale-125"
                       fill={isLiked ? "currentColor" : "none"}
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -262,7 +262,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   </button>
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#35191C] leading-snug mt-1">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-sans font-bold text-[#1F1517] leading-relaxed tracking-tight mt-2.5">
                   {product.description}
                 </h1>
               </div>
@@ -270,17 +270,17 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               {/* Anklet Single/Pair Toggle */}
               {product.category === "anklets" && (
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-[#35191C]">Select Type:</span>
-                  <div className="flex p-1 bg-[#FFF0EA]/40 border border-[#E8CFC5] rounded-xl">
+                  <span className="font-sans text-sm font-bold text-[#1F1517]">Select Type:</span>
+                  <div className="flex p-1 bg-[#FFF0EA]/50 border border-[#E8CFC5] rounded-xl">
                     <button
                       onClick={() => setAnkletOption("Single")}
-                      className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${ankletOption === "Single" ? "bg-[#7C1B2A] text-white shadow-md" : "text-[#6F4A4A] hover:bg-[#FFE2D8]"}`}
+                      className={`px-4 py-1.5 rounded-lg font-sans text-sm font-bold transition-all cursor-pointer ${ankletOption === "Single" ? "bg-[#9B1B30] text-white shadow-md" : "text-[#5C3838] hover:bg-[#FFE2D8]"}`}
                     >
                       Single
                     </button>
                     <button
                       onClick={() => setAnkletOption("Pair")}
-                      className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${ankletOption === "Pair" ? "bg-[#7C1B2A] text-white shadow-md" : "text-[#6F4A4A] hover:bg-[#FFE2D8]"}`}
+                      className={`px-4 py-1.5 rounded-lg font-sans text-sm font-bold transition-all cursor-pointer ${ankletOption === "Pair" ? "bg-[#9B1B30] text-white shadow-md" : "text-[#5C3838] hover:bg-[#FFE2D8]"}`}
                     >
                       Pair
                     </button>
@@ -289,40 +289,47 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               )}
 
               {/* Price Section */}
-              <div className="bg-[#FFF0EA]/70 p-4 sm:p-5 rounded-2xl border border-[#E8CFC5] space-y-1">
-                <div className="flex items-baseline gap-3">
-                  <span className="font-serif text-3xl sm:text-4xl font-bold text-[#7C1B2A]">
+              <div className="bg-[#FFF4EE] p-4 sm:p-5 rounded-2xl border border-[#E8CFC5] space-y-1.5 shadow-xs">
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  <span className="font-sans font-black text-3xl sm:text-4xl text-[#9B1B30] tracking-tight">
                     ₹{activePrice.toLocaleString("en-IN")}
                   </span>
                   {activeMrp && activeMrp > activePrice && (
-                    <span className="text-base text-[#6F4A4A]/60 line-through">
+                    <span className="font-sans text-sm sm:text-base text-[#6F4A4A]/70 line-through font-medium">
                       ₹{activeMrp.toLocaleString("en-IN")} MRP
                     </span>
                   )}
+                  {discountPercent > 0 && (
+                    <span className="font-sans text-xs sm:text-sm font-bold text-[#1B5E20] bg-[#E8F5E9] px-2.5 py-0.5 rounded-full border border-[#C8E6C9]">
+                      {discountPercent}% OFF
+                    </span>
+                  )}
                 </div>
-                <p className="text-xs text-[#6F4A4A] font-light">
-                  ✦ Inclusive of all taxes & BIS Hallmarking Certification
+                <p className="font-sans text-xs text-[#5C3838] font-medium flex items-center gap-1.5">
+                  <span className="text-[#C59B27]">✦</span> Inclusive of all taxes &amp; BIS Hallmarking Certification
                 </p>
               </div>
 
               {/* Quantity Selector */}
-              <div className="flex items-center gap-4 py-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#35191C]">
+              <div className="flex items-center gap-4 py-1.5">
+                <span className="font-sans text-sm font-bold text-[#1F1517]">
                   Quantity:
                 </span>
-                <div className="flex items-center border border-[#E8CFC5] rounded-xl bg-[#FFF0EA]/40">
+                <div className="flex items-center border border-[#E8CFC5] rounded-xl bg-white shadow-xs">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3 py-1.5 text-sm font-bold text-[#7C1B2A] hover:bg-[#FFE2D8] rounded-l-xl transition-colors"
+                    className="px-3.5 py-2 font-sans text-sm font-bold text-[#9B1B30] hover:bg-[#FFE2D8] rounded-l-xl transition-colors cursor-pointer"
+                    aria-label="Decrease quantity"
                   >
-                    -
+                    −
                   </button>
-                  <span className="px-4 py-1.5 text-sm font-semibold text-[#35191C]">
+                  <span className="px-4 py-2 font-sans text-sm font-bold text-[#1F1517]">
                     {quantity}
                   </span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="px-3 py-1.5 text-sm font-bold text-[#7C1B2A] hover:bg-[#FFE2D8] rounded-r-xl transition-colors"
+                    className="px-3.5 py-2 font-sans text-sm font-bold text-[#9B1B30] hover:bg-[#FFE2D8] rounded-r-xl transition-colors cursor-pointer"
+                    aria-label="Increase quantity"
                   >
                     +
                   </button>
@@ -330,23 +337,23 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               </div>
 
               {/* Specifications Grid */}
-              <div className="bg-white border border-[#E8CFC5] rounded-2xl p-4 space-y-2 text-xs">
-                <h3 className="font-bold text-[#7C1B2A] uppercase tracking-wider border-b border-[#E8CFC5]/60 pb-1.5">
+              <div className="bg-[#FAF7F5] border border-[#E8CFC5] rounded-2xl p-4 sm:p-5 space-y-3 shadow-xs">
+                <h3 className="font-sans font-bold text-xs uppercase tracking-wider text-[#9B1B30] border-b border-[#E8CFC5]/80 pb-2">
                   Jewellery Specifications
                 </h3>
-                <div className="grid grid-cols-2 gap-2 text-[#35191C]">
-                  <div>
-                    <span className="text-[#6F4A4A] block">Purity & Material:</span>
-                    <span className="font-semibold">{product.material}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E8CFC5]/50">
+                    <span className="text-xs text-[#705252] font-medium block mb-0.5">✨ Purity &amp; Material:</span>
+                    <span className="font-sans font-bold text-[#1F1517]">{product.material || "92.5 Pure Silver"}</span>
                   </div>
-                  <div>
-                    <span className="text-[#6F4A4A] block">Approx Weight:</span>
-                    <span className="font-semibold">{product.weight}</span>
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E8CFC5]/50">
+                    <span className="text-xs text-[#705252] font-medium block mb-0.5">⚖️ Approx Weight:</span>
+                    <span className="font-sans font-bold text-[#1F1517]">{product.weight || "N/A"}</span>
                   </div>
-                  <div className="col-span-2">
-                    <span className="text-[#6F4A4A] block">Dimensions (L x W x H):</span>
-                    <span className="font-semibold">
-                      {product.dimensionL || "N/A"} x {product.dimensionW || "N/A"} x {product.dimensionH || "N/A"}
+                  <div className="bg-white p-2.5 rounded-xl border border-[#E8CFC5]/50 sm:col-span-2">
+                    <span className="text-xs text-[#705252] font-medium block mb-0.5">📏 Dimensions (L × W × H):</span>
+                    <span className="font-sans font-bold text-[#1F1517]">
+                      {product.dimensionL || "N/A"} × {product.dimensionW || "N/A"} × {product.dimensionH || "N/A"}
                     </span>
                   </div>
                 </div>
@@ -366,17 +373,17 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                   }
                   setIsCheckoutOpen(true);
                 }}
-                className="w-full py-4 px-5 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                className="w-full py-3.5 sm:py-4 px-5 bg-[#9B1B30] hover:bg-[#7C1B2A] text-[#FFF8F0] font-sans font-bold text-sm sm:text-base rounded-xl shadow-md hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span className="text-base">💳</span>
-                <span>Buy Now with Razorpay (Online Payment)</span>
+                <span className="text-lg">💳</span>
+                <span>Buy Now with Razorpay</span>
               </button>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* 🛒 Add to Cart Button */}
                 <button
                   onClick={handleAddToCart}
-                  className="w-full py-3 px-4 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] font-bold text-xs uppercase tracking-wider rounded-xl border border-[#E8CFC5] active:scale-[0.98] transition-all shadow-xs flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#9B1B30] font-sans font-bold text-sm rounded-xl border border-[#E8CFC5] active:scale-[0.98] transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span className="text-base">🛒</span>
                   <span>Add to Cart</span>
@@ -386,7 +393,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 <Link
                   href={`https://wa.me/919827415111?text=${waMessage}`}
                   target="_blank"
-                  className="w-full py-3 px-4 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#7C1B2A] font-bold text-xs uppercase tracking-wider rounded-xl border border-[#E8CFC5] active:scale-[0.98] transition-all shadow-xs flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 bg-[#25D366] hover:bg-[#1EBE5D] text-white font-sans font-bold text-sm rounded-xl shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                 >
                   <span className="text-base">💬</span>
                   <span>WhatsApp Enquire</span>
@@ -395,21 +402,21 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             </div>
 
             {/* Hallmarking & Trust Badges */}
-            <div className="grid grid-cols-3 gap-2 pt-4 border-t border-[#E8CFC5]/60 text-center">
+            <div className="grid grid-cols-3 gap-2 pt-4 border-t border-[#E8CFC5]/80 text-center">
               <div className="p-2 space-y-1">
-                <span className="text-lg block">👑</span>
-                <p className="text-[10px] font-bold text-[#7C1B2A] uppercase tracking-wider">100% BIS Hallmark</p>
-                <p className="text-[9px] text-[#6F4A4A]">HM/C-8290497727</p>
+                <span className="text-xl block">👑</span>
+                <p className="font-sans text-xs sm:text-sm font-bold text-[#7C1B2A]">100% BIS Hallmark</p>
+                <p className="font-sans text-[11px] sm:text-xs text-[#5C3838]">HM/C-8290497727</p>
               </div>
-              <div className="p-2 space-y-1 border-x border-[#E8CFC5]/60">
-                <span className="text-lg block">🔄</span>
-                <p className="text-[10px] font-bold text-[#7C1B2A] uppercase tracking-wider">Lifetime Exchange</p>
-                <p className="text-[9px] text-[#6F4A4A]">Guaranteed Value</p>
+              <div className="p-2 space-y-1 border-x border-[#E8CFC5]/80">
+                <span className="text-xl block">🔄</span>
+                <p className="font-sans text-xs sm:text-sm font-bold text-[#7C1B2A]">Lifetime Exchange</p>
+                <p className="font-sans text-[11px] sm:text-xs text-[#5C3838]">Guaranteed Value</p>
               </div>
               <div className="p-2 space-y-1">
-                <span className="text-lg block">🚚</span>
-                <p className="text-[10px] font-bold text-[#7C1B2A] uppercase tracking-wider">Free Shipping</p>
-                <p className="text-[9px] text-[#6F4A4A]">Safe & Insured</p>
+                <span className="text-xl block">🚚</span>
+                <p className="font-sans text-xs sm:text-sm font-bold text-[#7C1B2A]">Free Shipping</p>
+                <p className="font-sans text-[11px] sm:text-xs text-[#5C3838]">Safe &amp; Insured</p>
               </div>
             </div>
 
