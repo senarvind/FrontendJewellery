@@ -2,6 +2,10 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL || "https://jewellery-backend-1ycr.onrender.com"
+).trim().replace(/\/+$/, "");
+
 export interface User {
   id: string;
   name: string;
@@ -37,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setToken(savedToken);
         }
 
-        const res = await fetch("/api/auth/me", {
+        const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
           headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
         });
 
@@ -78,7 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -111,7 +115,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signup = async (name: string, email: string, password: string, phone?: string) => {
     try {
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password, phone }),
@@ -144,13 +148,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const forgotPassword = async (email: string) => {
     try {
-      const res = await fetch("/api/auth/forgot-password", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        return { success: false, error: res.ok ? "Invalid server response" : text || "Failed to send reset code" };
+      }
+
       if (!res.ok || !data.success) {
         return { success: false, error: data.error || "Failed to send reset code" };
       }
@@ -163,13 +174,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const resetPassword = async (email: string, otp: string, newPassword: string) => {
     try {
-      const res = await fetch("/api/auth/reset-password", {
+      const res = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp, newPassword }),
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (parseErr) {
+        return { success: false, error: res.ok ? "Invalid server response" : text || "Failed to reset password" };
+      }
+
       if (!res.ok || !data.success) {
         return { success: false, error: data.error || "Failed to reset password" };
       }
@@ -182,7 +200,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await fetch(`${API_BASE_URL}/api/auth/logout`, { method: "POST" });
     } catch (err) {
       console.error("Logout error:", err);
     } finally {

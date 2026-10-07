@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const backendUrl = process.env.NEXT_PUBLIC_API_URL || "https://my-jewellery-backend.onrender.com";
+const backendUrl = (process.env.NEXT_PUBLIC_API_URL || "https://my-jewellery-backend.onrender.com").trim().replace(/\/+$/, "");
 
 const securityHeaders = [
   {
