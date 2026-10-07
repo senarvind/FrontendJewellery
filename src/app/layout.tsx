@@ -44,6 +44,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
   openGraph: {
     title: "Keshar Jewellers | Gold & Diamond Jewellery",
     description: "Explore premium gold, diamond and jewellery collections at Keshar Jewellers.",

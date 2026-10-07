@@ -26,7 +26,6 @@ export interface CategoryMeta {
 
 export const STORE_CATEGORIES: CategoryMeta[] = [
   { slug: "necklaces", name: "Necklaces", hallmarkText: "✦ BIS 91.6 & 92.5 HALLMARK CERTIFIED ✦" },
-  { slug: "necklace-sets", name: "Necklace Sets", hallmarkText: "✦ BIS 91.6 & 92.5 HALLMARK CERTIFIED ✦" },
   { slug: "earrings", name: "Earrings", hallmarkText: "✦ BIS 91.6 & 92.5 STERLING HALLMARK CERTIFIED ✦" },
   { slug: "bangles", name: "Bangles", hallmarkText: "✦ BIS 91.6 GOLD & 92.5 SILVER CERTIFIED ✦" },
   { slug: "bracelets", name: "Bracelets", hallmarkText: "✦ BIS 91.6 & 92.5 HALLMARK CERTIFIED ✦" },
@@ -40,7 +39,6 @@ export const STORE_CATEGORIES: CategoryMeta[] = [
   { slug: "toe-rings", name: "Toe Rings", hallmarkText: "✦ PURE 92.5 STERLING SILVER ✦" },
   { slug: "kada", name: "Kada", hallmarkText: "✦ 22K GOLD & 92.5 STERLING SILVER ✦" },
   { slug: "waist-jewellery", name: "Waist Jewellery", hallmarkText: "✦ TRADITIONAL HANDCRAFTED 925 SILVER ✦" },
-  { slug: "bajuband-armlets", name: "Bajuband / Armlets", hallmarkText: "✦ ROYAL TRADITIONAL JEWELLERY ✦" },
   { slug: "hair-jewellery", name: "Hair Jewellery", hallmarkText: "✦ BRIDAL HANDCRAFTED JEWELLERY ✦" },
   { slug: "nath", name: "Nath", hallmarkText: "✦ BRIDAL 22K GOLD & 925 SILVER NATH ✦" },
   { slug: "bridal-jewellery-sets", name: "Bridal Jewellery Sets", hallmarkText: "✦ EXQUISITE BRIDAL JEWELLERY SETS ✦" },
@@ -48,7 +46,7 @@ export const STORE_CATEGORIES: CategoryMeta[] = [
   { slug: "kids", name: "Kids/Baby", hallmarkText: "✦ SKIN SAFE 92.5 PURE SILVER ✦" },
   { slug: "pens", name: "Pens", hallmarkText: "✦ 92.5 STERLING SILVER LUXURY GIFTS ✦" },
   { slug: "utensils", name: "Utensils", hallmarkText: "✦ 999 PURE SILVER UTENSILS & ARTIFACTS ✦" },
-  { slug: "artifacts", name: "Artifacts & Idols", hallmarkText: "✦ 999 PURE SILVER ARTIFACTS & IDOLS ✦" },
+  { slug: "artifacts", name: "Idols & Articles", hallmarkText: "✦ 999 PURE SILVER IDOLS & ARTICLES ✦" },
   { slug: "coins-bars", name: "Coins & Bars", hallmarkText: "✦ 24K 999 PURE GOLD & 999 SILVER COINS ✦" },
   { slug: "pooja-articles", name: "Pooja Articles", hallmarkText: "✦ AUTHENTIC SACRED SILVER ARTICLES ✦" },
   { slug: "festival-collection", name: "Festival Collection", hallmarkText: "✦ AUSPICIOUS FESTIVE 91.6 GOLD & 92.5 SILVER ✦" },

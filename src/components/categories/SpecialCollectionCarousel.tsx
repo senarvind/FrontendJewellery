@@ -14,7 +14,7 @@ const COLLECTION_TAGS: Record<string, string> = {
   kids: "Baby & Children",
   pens: "Luxury Silver Gifts",
   utensils: "999 Pure Silver",
-  artifacts: "Sacred Idols & Decor",
+  artifacts: "Idols & Articles",
   "coins-bars": "24K & 999 Silver",
   "pooja-articles": "Devotional & Mandir",
 };

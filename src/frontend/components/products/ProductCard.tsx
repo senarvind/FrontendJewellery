@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,13 +22,15 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  // 0 = Front Image, 1 = Back Image, 2 = Model Image
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [justAdded, setJustAdded] = useState<boolean>(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
   const [showLoginToast, setShowLoginToast] = useState<boolean>(false);
   const [mounted, setMounted] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>("");
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
+
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { user } = useAuth();
@@ -46,17 +48,58 @@ export default function ProductCard({ product }: ProductCardProps) {
     },
   ];
 
-  const images = [
-    { label: "Front", src: product.frontImage || "/images/placeholder.jpg" },
-    { label: "Back", src: product.backImage || product.frontImage || "/images/placeholder.jpg" },
-    { label: "Model", src: product.modelImage || product.frontImage || "/images/placeholder.jpg" },
-  ];
+  // Collect available unique images (Front, Back, Model)
+  const imageList = useMemo(() => {
+    const list = [product.frontImage, product.backImage, product.modelImage].filter(
+      (img): img is string => typeof img === "string" && img.trim().length > 0
+    );
+    const unique = Array.from(new Set(list));
+    return unique.length > 0 ? unique : [product.frontImage || "/images/placeholder.jpg"];
+  }, [product.frontImage, product.backImage, product.modelImage]);
 
   useEffect(() => {
     setMounted(true);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, []);
 
-  const currentImage = images[activeImageIndex]?.src || product.frontImage;
+  // Auto-slide every 1.5s on hover, stop and reset on mouse leave
+  const startAutoSlide = () => {
+    if (imageList.length <= 1) return;
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => {
+      setActiveImageIndex((prev) => (prev + 1) % imageList.length);
+    }, 1500);
+  };
+
+  const stopAutoSlide = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setActiveImageIndex(0);
+  };
+
+  // Mobile swipe support
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null || imageList.length <= 1) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+    if (Math.abs(deltaX) > 40) {
+      if (deltaX < 0) {
+        setActiveImageIndex((prev) => (prev + 1) % imageList.length);
+      } else {
+        setActiveImageIndex((prev) => (prev - 1 + imageList.length) % imageList.length);
+      }
+    }
+    touchStartXRef.current = null;
+  };
+
+  const currentImage = imageList[activeImageIndex] || imageList[0];
   const detailUrl = `/products/details/${product.id}`;
 
   const discount =
@@ -91,76 +134,80 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="bg-[#FFFDFC] rounded-2xl border border-[#E8CFC5] p-2 sm:p-3 shadow-[0_4px_20px_rgba(72,12,20,0.05)] hover:shadow-[0_12px_32px_rgba(72,12,20,0.12)] hover:border-[#E8A58A] transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-full">
+    <div
+      onMouseEnter={startAutoSlide}
+      onMouseLeave={stopAutoSlide}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="bg-[#FFFDFC] rounded-2xl border border-[#E8CFC5] p-2 sm:p-3 shadow-[0_4px_20px_rgba(72,12,20,0.05)] hover:shadow-[0_12px_32px_rgba(72,12,20,0.12)] hover:border-[#E8A58A] transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-full"
+    >
       <div>
         {/* Visual Container (Clickable -> Detail Page) */}
-        <div className="relative w-full aspect-square rounded-xl bg-[#FFF0EA] flex items-center justify-center border border-[#E8CFC5]/60 overflow-hidden mb-2">
-          {/* Subtle Hallmark/Material Badge Top-Left */}
-          <span className="absolute top-1.5 left-1.5 z-10 px-2 py-0.5 rounded-md bg-[#5E121F]/85 backdrop-blur-md text-[9px] sm:text-[10px] font-bold text-[#E6C766] border border-[#D4AF37]/40 uppercase tracking-wider shadow-xs">
-            ✨ {product.material ? product.material.replace(/Sterling Silver/i, "Silver") : "BIS 916"}
-          </span>
+        <div className="relative w-full aspect-[4/5] rounded-xl bg-[#FFF0EA] flex items-center justify-center border border-[#E8CFC5]/60 overflow-hidden mb-2">
 
-          {/* ❤️ Wishlist Button Top-Right */}
+          {/* ❤️ Wishlist Button Top-Right (No Background) */}
           <button
             type="button"
             onClick={handleToggleWishlist}
             suppressHydrationWarning
-            className={`absolute top-1.5 right-1.5 z-20 p-1.5 rounded-full border backdrop-blur-md transition-all cursor-pointer ${
-              isLiked
-                ? "bg-white border-[#F8B4B4] text-[#B82E44] shadow-md scale-110"
-                : "bg-[#35191C]/50 border-[#E8CFC5]/40 text-white hover:text-[#B82E44] hover:bg-white"
+            className={`absolute top-2 right-2 z-20 p-1 transition-transform duration-200 cursor-pointer active:scale-125 ${
+              isLiked ? "scale-110" : "hover:scale-110"
             }`}
             aria-label="Wishlist Item"
           >
             <svg
-              className="w-3.5 h-3.5 sm:w-4 sm:h-4"
-              fill={isLiked ? "#B82E44" : "none"}
-              stroke={isLiked ? "#B82E44" : "currentColor"}
+              className="w-5 h-5 sm:w-6 sm:h-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]"
+              fill={isLiked ? "#B82E44" : "rgba(0,0,0,0.15)"}
+              stroke={isLiked ? "#B82E44" : "#FFFFFF"}
+              strokeWidth="2"
               viewBox="0 0 24 24"
             >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="2"
                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
               />
             </svg>
           </button>
 
-          {/* Sleek Floating Photo Switcher (Front, Back, Model) */}
-          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 bg-[#1E0508]/80 backdrop-blur-md px-2 py-0.5 rounded-full border border-[#D4AF37]/30 shadow-sm">
-            {images.map((img, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setActiveImageIndex(idx);
-                }}
-                onMouseEnter={() => setActiveImageIndex(idx)}
-                className={`px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-semibold transition-all cursor-pointer ${
-                  activeImageIndex === idx
-                    ? "bg-[#B82E44] text-white font-bold shadow-xs scale-105"
-                    : "text-[#FFE2D8]/80 hover:text-white"
-                }`}
-              >
-                {img.label}
-              </button>
-            ))}
-          </div>
-
           {/* Product Image Link */}
           <Link href={detailUrl} className="block w-full h-full relative">
             <Image
               src={IMAGE_PRESETS.productCard(currentImage)}
-              alt={`${product.productType} - ${images[activeImageIndex].label} View`}
+              alt={`${product.productType}`}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-opacity duration-300 group-hover:scale-105"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
               loading="lazy"
             />
           </Link>
+
+          {/* ● ○ ○ Dot Indicators (Bottom Center) */}
+          {imageList.length > 1 && (
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 bg-[#1E0508]/60 backdrop-blur-md px-2 py-1 rounded-full border border-white/20 shadow-xs pointer-events-auto">
+              {imageList.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActiveImageIndex(idx);
+                  }}
+                  onMouseEnter={() => {
+                    if (intervalRef.current) clearInterval(intervalRef.current);
+                    setActiveImageIndex(idx);
+                  }}
+                  className={`transition-all duration-300 rounded-full cursor-pointer ${
+                    activeImageIndex === idx
+                      ? "w-4 h-1.5 bg-[#E6C766] shadow-xs"
+                      : "w-1.5 h-1.5 bg-white/60 hover:bg-white"
+                  }`}
+                  aria-label={`View image ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Material & Weight Specs (Inline Badges) */}
