@@ -68,8 +68,8 @@ export default function RootLayout({
         {/* Preconnect to asset and API domains for lightning fast loading */}
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
-        <link rel="preconnect" href="https://my-jewellery-backend.onrender.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://my-jewellery-backend.onrender.com" />
+        <link rel="preconnect" href="https://jewellery-backend-1ycr.onrender.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://jewellery-backend-1ycr.onrender.com" />
       </head>
       <body
         suppressHydrationWarning

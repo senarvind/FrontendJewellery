@@ -150,7 +150,7 @@ export default function CheckoutModal({
         currency: res.currency || "INR",
         name: "Keshar Jewellers 💎",
         description: `Purchase of ${items.length} ${items.length === 1 ? "Jewellery item" : "items"}`,
-        image: "https://my-jewellery-backend.onrender.com/uploads/logo.png",
+        image: "https://jewellery-backend-1ycr.onrender.com/uploads/logo.png",
         order_id: res.orderId,
         prefill: {
           name: customerName,
