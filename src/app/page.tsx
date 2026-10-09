@@ -13,6 +13,12 @@ import { getAllProducts } from "@/lib/api";
 // Jab images URL-based ho jaaye tab ISR (revalidate=60) pe switch karein
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  alternates: {
+    canonical: "/",
+  },
+};
+
 export default async function Home() {
   const allProducts = await getAllProducts();
 

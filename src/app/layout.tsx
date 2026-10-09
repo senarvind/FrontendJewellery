@@ -37,9 +37,6 @@ export const metadata: Metadata = {
   icons: {
     icon: "/logo-old.png",
   },
-  alternates: {
-    canonical: "/",
-  },
   robots: {
     index: true,
     follow: true,
