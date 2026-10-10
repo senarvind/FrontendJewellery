@@ -12,6 +12,7 @@ import { useAuth } from "@/context/AuthContext";
 import { IMAGE_PRESETS } from "@/lib/cloudinary";
 import dynamic from "next/dynamic";
 import type { CheckoutItem } from "@/components/checkout/CheckoutModal";
+import { productName, productPath, visiblePrice, isInStock } from "@/lib/seo";
 
 const CheckoutModal = dynamic(() => import("@/components/checkout/CheckoutModal"), {
   ssr: false,
@@ -19,9 +20,11 @@ const CheckoutModal = dynamic(() => import("@/components/checkout/CheckoutModal"
 
 interface ProductCardProps {
   product: Product;
+  /** Load this card's image eagerly (use for the first cards above the fold). */
+  priority?: boolean;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, priority = false }: ProductCardProps) {
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [justAdded, setJustAdded] = useState<boolean>(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
@@ -37,14 +40,17 @@ export default function ProductCard({ product }: ProductCardProps) {
   const router = useRouter();
 
   const isLiked = isInWishlist(product.id);
+  const name = productName(product);
+  const price = visiblePrice(product);
+  const inStock = isInStock(product);
 
   const checkoutItems: CheckoutItem[] = [
     {
       productId: product.id,
-      productName: product.productType || product.description,
+      productName: name,
       category: product.category,
       quantity: 1,
-      price: product.sellingPrice,
+      price,
     },
   ];
 
@@ -54,7 +60,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       (img): img is string => typeof img === "string" && img.trim().length > 0
     );
     const unique = Array.from(new Set(list));
-    return unique.length > 0 ? unique : [product.frontImage || "/images/placeholder.jpg"];
+    return unique.length > 0 ? unique : [product.frontImage || "/images/logo.png"];
   }, [product.frontImage, product.backImage, product.modelImage]);
 
   useEffect(() => {
@@ -100,11 +106,11 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   const currentImage = imageList[activeImageIndex] || imageList[0];
-  const detailUrl = `/products/details/${product.id}`;
+  const detailUrl = productPath(product);
 
   const discount =
-    product.mrp && product.mrp > product.sellingPrice
-      ? Math.round(((product.mrp - product.sellingPrice) / product.mrp) * 100)
+    product.mrp && product.mrp > price
+      ? Math.round(((product.mrp - price) / product.mrp) * 100)
       : 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -174,11 +180,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           <Link href={detailUrl} className="block w-full h-full relative">
             <Image
               src={IMAGE_PRESETS.productCard(currentImage)}
-              alt={`${product.productType}`}
+              alt={`${name} – ${product.material}`}
               fill
               className="object-cover transition-opacity duration-300 group-hover:scale-105"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
-              loading="lazy"
+              loading={priority ? "eager" : "lazy"}
+              fetchPriority={priority ? "high" : "auto"}
             />
           </Link>
 
@@ -211,7 +218,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Material & Weight Specs (Inline Badges) */}
-        <div className="flex items-center justify-between gap-1 text-[10px] sm:text-xs text-[#6F4A4A] font-medium mb-1">
+        <div className="flex items-center justify-between gap-1 text-xs text-[#6F4A4A] font-medium mb-1">
           <span className="truncate font-semibold text-[#B82E44] bg-[#FFE2D8] px-1.5 py-0.5 rounded">
             {product.material}
           </span>
@@ -225,9 +232,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Product Type & Title (Link to Details Page) */}
         <Link href={detailUrl} className="block group-hover:text-[#B82E44] transition-colors mb-1">
           <h3 className="font-sans font-bold text-xs sm:text-sm text-[#35191C] leading-snug line-clamp-1 truncate">
-            {product.productType || product.description}
+            {name}
           </h3>
-          <p className="text-[10px] sm:text-xs text-[#6F4A4A]/80 font-normal line-clamp-1 truncate">
+          <p className="text-xs text-[#6F4A4A] font-normal line-clamp-1 truncate">
             {product.description}
           </p>
         </Link>
@@ -239,27 +246,32 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-baseline justify-between gap-1 my-1">
           <div className="flex items-baseline gap-1.5 flex-wrap">
             <span className="font-sans font-extrabold text-base sm:text-lg text-[#9B1B30]">
-              ₹{product.sellingPrice.toLocaleString("en-IN")}
+              ₹{price.toLocaleString("en-IN")}
             </span>
-            {product.mrp && product.mrp > product.sellingPrice && (
-              <span className="text-[10px] sm:text-xs text-[#6F4A4A]/50 line-through font-normal">
+            {product.mrp && product.mrp > price && (
+              <span className="text-xs text-[#6F4A4A] line-through font-normal">
                 ₹{product.mrp.toLocaleString("en-IN")}
               </span>
             )}
           </div>
           {discount > 0 && (
-            <span className="text-[9px] sm:text-xs font-bold text-[#2E7D32] bg-[#E8F5E9] px-1.5 py-0.5 rounded whitespace-nowrap">
+            <span className="text-xs font-bold text-[#2E7D32] bg-[#E8F5E9] px-1.5 py-0.5 rounded whitespace-nowrap">
               {discount}% OFF
             </span>
           )}
         </div>
+
+        {!inStock && (
+          <p className="text-xs font-bold text-[#9B1B30] mb-1">Out of stock – enquire on WhatsApp</p>
+        )}
 
         {/* Action Buttons: Add to Cart & Buy Now */}
         <div className="grid grid-cols-2 gap-1.5 mt-1.5">
           <button
             type="button"
             onClick={handleAddToCart}
-            className={`w-full py-2 px-1.5 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wide border transition-all flex items-center justify-center gap-1 cursor-pointer ${
+            disabled={!inStock}
+            className={`w-full py-2 px-1.5 rounded-lg text-xs disabled:opacity-50 disabled:cursor-not-allowed font-bold uppercase tracking-wide border transition-all flex items-center justify-center gap-1 cursor-pointer ${
               justAdded
                 ? "bg-[#2E7D32] text-white border-[#2E7D32]"
                 : "bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#B82E44] border-[#E8CFC5]"
@@ -281,7 +293,8 @@ export default function ProductCard({ product }: ProductCardProps) {
               }
               setIsCheckoutOpen(true);
             }}
-            className="w-full py-2 px-1.5 bg-[#B82E44] hover:bg-[#7C1B2A] text-[#FFF8F0] text-[10px] sm:text-xs font-bold uppercase tracking-wide rounded-lg shadow-xs active:scale-95 transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
+            disabled={!inStock}
+            className="w-full py-2 px-1.5 bg-[#B82E44] hover:bg-[#7C1B2A] text-[#FFF8F0] text-xs disabled:opacity-50 disabled:cursor-not-allowed font-bold uppercase tracking-wide rounded-lg shadow-xs active:scale-95 transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
           >
             <span>💳 Buy</span>
           </button>
@@ -294,7 +307,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           isOpen={isCheckoutOpen}
           onClose={() => setIsCheckoutOpen(false)}
           items={checkoutItems}
-          totalAmount={product.sellingPrice}
+          totalAmount={price}
         />
       )}
 

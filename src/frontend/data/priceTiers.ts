@@ -18,7 +18,7 @@ export const PRICE_TIERS: PriceTier[] = [
     priceLabel: "Most Liked Products",
     itemsDescription: "Customer Favorites & Trending Hallmarked Jewellery",
     icon: "💖",
-    href: "/products/all"
+    href: "/products"
   },
   {
     id: 2,

@@ -1,10 +1,21 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { getAllProducts } from "@/lib/api";
 import ProductCard from "@/frontend/components/products/ProductCard";
 import { STORE_CATEGORIES } from "@/frontend/types/product";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 300;
+// Only the price ranges we actually link to exist; any other slug is a real 404.
+export const dynamicParams = false;
+
+const PRICE_RANGES: Record<string, { maxPrice: number; title: string }> = {
+  "under-999": { maxPrice: 999, title: "Under ₹999" },
+};
+
+export async function generateStaticParams() {
+  return Object.keys(PRICE_RANGES).map((range) => ({ range }));
+}
 
 interface PriceRangePageProps {
   params: Promise<{
@@ -12,25 +23,22 @@ interface PriceRangePageProps {
   }>;
 }
 
-function parsePriceParam(rangeSlug: string): { maxPrice: number; title: string } {
-  const clean = rangeSlug.toLowerCase().trim();
-  const match = clean.match(/under-(\d+)/);
-  if (match && match[1]) {
-    const num = parseInt(match[1], 10);
-    return {
-      maxPrice: num,
-      title: `Under ₹${num.toLocaleString("en-IN")}`,
-    };
-  }
+export async function generateMetadata({ params }: PriceRangePageProps): Promise<Metadata> {
+  const { range } = await params;
+  const tier = PRICE_RANGES[range];
+  if (!tier) return {};
   return {
-    maxPrice: 999,
-    title: "Under ₹999",
+    title: `Silver Jewellery ${tier.title}`,
+    description: `Hallmarked 92.5 silver rings, earrings, pendants and gifts ${tier.title.toLowerCase()} at Keshar Jewellers, Sarafa Market, Sehore.`,
+    alternates: { canonical: `/products/price/${range}` },
   };
 }
 
 export default async function PriceRangeProductsPage({ params }: PriceRangePageProps) {
   const { range } = await params;
-  const { maxPrice, title } = parsePriceParam(range);
+  const tier = PRICE_RANGES[range];
+  if (!tier) notFound();
+  const { maxPrice, title } = tier;
 
   // Fetch all products across entire store
   const allProducts = await getAllProducts();
@@ -55,10 +63,10 @@ export default async function PriceRangeProductsPage({ params }: PriceRangePageP
   const availableCategories = Object.keys(categoryCounts);
 
   return (
-    <main className="min-h-screen bg-[#FFF8F0] text-[#35191C] px-2.5 sm:px-8 lg:px-12 py-4 sm:py-8">
+    <div className="min-h-screen bg-[#FFF8F0] text-[#35191C] px-2.5 sm:px-8 lg:px-12 py-4 sm:py-8">
       <div className="max-w-7xl mx-auto">
         {/* Breadcrumbs */}
-        <div className="mb-4 sm:mb-6 flex items-center gap-2 text-[10px] sm:text-xs uppercase tracking-widest text-[#B82E44]">
+        <div className="mb-4 sm:mb-6 flex items-center gap-2 text-xs uppercase tracking-widest text-[#B82E44]">
           <Link href="/" className="hover:underline transition-all">
             Home
           </Link>
@@ -72,15 +80,15 @@ export default async function PriceRangeProductsPage({ params }: PriceRangePageP
 
         {/* Page Header */}
         <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-10 px-1">
-          <span className="text-[#C77D62] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-1.5 sm:mb-2">
+          <span className="text-[#965238] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-xs font-bold block mb-1.5 sm:mb-2">
             ✦ AFFORDABLE LUXURY • 92.5 STERLING SILVER &amp; HALLMARK ✦
           </span>
           <h1 className="font-serif text-2xl sm:text-5xl lg:text-6xl text-[#9B1B30] tracking-tight mb-2 sm:mb-3">
-            {title} Collection
+            Silver Jewellery {title}
           </h1>
           <div className="flex items-center justify-center gap-3 my-2 sm:my-3 text-[#D4AF37]/60 w-36 sm:w-48 mx-auto">
             <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
-            <span className="text-[10px] sm:text-xs font-serif text-[#A77C18]">❖</span>
+            <span className="text-xs font-serif text-[#A77C18]">❖</span>
             <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
           </div>
           <p className="font-light text-[#6F4A4A] text-xs sm:text-base leading-relaxed">
@@ -115,8 +123,8 @@ export default async function PriceRangeProductsPage({ params }: PriceRangePageP
         {/* Products Grid */}
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6 lg:gap-8">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {filteredProducts.map((product, i) => (
+              <ProductCard key={product.id} product={product} priority={i < 2} />
             ))}
           </div>
         ) : (
@@ -125,9 +133,9 @@ export default async function PriceRangeProductsPage({ params }: PriceRangePageP
             <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full bg-[#FFF0EA] border border-[#D4AF37]/40 flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4">
               🏷️
             </div>
-            <h3 className="font-serif text-xl sm:text-2xl text-[#9B1B30] mb-2 font-bold">
+            <h2 className="font-serif text-xl sm:text-2xl text-[#9B1B30] mb-2 font-bold">
               No Products Found {title}
-            </h3>
+            </h2>
             <p className="text-xs sm:text-sm text-[#6F4A4A] mb-6 leading-relaxed">
               We are adding new budget-friendly handcrafted designs daily. Connect with our artisans directly on WhatsApp for custom orders or instant catalog previews.
             </p>
@@ -149,6 +157,6 @@ export default async function PriceRangeProductsPage({ params }: PriceRangePageP
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

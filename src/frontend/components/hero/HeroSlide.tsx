@@ -25,7 +25,6 @@ export default function HeroSlide({ slide }: HeroSlideProps) {
           fill
           sizes="100vw"
           className="object-cover object-center"
-          priority
         />
 
         {/* Elegant Gradient Overlay - only when text is present */}
@@ -43,9 +42,9 @@ export default function HeroSlide({ slide }: HeroSlideProps) {
             )}
 
             {slide.title && (
-              <h2 className="font-serif text-2xl sm:text-4xl lg:text-6xl font-extrabold text-[#FFFDFC] tracking-tight leading-tight mb-1 sm:mb-3 drop-shadow-lg">
+              <p className="font-serif text-2xl sm:text-4xl lg:text-6xl font-extrabold text-[#FFFDFC] tracking-tight leading-tight mb-1 sm:mb-3 drop-shadow-lg">
                 {slide.title}
-              </h2>
+              </p>
             )}
 
             {slide.title && (
@@ -95,13 +94,13 @@ export default function HeroSlide({ slide }: HeroSlideProps) {
 
         {/* Left Side: Typography & Product Tagline */}
         <div className="flex-1 flex flex-col items-center md:items-start text-center md:text-left justify-center max-w-xl">
-          <span className="inline-block text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#C77D62] font-bold mb-1 sm:mb-2">
+          <span className="inline-block text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#965238] font-bold mb-1 sm:mb-2">
             {slide.category}
           </span>
 
-          <h2 className="font-serif text-xl xs:text-2xl sm:text-4xl lg:text-5xl font-bold text-[#B82E44] tracking-tight leading-tight mb-1 sm:mb-2">
+          <p className="font-serif text-xl xs:text-2xl sm:text-4xl lg:text-5xl font-bold text-[#B82E44] tracking-tight leading-tight mb-1 sm:mb-2">
             {slide.title}
-          </h2>
+          </p>
 
           {/* Ornamental Divider */}
           <div className="flex items-center gap-2 sm:gap-3 my-1 sm:my-2 text-[#B82E44]/60 w-28 xs:w-36 md:w-48">
@@ -128,7 +127,7 @@ export default function HeroSlide({ slide }: HeroSlideProps) {
           <div className="relative w-28 h-28 xs:w-36 xs:h-36 sm:w-52 sm:h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 xl:w-80 xl:h-80 rounded-full bg-gradient-to-br from-[#FFF8F0]/90 via-[#FFE2D8]/80 to-[#FFF0EA]/70 border-2 border-[#E8A58A] shadow-[0_10px_30px_rgba(122,16,33,0.12)] flex items-center justify-center p-2 sm:p-4">
             <div className="w-full h-full rounded-full border border-dashed border-[#D4AF37] flex items-center justify-center text-center relative overflow-hidden">
               {slide.image ? (
-                <Image src={slide.image} alt={slide.alt} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover p-1.5 sm:p-2 rounded-full" priority />
+                <Image src={slide.image} alt={slide.alt} fill sizes="(max-width: 639px) 112px, (max-width: 767px) 208px, (max-width: 1023px) 256px, (max-width: 1279px) 288px, 320px" className="object-cover p-1.5 sm:p-2 rounded-full" />
               ) : (
                 <div className="relative z-10 flex flex-col items-center justify-center p-2 sm:p-6">
                   <span className="text-2xl sm:text-5xl md:text-6xl mb-1 filter drop-shadow-[0_10px_20px_rgba(212,175,55,0.4)]">

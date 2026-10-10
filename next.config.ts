@@ -23,23 +23,16 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), payment=(self)",
   },
-  {
-    key: "X-XSS-Protection",
-    value: "1; mode=block",
-  },
 ];
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
-      },
-      {
-        protocol: "https",
-        hostname: "jewellery-backend-1ycr.onrender.com",
       },
       {
         protocol: "https",
@@ -57,6 +50,17 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+    ];
+  },
+  // Old / duplicate URLs → one canonical page each (308 = permanent, keeps Google ranking).
+  async redirects() {
+    return [
+      { source: "/about", destination: "/info", permanent: true },
+      { source: "/policy", destination: "/policies", permanent: true },
+      { source: "/track-order", destination: "/orders", permanent: true },
+      { source: "/products/all", destination: "/products", permanent: true },
+      { source: "/products/religious-gift-items", destination: "/products/pooja-articles", permanent: true },
+      { source: "/products/price/under-1000", destination: "/products/price/under-999", permanent: true },
     ];
   },
   async rewrites() {

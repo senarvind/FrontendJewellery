@@ -1,13 +1,20 @@
+import type { Metadata } from 'next';
 import { getActiveOffers, Offer } from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export const revalidate = 60;
 
-export const metadata = {
-  title: 'Special Offers | Keshar Jewellers',
-  description: 'Exclusive jewellery offers and discounts from Keshar Jewellers, Sehore.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const offers = await getActiveOffers().catch(() => []);
+  return {
+    title: 'Jewellery Offers & Discounts',
+    description: 'Current offers on 92.5 silver and hallmarked gold jewellery at Keshar Jewellers, Sarafa Market, Sehore.',
+    alternates: { canonical: '/offers' },
+    // An empty "no offers" page should not appear in Google.
+    ...(offers.length === 0 ? { robots: { index: false, follow: true } } : {}),
+  };
+}
 
 function OfferCard({ offer }: { offer: Offer }) {
   const validTo = new Date(offer.validTo);
@@ -112,7 +119,7 @@ export default async function OffersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#FFF8F0] pb-24 md:pb-8">
+    <div className="min-h-screen bg-[#FFF8F0] pb-24 md:pb-8">
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-[#9B1B30] to-[#6B0F20] text-white py-10 px-4 text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
@@ -125,7 +132,7 @@ export default async function OffersPage() {
           Special Offers
         </h1>
         <p className="text-sm text-white/80 max-w-md mx-auto">
-          Keshar Jewellers ki taraf se khaas offers — limited time ke liye!
+          Exclusive offers from Keshar Jewellers, Sehore – for a limited time.
         </p>
       </div>
 
@@ -139,16 +146,16 @@ export default async function OffersPage() {
               </svg>
             </div>
             <h2 className="font-serif text-xl text-[#35191C] font-semibold mb-2">
-              Abhi koi offers nahi hain
+              No offers right now
             </h2>
             <p className="text-sm text-[#6F4A4A] mb-6">
-              Jald hi khaas offers laayenge — tab tak hamare collection dekhein!
+              New offers are coming soon – meanwhile, explore our collection.
             </p>
             <Link
               href="/products"
               className="inline-block bg-[#9B1B30] text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-[#7C1424] transition-colors"
             >
-              Jewellery Dekhein
+              Browse Jewellery
             </Link>
           </div>
         ) : (
@@ -164,6 +171,6 @@ export default async function OffersPage() {
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 }

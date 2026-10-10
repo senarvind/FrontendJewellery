@@ -480,7 +480,7 @@ export default function ProfilePage() {
               </p>
               <div className="pt-1">
                 <Link
-                  href="/products/all"
+                  href="/products"
                   className="inline-block px-4 py-2 bg-[#7C1B2A] text-white text-xs font-bold rounded-xl shadow-sm"
                 >
                   Start Shopping Now

@@ -4,13 +4,14 @@ import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { safeRedirect } from "@/lib/security/safeRedirect";
 
 function SignupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signup } = useAuth();
 
-  const redirectUrl = searchParams.get("redirect") || "/";
+  const redirectUrl = safeRedirect(searchParams.get("redirect"));
   const noticeMsg = searchParams.get("msg");
 
   const [name, setName] = useState("");

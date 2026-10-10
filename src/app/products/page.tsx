@@ -1,29 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllProducts } from "@/lib/api";
 import ProductCard from "@/frontend/components/products/ProductCard";
 import { STORE_CATEGORIES } from "@/frontend/types/product";
 
-export const revalidate = 60;
+export const revalidate = 300;
 
-export default async function AllProductsPage(props: {
-  searchParams?: Promise<{ maxPrice?: string }>;
-}) {
-  const searchParams = props.searchParams ? await props.searchParams : {};
-  const maxPriceNum = searchParams?.maxPrice ? parseFloat(searchParams.maxPrice) : null;
+export const metadata: Metadata = {
+  title: "All Jewellery – 92.5 Silver & Hallmark Gold",
+  description: "Browse every piece at Keshar Jewellers, Sehore – 92.5 sterling silver payal, rings, chains, earrings, pooja articles and BIS hallmark 22K gold jewellery.",
+  alternates: { canonical: "/products" },
+};
+
+export default async function AllProductsPage() {
   const allProducts = await getAllProducts();
-  const safeAllProducts = Array.isArray(allProducts) ? allProducts : [];
-
-  const products =
-    maxPriceNum && !isNaN(maxPriceNum)
-      ? safeAllProducts.filter((p) => {
-          const raw = p.sellingPrice;
-          const price =
-            typeof raw === "number"
-              ? raw
-              : parseFloat(String(raw || "").replace(/[^0-9.]/g, ""));
-          return !isNaN(price) && price > 0 && price < maxPriceNum;
-        })
-      : safeAllProducts;
+  const products = Array.isArray(allProducts) ? allProducts : [];
 
   // Extract unique category names from products
   const categoryCounts = products.reduce((acc: Record<string, number>, p) => {
@@ -33,7 +24,7 @@ export default async function AllProductsPage(props: {
   }, {});
 
   return (
-    <main className="min-h-screen bg-[#FFF8F0] text-[#35191C] px-2.5 sm:px-8 lg:px-12 py-4 sm:py-8">
+    <div className="min-h-screen bg-[#FFF8F0] text-[#35191C] px-2.5 sm:px-8 lg:px-12 py-4 sm:py-8">
       <div className="max-w-7xl mx-auto">
         {/* Back Navigation Bar */}
         <div className="mb-4 sm:mb-6 flex items-center justify-between gap-3 bg-[#FFF0EA] border border-[#E8CFC5] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-xs">
@@ -46,7 +37,7 @@ export default async function AllProductsPage(props: {
             </svg>
             <span>Back to Home</span>
           </Link>
-          <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#6F4A4A] overflow-hidden">
+          <div className="flex items-center gap-1.5 text-xs text-[#6F4A4A] overflow-hidden">
             <Link href="/" className="hover:text-[#9B1B30] font-medium hover:underline">Home</Link>
             <span>/</span>
             <span className="text-[#9B1B30] font-bold">All Products</span>
@@ -55,7 +46,7 @@ export default async function AllProductsPage(props: {
 
         {/* Page Header */}
         <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-10 px-1">
-          <span className="text-[#C77D62] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-1.5 sm:mb-2">
+          <span className="text-[#965238] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-xs font-bold block mb-1.5 sm:mb-2">
             ✦ BIS 91.6 GOLD & 92.5 STERLING SILVER CERTIFIED ✦
           </span>
           <h1 className="font-serif text-2xl sm:text-5xl lg:text-6xl text-[#9B1B30] tracking-tight mb-2 sm:mb-3">
@@ -63,7 +54,7 @@ export default async function AllProductsPage(props: {
           </h1>
           <div className="flex items-center justify-center gap-3 my-2 sm:my-3 text-[#D4AF37]/60 w-36 sm:w-48 mx-auto">
             <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
-            <span className="text-[10px] sm:text-xs font-serif text-[#A77C18]">❖</span>
+            <span className="text-xs font-serif text-[#A77C18]">❖</span>
             <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
           </div>
           <p className="font-light text-[#6F4A4A] text-xs sm:text-base leading-relaxed">
@@ -101,8 +92,8 @@ export default async function AllProductsPage(props: {
         {/* Products Grid */}
         {products.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6 lg:gap-8">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {products.map((product, i) => (
+              <ProductCard key={product.id} product={product} priority={i < 2} />
             ))}
           </div>
         ) : (
@@ -127,6 +118,6 @@ export default async function AllProductsPage(props: {
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

@@ -4,6 +4,7 @@ import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { safeRedirect } from "@/lib/security/safeRedirect";
 
 type ViewMode = "login" | "forgot_email" | "forgot_otp" | "success";
 
@@ -14,7 +15,7 @@ function LoginContent() {
 
   const rawRedirect = searchParams.get("redirect") || "/";
   // Prevent Open Redirect: Only allow relative paths starting with a single '/'
-  const redirectUrl = (rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")) ? rawRedirect : "/";
+  const redirectUrl = safeRedirect(rawRedirect);
   const noticeMsg = searchParams.get("msg");
 
   // Login form states

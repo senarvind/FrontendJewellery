@@ -11,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { IMAGE_PRESETS } from "@/lib/cloudinary";
 import CheckoutModal, { CheckoutItem } from "@/components/checkout/CheckoutModal";
+import { categoryName, isInStock, productName, productPath, SITE_URL } from "@/lib/seo";
 
 interface ProductDetailClientProps {
   product: Product;
@@ -28,6 +29,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [toastMessage, setToastMessage] = useState<string>("");
   const [mounted, setMounted] = useState<boolean>(false);
   const { addToCart } = useCart();
+  const name = productName(product);
+  const inStock = isInStock(product);
 
   const [ankletOption, setAnkletOption] = useState<"Single" | "Pair">("Single");
 
@@ -42,7 +45,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const checkoutItems: CheckoutItem[] = [
     {
       productId: product.id,
-      productName: product.productType || product.description,
+      productName: name,
       category: product.category,
       quantity: quantity,
       price: activePrice,
@@ -50,9 +53,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   ];
 
   const images = [
-    { label: "Front View", src: product.frontImage || "/images/placeholder.jpg" },
-    { label: "Back / Stamp View", src: product.backImage || product.frontImage || "/images/placeholder.jpg" },
-    { label: "Model Wear View", src: product.modelImage || product.frontImage || "/images/placeholder.jpg" },
+    { label: "Front View", src: product.frontImage || "/images/logo.png" },
+    { label: "Back / Stamp View", src: product.backImage || product.frontImage || "/images/logo.png" },
+    { label: "Model Wear View", src: product.modelImage || product.frontImage || "/images/logo.png" },
   ];
 
   const currentImage = images[activeImageIndex]?.src || product.frontImage;
@@ -64,14 +67,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
   const waMessage = encodeURIComponent(
     `Hello Keshar Jewellers, I want to BUY / order this item:
-• Product: ${product.productType}
+• Product: ${name}
 • Description: ${product.description}
 • Material: ${product.material}
 • Weight: ${product.weight}
 • Dimensions: L:${product.dimensionL} x W:${product.dimensionW} x H:${product.dimensionH}
 • Quantity: ${quantity}
 • Total Price: ₹${(activePrice * quantity).toLocaleString("en-IN")}
-• Item URL ID: ${product.id}`
+• Link: ${SITE_URL}${productPath(product)}`
   );
 
   useEffect(() => {
@@ -103,16 +106,15 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         {/* Back & Breadcrumb Navigation */}
         <div className="flex items-center justify-between gap-3 bg-[#FFF0EA] border border-[#E8CFC5] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-xs flex-wrap">
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => router.back()}
+            <Link
+              href={`/products/${product.category}`}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#FFE2D8] text-[#7C1B2A] transition-all text-xs font-bold border border-[#E8CFC5] shadow-xs active:scale-95"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              <span>Back</span>
-            </button>
+              <span>More {categoryName(product.category)}</span>
+            </Link>
             <Link
               href="/"
               className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#9B1B30] hover:bg-[#7C1B2A] text-[#FFF8F0] transition-all text-xs font-bold shadow-xs active:scale-95"
@@ -123,13 +125,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
           <nav className="font-sans text-xs sm:text-sm text-[#5C3838] flex items-center gap-1.5 sm:gap-2 tracking-normal font-medium overflow-hidden">
             <Link href="/" className="hover:text-[#7C1B2A] transition-colors">Home</Link>
-            <span className="text-[#C77D62]">/</span>
-            <Link href={`/products/${product.category}`} className="capitalize hover:text-[#7C1B2A] transition-colors">
-              {product.category}
+            <span className="text-[#965238]">/</span>
+            <Link href={`/products/${product.category}`} className="hover:text-[#7C1B2A] transition-colors">
+              {categoryName(product.category)}
             </Link>
-            <span className="text-[#C77D62]">/</span>
+            <span className="text-[#965238]">/</span>
             <span className="text-[#9B1B30] font-bold truncate max-w-[140px] sm:max-w-none">
-              {product.productType}
+              {name}
             </span>
           </nav>
         </div>
@@ -164,9 +166,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               {/* Displayed Image */}
               <Image
                 src={IMAGE_PRESETS.productDetail(currentImage)}
-                alt={`${product.productType}`}
+                alt={`${name} – ${images[activeImageIndex]?.label ?? "Front View"}`}
                 fill
-                priority
+                loading="eager"
+                fetchPriority="high"
                 className="object-cover group-hover:scale-105 transition-transform duration-500"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
@@ -186,7 +189,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 >
                   <Image
                     src={IMAGE_PRESETS.categoryIcon(img.src)}
-                    alt={img.label}
+                    alt={`${name} – ${img.label}`}
                     fill
                     sizes="(max-width: 640px) 80px, 120px"
                     className="object-cover rounded-lg"
@@ -246,8 +249,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 </div>
 
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-sans font-bold text-[#1F1517] leading-relaxed tracking-tight mt-2.5">
-                  {product.description}
+                  {name}
                 </h1>
+                {product.description && product.description !== name && (
+                  <p className="mt-1.5 text-sm text-[#5C3838] leading-relaxed">{product.description}</p>
+                )}
+                {!inStock && (
+                  <p className="mt-2 text-sm font-bold text-[#9B1B30]">Out of stock – enquire on WhatsApp for re-order</p>
+                )}
               </div>
 
               {/* Anklet Single/Pair Toggle */}
@@ -278,7 +287,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     ₹{activePrice.toLocaleString("en-IN")}
                   </span>
                   {activeMrp && activeMrp > activePrice && (
-                    <span className="font-sans text-sm sm:text-base text-[#6F4A4A]/70 line-through font-medium">
+                    <span className="font-sans text-sm sm:text-base text-[#6F4A4A] line-through font-medium">
                       ₹{activeMrp.toLocaleString("en-IN")} MRP
                     </span>
                   )}
@@ -321,9 +330,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
               {/* Specifications Grid */}
               <div className="bg-[#FAF7F5] border border-[#E8CFC5] rounded-2xl p-4 sm:p-5 space-y-3 shadow-xs">
-                <h3 className="font-sans font-bold text-xs uppercase tracking-wider text-[#9B1B30] border-b border-[#E8CFC5]/80 pb-2">
+                <h2 className="font-sans font-bold text-xs uppercase tracking-wider text-[#9B1B30] border-b border-[#E8CFC5]/80 pb-2">
                   Jewellery Specifications
-                </h3>
+                </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                   <div className="bg-white p-2.5 rounded-xl border border-[#E8CFC5]/50">
                     <span className="text-xs text-[#705252] font-medium block mb-0.5">✨ Purity &amp; Material:</span>
@@ -349,14 +358,15 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <button
                 onClick={() => {
                   if (!user) {
-                    const redirectUrl = encodeURIComponent(`/products/details/${product.id}`);
+                    const redirectUrl = encodeURIComponent(productPath(product));
                     const msg = encodeURIComponent("Please sign in to buy this product.");
                     router.push(`/login?redirect=${redirectUrl}&msg=${msg}`);
                     return;
                   }
                   setIsCheckoutOpen(true);
                 }}
-                className="w-full py-3.5 sm:py-4 px-5 bg-[#9B1B30] hover:bg-[#7C1B2A] text-[#FFF8F0] font-sans font-bold text-sm sm:text-base rounded-xl shadow-md hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                disabled={!inStock}
+                className="w-full disabled:opacity-50 disabled:cursor-not-allowed py-3.5 sm:py-4 px-5 bg-[#9B1B30] hover:bg-[#7C1B2A] text-[#FFF8F0] font-sans font-bold text-sm sm:text-base rounded-xl shadow-md hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span className="text-lg">💳</span>
                 <span>Buy Now with Razorpay</span>
@@ -366,7 +376,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 {/* 🛒 Add to Cart Button */}
                 <button
                   onClick={handleAddToCart}
-                  className="w-full py-3 px-4 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#9B1B30] font-sans font-bold text-sm rounded-xl border border-[#E8CFC5] active:scale-[0.98] transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+                  disabled={!inStock}
+                  className="w-full disabled:opacity-50 disabled:cursor-not-allowed py-3 px-4 bg-[#FFF0EA] hover:bg-[#FFE2D8] text-[#9B1B30] font-sans font-bold text-sm rounded-xl border border-[#E8CFC5] active:scale-[0.98] transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span className="text-base">🛒</span>
                   <span>Add to Cart</span>
@@ -376,7 +387,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                 <Link
                   href={`https://wa.me/919827415111?text=${waMessage}`}
                   target="_blank"
-                  className="w-full py-3 px-4 bg-[#25D366] hover:bg-[#1EBE5D] text-white font-sans font-bold text-sm rounded-xl shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 bg-[#075E54] hover:bg-[#064C44] text-white font-sans font-bold text-sm rounded-xl shadow-xs active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                 >
                   <span className="text-base">💬</span>
                   <span>WhatsApp Enquire</span>
@@ -412,7 +423,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           isOpen={isCheckoutOpen}
           onClose={() => setIsCheckoutOpen(false)}
           items={checkoutItems}
-          totalAmount={product.sellingPrice * quantity}
+          totalAmount={activePrice * quantity}
         />
 
         {/* Toast Notification for Login Required */}

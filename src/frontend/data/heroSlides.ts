@@ -25,7 +25,7 @@ export const heroSlides: HeroSlideData[] = [
     title: "Flora Mangalsutra",
     subtitle: "A Symbol of Love & Grace",
     category: "SACRED SIGNATURE COLLECTION",
-    alt: "Flora Mangalsutra - Pure Gold & Diamond",
+    alt: "Flora mangalsutra with black beads – Keshar Jewellers",
     href: "/products/mangalsutra",
     image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844035/keshar-categories/Mangalsutra.jpg"
   },

@@ -1,16 +1,13 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
+import { BUSINESS } from "@/lib/seo";
 
+// Server component: every FAQ answer is in the HTML so Google can read it.
 export default function InfoPage() {
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
-
   const faqs = [
     {
       question: "Where is Keshar Jewellers located in Sehore?",
       answer:
-        "Our flagship showroom is located in Charkha Line, Sarafa Bazar, Sehore, Madhya Pradesh – 466001. We are situated in the heart of Sarafa Bazar, easily accessible with dedicated customer assistance.",
+        "Our showroom is on Charkha Line, Sarafa Market, Sehore, Madhya Pradesh – 466001, in the heart of the Sehore Sarafa (jewellers' market). Open the Google Maps link on this page for directions.",
     },
     {
       question: "Are all gold ornaments certified with BIS Hallmark?",
@@ -20,12 +17,12 @@ export default function InfoPage() {
     {
       question: "What are the store operating hours?",
       answer:
-        "Our showroom is open Monday through Saturday from 10:30 AM to 8:30 PM. On Sundays, we are open from 11:00 AM to 7:00 PM.",
+        "Our showroom is open Monday to Saturday from 10:00 AM to 10:30 PM, and on Sunday from 11:00 AM to 8:00 PM.",
     },
     {
       question: "Can I order customized bridal or temple jewellery?",
       answer:
-        "Absolulely! We specialize in custom hand-crafted gold & silver bridal sets, traditional temple ornaments, and personalized gemstone rings. You can bring your design ideas or choose from our extensive catalogue.",
+        "Absolutely! We specialize in custom hand-crafted gold & silver bridal sets, traditional temple ornaments, and personalized gemstone rings. You can bring your design ideas or choose from our extensive catalogue.",
     },
     {
       question: "What are your making charges?",
@@ -72,11 +69,11 @@ export default function InfoPage() {
       </section>
 
       {/* Main Content Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 space-y-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 space-y-12">
         {/* Section 1: Store Story & Heritage */}
         <section id="story" className="scroll-mt-24 bg-[#FFFDFC] border border-[#E8CFC5] rounded-3xl p-6 sm:p-10 shadow-[0_4px_20px_rgba(72,12,20,0.04)] grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div className="space-y-4">
-            <span className="text-xs uppercase tracking-[0.25em] text-[#C77D62] font-bold">
+            <span className="text-xs uppercase tracking-[0.25em] text-[#965238] font-bold">
               ✦ Our Heritage &amp; Legacy ✦
             </span>
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#7C1B2A] leading-tight">
@@ -107,7 +104,7 @@ export default function InfoPage() {
           </div>
 
           {/* Showroom Info Box */}
-          <div className="bg-gradient-to-br from-[#7C1B2A] to-[#5E121F] text-[#FFF8F0] p-6 sm:p-8 rounded-3xl border border-[#D4AF37]/40 shadow-xl space-y-6">
+          <div id="location" className="scroll-mt-24 bg-gradient-to-br from-[#7C1B2A] to-[#5E121F] text-[#FFF8F0] p-6 sm:p-8 rounded-3xl border border-[#D4AF37]/40 shadow-xl space-y-6">
             <div className="border-b border-[#D4AF37]/30 pb-4 flex items-center justify-between">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.2em] text-[#E6C766] font-bold">Showroom Contact</p>
@@ -121,7 +118,7 @@ export default function InfoPage() {
                 <span className="text-[#E6C766] text-base">📍</span>
                 <div>
                   <p className="font-semibold text-[#FFF8F0]">Address:</p>
-                  <p>Charkha Line, Sarafa Bazar, Sehore, Madhya Pradesh – 466001</p>
+                  <p>Charkha Line, Sarafa Market, Sehore, Madhya Pradesh – 466001</p>
                 </div>
               </div>
 
@@ -129,8 +126,9 @@ export default function InfoPage() {
                 <span className="text-[#E6C766] text-base">🕒</span>
                 <div>
                   <p className="font-semibold text-[#FFF8F0]">Operating Hours:</p>
-                  <p>Mon – Sat: 10:30 AM – 8:30 PM</p>
-                  <p>Sunday: 11:00 AM – 7:00 PM</p>
+                  {BUSINESS.hoursDisplay.map((h) => (
+                    <p key={h}>{h}</p>
+                  ))}
                 </div>
               </div>
 
@@ -138,14 +136,30 @@ export default function InfoPage() {
                 <span className="text-[#E6C766] text-base">📞</span>
                 <div>
                   <p className="font-semibold text-[#FFF8F0]">Direct Phone / WhatsApp:</p>
-                  <p className="text-[#E6C766] font-mono text-sm font-medium">+91 98274 15111</p>
+                  <p className="text-[#E6C766] font-mono text-sm font-medium">{BUSINESS.phoneDisplay}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="text-[#E6C766] text-base">✉️</span>
+                <div>
+                  <p className="font-semibold text-[#FFF8F0]">Email:</p>
+                  <a href={`mailto:${BUSINESS.email}`} className="text-[#E6C766] break-all">{BUSINESS.email}</a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="text-[#E6C766] text-base">🧾</span>
+                <div>
+                  <p className="font-semibold text-[#FFF8F0]">GSTIN / BIS Registration:</p>
+                  <p>{BUSINESS.gstin} • {BUSINESS.bisRegistration}</p>
                 </div>
               </div>
             </div>
 
             <div className="pt-2 flex flex-wrap gap-3">
               <a
-                href="https://maps.google.com/?q=Charkha+Line+Sarafa+Bazar+Sehore+Madhya+Pradesh+466001"
+                href={BUSINESS.googleBusinessUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 min-w-[140px] text-center px-4 py-2.5 bg-[#E6C766] hover:bg-[#FFF8F0] text-[#5E121F] font-bold text-xs rounded-xl transition-all shadow-md"
@@ -165,7 +179,7 @@ export default function InfoPage() {
         {/* Section 2: Purity & Hallmarking Guide */}
         <section id="purity" className="scroll-mt-24 bg-[#FFFDFC] border border-[#E8CFC5] rounded-3xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(72,12,20,0.04)] space-y-6">
           <div className="border-b border-[#E8CFC5]/60 pb-4">
-            <span className="text-xs uppercase tracking-[0.2em] text-[#C77D62] font-bold">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#965238] font-bold">
               ✦ Gold &amp; Silver Purity Standards ✦
             </span>
             <h2 className="font-serif text-2xl font-bold text-[#7C1B2A]">
@@ -200,7 +214,7 @@ export default function InfoPage() {
                 <span className="px-2 py-0.5 bg-[#FFE2D8] text-[#9B1B30] text-[10px] font-bold rounded">92.5% Purity</span>
               </div>
               <p className="text-xs text-[#6F4A4A] leading-relaxed font-light">
-                Premium grade silver standard used for payal (anklets), bichhiya (toe rings), silver coins, and pooja utensils.
+                Premium grade silver standard used for payal (anklets), bichhiya (toe rings), chains, rings, utensils and pooja articles.
               </p>
             </div>
           </div>
@@ -209,7 +223,7 @@ export default function InfoPage() {
         {/* Section 3: Custom Jewellery Order Process */}
         <section id="custom" className="scroll-mt-24 bg-[#FFFDFC] border border-[#E8CFC5] rounded-3xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(72,12,20,0.04)] space-y-6">
           <div className="border-b border-[#E8CFC5]/60 pb-4">
-            <span className="text-xs uppercase tracking-[0.2em] text-[#C77D62] font-bold">
+            <span className="text-xs uppercase tracking-[0.2em] text-[#965238] font-bold">
               ✦ Bespoke Craftsmanship ✦
             </span>
             <h2 className="font-serif text-2xl font-bold text-[#7C1B2A]">
@@ -220,26 +234,26 @@ export default function InfoPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-[#FFF8F0] border border-[#E8CFC5] p-4 rounded-2xl text-center space-y-2">
               <span className="w-8 h-8 rounded-full bg-[#7C1B2A] text-[#FFF8F0] font-bold text-xs flex items-center justify-center mx-auto">1</span>
-              <h4 className="font-bold text-xs text-[#35191C]">Design Consultation</h4>
-              <p className="text-[11px] text-[#6F4A4A]">Share reference photos or select patterns in showroom.</p>
+              <h3 className="font-bold text-xs text-[#35191C]">Design Consultation</h3>
+              <p className="text-xs text-[#6F4A4A]">Share reference photos or select patterns in showroom.</p>
             </div>
 
             <div className="bg-[#FFF8F0] border border-[#E8CFC5] p-4 rounded-2xl text-center space-y-2">
               <span className="w-8 h-8 rounded-full bg-[#7C1B2A] text-[#FFF8F0] font-bold text-xs flex items-center justify-center mx-auto">2</span>
-              <h4 className="font-bold text-xs text-[#35191C]">Weight &amp; Rate Estimation</h4>
-              <p className="text-[11px] text-[#6F4A4A]">Get clear breakdown of gold weight, karat, and making charges.</p>
+              <h3 className="font-bold text-xs text-[#35191C]">Weight &amp; Rate Estimation</h3>
+              <p className="text-xs text-[#6F4A4A]">Get clear breakdown of gold weight, karat, and making charges.</p>
             </div>
 
             <div className="bg-[#FFF8F0] border border-[#E8CFC5] p-4 rounded-2xl text-center space-y-2">
               <span className="w-8 h-8 rounded-full bg-[#7C1B2A] text-[#FFF8F0] font-bold text-xs flex items-center justify-center mx-auto">3</span>
-              <h4 className="font-bold text-xs text-[#35191C]">Master Crafting</h4>
-              <p className="text-[11px] text-[#6F4A4A]">Experienced artisans handcraft your piece with precision.</p>
+              <h3 className="font-bold text-xs text-[#35191C]">Master Crafting</h3>
+              <p className="text-xs text-[#6F4A4A]">Experienced artisans handcraft your piece with precision.</p>
             </div>
 
             <div className="bg-[#FFF8F0] border border-[#E8CFC5] p-4 rounded-2xl text-center space-y-2">
               <span className="w-8 h-8 rounded-full bg-[#7C1B2A] text-[#FFF8F0] font-bold text-xs flex items-center justify-center mx-auto">4</span>
-              <h4 className="font-bold text-xs text-[#35191C]">BIS Hallmarking &amp; Delivery</h4>
-              <p className="text-[11px] text-[#6F4A4A]">Final HUID certification stamp &amp; safe showroom pickup/delivery.</p>
+              <h3 className="font-bold text-xs text-[#35191C]">BIS Hallmarking &amp; Delivery</h3>
+              <p className="text-xs text-[#6F4A4A]">Final HUID certification stamp &amp; safe showroom pickup/delivery.</p>
             </div>
           </div>
         </section>
@@ -248,7 +262,7 @@ export default function InfoPage() {
         <section id="faq" className="scroll-mt-24 bg-[#FFFDFC] border border-[#E8CFC5] rounded-3xl p-6 sm:p-8 shadow-[0_4px_20px_rgba(72,12,20,0.04)] space-y-6">
           <div className="border-b border-[#E8CFC5]/60 pb-4 flex items-center justify-between">
             <div>
-              <span className="text-xs uppercase tracking-[0.2em] text-[#C77D62] font-bold">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#965238] font-bold">
                 ✦ Frequently Asked Questions ✦
               </span>
               <h2 className="font-serif text-2xl font-bold text-[#7C1B2A]">
@@ -259,30 +273,21 @@ export default function InfoPage() {
           </div>
 
           <div className="space-y-3">
-            {faqs.map((faq, index) => {
-              const isOpen = openFaq === index;
-              return (
-                <div
-                  key={index}
-                  className="bg-[#FFF8F0] border border-[#E8CFC5] rounded-2xl overflow-hidden transition-colors"
-                >
-                  <button
-                    onClick={() => setOpenFaq(isOpen ? null : index)}
-                    className="w-full p-4 text-left flex items-center justify-between font-semibold text-xs sm:text-sm text-[#35191C] hover:text-[#B82E44]"
-                  >
-                    <span>{faq.question}</span>
-                    <span className="text-[#B82E44] font-bold text-base font-mono ml-2">
-                      {isOpen ? "−" : "+"}
-                    </span>
-                  </button>
-                  {isOpen && (
-                    <div className="px-4 pb-4 text-xs text-[#6F4A4A] leading-relaxed border-t border-[#E8CFC5]/40 pt-3">
-                      {faq.answer}
-                    </div>
-                  )}
+            {faqs.map((faq, index) => (
+              <details
+                key={faq.question}
+                open={index === 0}
+                className="group bg-[#FFF8F0] border border-[#E8CFC5] rounded-2xl overflow-hidden"
+              >
+                <summary className="list-none [&::-webkit-details-marker]:hidden w-full p-4 cursor-pointer flex items-center justify-between font-semibold text-sm text-[#35191C] hover:text-[#B82E44]">
+                  <h3 className="text-sm font-semibold">{faq.question}</h3>
+                  <span className="text-[#B82E44] font-bold text-base font-mono ml-2 transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <div className="px-4 pb-4 text-sm text-[#6F4A4A] leading-relaxed border-t border-[#E8CFC5]/40 pt-3">
+                  {faq.answer}
                 </div>
-              );
-            })}
+              </details>
+            ))}
           </div>
         </section>
 
@@ -301,7 +306,7 @@ export default function InfoPage() {
             Read Our Store Policies →
           </Link>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

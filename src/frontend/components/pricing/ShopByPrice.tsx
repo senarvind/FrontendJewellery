@@ -8,7 +8,7 @@ export default function ShopByPrice() {
 
         {/* Section Header */}
         <div className="text-center mb-6 sm:mb-8 select-none">
-          <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] text-[#C77D62] font-bold block mb-1">
+          <span className="text-[10px] sm:text-xs uppercase tracking-[0.3em] text-[#965238] font-bold block mb-1">
             CURATED SELECTION
           </span>
           <h2 className="font-serif italic text-3xl sm:text-4xl md:text-5xl font-normal text-[#B82E44] tracking-tight">
