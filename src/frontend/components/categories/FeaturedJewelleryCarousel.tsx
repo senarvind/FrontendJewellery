@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
+import React, { useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CATEGORIES, CategoryItem, FEATURED_JEWELLERY_SLUGS } from "@/frontend/data/categories";
@@ -13,14 +13,7 @@ interface FeaturedJewelleryCarouselProps {
 export default function FeaturedJewelleryCarousel({
   categories = CATEGORIES,
 }: FeaturedJewelleryCarouselProps) {
-  const [isPaused, setIsPaused] = useState(false);
-  const pauseTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Touch drag state
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const touchStartXRef = useRef<number>(0);
-  const touchStartScrollRef = useRef<number>(0);
-  const isDraggingRef = useRef<boolean>(false);
 
   // Filter only the featured jewellery categories requested
   const featuredCategories = useMemo(() => {
@@ -65,108 +58,18 @@ export default function FeaturedJewelleryCarousel({
     });
   }, [categories]);
 
-  // 4x duplicate for infinite seamless loop — gives enough room for manual dragging too
-  const displayList = useMemo(() => {
-    if (featuredCategories.length === 0) return [];
-    return [
-      ...featuredCategories,
-      ...featuredCategories,
-      ...featuredCategories,
-      ...featuredCategories,
-    ];
-  }, [featuredCategories]);
-
-  // Resume auto-slide after 5s of inactivity
-  const scheduleResume = useCallback(() => {
-    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
-    pauseTimerRef.current = setTimeout(() => {
-      setIsPaused(false);
-      isDraggingRef.current = false;
-    }, 5000);
-  }, []);
-
-  // ── Touch handlers ──────────────────────────────────────────────────────────
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
-    setIsPaused(true);
-    isDraggingRef.current = true;
-    touchStartXRef.current = e.touches[0].clientX;
-    touchStartScrollRef.current = scrollContainerRef.current?.scrollLeft ?? 0;
-  }, []);
-
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!isDraggingRef.current || !scrollContainerRef.current) return;
-    const deltaX = touchStartXRef.current - e.touches[0].clientX;
-    scrollContainerRef.current.scrollLeft = touchStartScrollRef.current + deltaX;
-  }, []);
-
-  const handleTouchEnd = useCallback(() => {
-    scheduleResume();
-  }, [scheduleResume]);
-
-  // Desktop: pause on hover
-  const handleMouseEnter = useCallback(() => {
-    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
-    setIsPaused(true);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
-    setIsPaused(false);
-  }, []);
-
-  // Desktop arrow scroll
-  const handleArrowScroll = useCallback((direction: "left" | "right") => {
-    setIsPaused(true);
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({
-        left: direction === "left" ? -240 : 240,
-        behavior: "smooth",
-      });
-    }
-    scheduleResume();
-  }, [scheduleResume]);
-
-  useEffect(() => {
-    return () => {
-      if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current);
-    };
-  }, []);
+  // Each category is rendered once (native swipe on mobile, arrows on desktop).
+  const handleArrowScroll = (direction: "left" | "right") => {
+    scrollContainerRef.current?.scrollBy({ left: direction === "left" ? -240 : 240, behavior: "smooth" });
+  };
 
   if (featuredCategories.length === 0) return null;
 
   return (
     <section className="w-full bg-[#FFF8F0] pt-2 sm:pt-3 pb-8 sm:pb-12 relative overflow-hidden">
-      <style jsx>{`
-        @keyframes marqueeFeatured {
-          0%   { transform: translate3d(0, 0, 0); }
-          100% { transform: translate3d(-50%, 0, 0); }
-        }
-        .marquee-featured-track {
-          display: flex;
-          width: max-content;
-          animation: marqueeFeatured 40s linear infinite;
-          will-change: transform;
-        }
-        /* Hide scrollbar but keep scrollable */
-        .featured-scroll-container {
-          -webkit-overflow-scrolling: touch;
-          overscroll-behavior-x: contain;
-          scrollbar-width: none;
-          -ms-overflow-x: hidden;
-        }
-        .featured-scroll-container::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
-
       {/* Stepped 1-Box Inset Continuous Auto-sliding Track */}
       <div className="w-full px-6 sm:px-16 md:px-24 lg:px-[172px]">
-        <div
-          className="w-full relative group"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
+        <div className="w-full relative group">
           {/* Subtle fade edges */}
           <div className="absolute left-0 top-0 bottom-0 w-6 sm:w-10 bg-gradient-to-r from-[#FFF8F0] to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-6 sm:w-10 bg-gradient-to-l from-[#FFF8F0] to-transparent z-10 pointer-events-none" />
@@ -196,37 +99,27 @@ export default function FeaturedJewelleryCarousel({
           {/* Scrollable container — becomes draggable on touch */}
           <div
             ref={scrollContainerRef}
-            className={`w-full featured-scroll-container ${
-              isPaused ? "overflow-x-scroll" : "overflow-hidden"
-            }`}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
+            className="w-full overflow-x-auto scrollbar-none snap-x snap-mandatory overscroll-x-contain"
           >
-            <div
-              className="marquee-featured-track gap-3.5 sm:gap-6 lg:gap-7 py-2 select-none"
-              style={{
-                animationPlayState: isPaused ? "paused" : "running",
-              }}
-            >
-              {displayList.map((cat, idx) => (
+            <div className="flex w-max mx-auto gap-3.5 sm:gap-6 lg:gap-7 py-2 px-4 select-none">
+              {featuredCategories.map((cat) => (
                 <Link
-                  key={`${cat.id || cat.slug}-featured-${idx}`}
+                  key={`${cat.id || cat.slug}-featured`}
                   href={cat.href || `/products/${cat.slug}`}
                   draggable={false}
-                  className="flex flex-col items-center group/item flex-shrink-0 cursor-pointer transition-transform duration-300 hover:scale-105 w-24 sm:w-28 md:w-32 lg:w-36 select-none"
+                  className="snap-start flex flex-col items-center group/item flex-shrink-0 cursor-pointer transition-transform duration-300 hover:scale-105 w-24 sm:w-28 md:w-32 lg:w-36 select-none"
                 >
                   {/* Category Card */}
                   <div className="w-full aspect-square rounded-2xl bg-[#FFF0EA] shadow-sm border border-[#E8CFC5] hover:border-[#B82E44] group-hover/item:border-[#B82E44] hover:shadow-md flex items-center justify-center transition-all duration-300 group-hover/item:-translate-y-1 relative overflow-hidden">
                     {cat.image ? (
                       <Image
                         src={IMAGE_PRESETS.categoryIcon(cat.image)}
-                        alt={cat.name}
-                        fill
-                        sizes="(max-width: 640px) 96px, (max-width: 768px) 112px, 144px"
+                        alt=""
+                        width={144}
+                        height={144}
                         loading="lazy"
                         draggable={false}
-                        className={`object-cover transition-transform duration-500 ease-out ${
+                        className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500 ease-out ${
                           cat.imageClassName ? cat.imageClassName : "group-hover/item:scale-110"
                         }`}
                       />

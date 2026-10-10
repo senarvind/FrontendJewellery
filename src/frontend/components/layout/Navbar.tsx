@@ -4,14 +4,14 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { CATEGORIES } from "@/data/categories";
+import { CATEGORIES, SPECIAL_COLLECTIONS } from "@/frontend/data/categories";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { Product } from "@/frontend/types/product";
-import { SAMPLE_PRODUCTS, searchOrdersApi } from "@/lib/api";
+import { searchOrdersApi } from "@/lib/api";
 
-const CATEGORY_NAV_ITEMS = CATEGORIES.map(({ name, href, icon, slug }) => ({ name, href, icon, slug }));
+const CATEGORY_NAV_ITEMS = [...CATEGORIES, ...SPECIAL_COLLECTIONS].map(({ name, href, icon, slug }) => ({ name, href, icon, slug }));
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -129,7 +129,8 @@ export default function Navbar() {
     } catch (e) {
       console.warn("Live search product fetch note:", e);
     }
-    setAllProducts(SAMPLE_PRODUCTS);
+    hasFetchedProductsRef.current = false; // retry on next search focus
+    setAllProducts([]);
   }, []);
 
   // Filter products when user types in search input
@@ -141,7 +142,7 @@ export default function Navbar() {
       return;
     }
 
-    const pool = allProducts.length > 0 ? allProducts : SAMPLE_PRODUCTS;
+    const pool = allProducts;
     const matches = pool.filter((p) => {
       const pType = (p.productType || "").toLowerCase();
       const pCat = (p.category || "").toLowerCase();
@@ -200,7 +201,7 @@ export default function Navbar() {
                 </svg>
               </a>
               <a
-                href=" https://www.instagram.com/kesharjewellers2003/?utm_source=ig_web_button_share_sheet"
+                href="https://www.instagram.com/kesharjewellers2003/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-[#E6C766] transition-colors"
@@ -248,7 +249,6 @@ export default function Navbar() {
                   alt="Keshar Jewellers Logo"
                   width={46}
                   height={46}
-                  priority
                   className="w-8 h-8 sm:w-10 sm:h-10 object-contain mr-1.5 sm:mr-2 filter drop-shadow-[0_2px_4px_rgba(122,16,33,0.15)]"
                 />
                 <div className="flex flex-col">
@@ -292,7 +292,7 @@ export default function Navbar() {
 
                 {/* Dropdown Menu Container */}
                 <div className={`absolute top-full left-0 ${isDesktopCategoryOpen ? "block" : "hidden group-hover:block"} w-[480px] bg-[#FFF8F0] border border-[#E8CFC5] rounded-2xl shadow-[0_15px_40px_rgba(72,12,20,0.12)] p-5 z-50 transition-all duration-300`}>
-                  <div className="text-[10px] uppercase tracking-[0.25em] text-[#C77D62] font-bold mb-3 pb-2 border-b border-[#E8CFC5]/60 flex items-center justify-between">
+                  <div className="text-[10px] uppercase tracking-[0.25em] text-[#965238] font-bold mb-3 pb-2 border-b border-[#E8CFC5]/60 flex items-center justify-between">
                     <span>Explore All Categories</span>
                     <span className="text-[#D4AF37]">✦ Fine Jewellery ✦</span>
                   </div>
@@ -336,7 +336,7 @@ export default function Navbar() {
                 </div>
 
                 <div className={`absolute top-full left-0 ${isDesktopInfoOpen ? "block" : "hidden group-hover:block"} w-64 bg-[#FFF8F0] border border-[#E8CFC5] rounded-2xl shadow-[0_15px_40px_rgba(72,12,20,0.12)] p-3 z-50 transition-all duration-300`}>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#C77D62] font-bold mb-2 pb-1.5 border-b border-[#E8CFC5]/60 flex items-center justify-between">
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#965238] font-bold mb-2 pb-1.5 border-b border-[#E8CFC5]/60 flex items-center justify-between">
                     <span>Store Information</span>
                     <span className="text-[#D4AF37]">✦ Est. 2003 ✦</span>
                   </div>
@@ -378,7 +378,7 @@ export default function Navbar() {
                 </div>
 
                 <div className={`absolute top-full left-0 ${isDesktopPolicyOpen ? "block" : "hidden group-hover:block"} w-72 bg-[#FFF8F0] border border-[#E8CFC5] rounded-2xl shadow-[0_15px_40px_rgba(72,12,20,0.12)] p-3 z-50 transition-all duration-300`}>
-                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#C77D62] font-bold mb-2 pb-1.5 border-b border-[#E8CFC5]/60 flex items-center justify-between">
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#965238] font-bold mb-2 pb-1.5 border-b border-[#E8CFC5]/60 flex items-center justify-between">
                     <span>Store Guidelines</span>
                     <span className="text-[#D4AF37]">✦ BIS Certified ✦</span>
                   </div>
@@ -887,11 +887,11 @@ export default function Navbar() {
 
               {/* Religious & Gift Items */}
               <Link
-                href="/products/religious-gift-items"
+                href="/products/pooja-articles"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="py-2 px-1 text-base font-semibold text-[#35191C] hover:text-[#8B1E2D] transition-colors border-t border-[#E8CFC5]/40 flex items-center justify-between"
               >
-                <span>Religious &amp; Gift Items</span>
+                <span>Pooja &amp; Gift Items</span>
               </Link>
 
               {/* Track Order (Only visible if user logged in AND has purchased products) */}

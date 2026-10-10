@@ -109,7 +109,7 @@ export default function BottomNav() {
                 )}
               </div>
               <span
-                className={`text-[10px] tracking-wide mt-1 font-medium transition-colors ${
+                className={`text-xs tracking-wide mt-1 font-medium transition-colors ${
                   item.active ? "text-[#9B1B30] font-bold" : "text-[#6F4A4A]"
                 }`}
               >

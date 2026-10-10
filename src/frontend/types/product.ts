@@ -1,5 +1,6 @@
 export interface Product {
   id: string;
+  name?: string;          // e.g. "925 Silver Black Stone Nose Pin" (preferred display/SEO name)
   category: string;       // e.g. "nose-pins", "earrings", "rings", etc.
   productType: string;    // e.g. "noz pin", "stud earring", "hoop"
   description: string;    // e.g. "silver Black+AD STONE pic 20"
@@ -15,6 +16,8 @@ export interface Product {
   frontImage: string;     // path or URL
   backImage: string;      // path or URL
   modelImage: string;     // path or URL
+  stock?: number;         // 0 = out of stock
+  likes?: number;         // popularity counter (set by admin panel)
   createdAt?: string;
 }
 
@@ -45,7 +48,7 @@ export const STORE_CATEGORIES: CategoryMeta[] = [
   { slug: "evil-eye", name: "Evil Eye", hallmarkText: "✦ 92.5 STERLING SILVER PROTECTIVE JEWELLERY ✦" },
   { slug: "kids", name: "Kids/Baby", hallmarkText: "✦ SKIN SAFE 92.5 PURE SILVER ✦" },
   { slug: "pens", name: "Pens", hallmarkText: "✦ 92.5 STERLING SILVER LUXURY GIFTS ✦" },
-  { slug: "utensils", name: "Utensils", hallmarkText: "✦ 999 PURE SILVER UTENSILS & ARTIFACTS ✦" },
+  { slug: "utensils", name: "Utensils", hallmarkText: "✦ 92.5 STERLING SILVER UTENSILS ✦" },
   { slug: "artifacts", name: "Idols & Articles", hallmarkText: "✦ 999 PURE SILVER IDOLS & ARTICLES ✦" },
   { slug: "coins-bars", name: "Coins & Bars", hallmarkText: "✦ 24K 999 PURE GOLD & 999 SILVER COINS ✦" },
   { slug: "pooja-articles", name: "Pooja Articles", hallmarkText: "✦ AUTHENTIC SACRED SILVER ARTICLES ✦" },

@@ -1,9 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getFestivalProducts } from "@/lib/api";
 import ProductCard from "@/frontend/components/products/ProductCard";
+import { CATEGORY_SEO } from "@/frontend/data/categorySeo";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 300;
+
+const seo = CATEGORY_SEO["festival-collection"];
+export const metadata: Metadata = {
+  title: seo.title,
+  description: seo.description,
+  alternates: { canonical: "/products/festival-collection" },
+};
 
 export default async function FestivalCollectionPage() {
   const products = await getFestivalProducts();
@@ -20,10 +28,10 @@ export default async function FestivalCollectionPage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#FFF8F0] text-[#35191C] px-2.5 sm:px-8 lg:px-12 py-4 sm:py-8">
+    <div className="min-h-screen bg-[#FFF8F0] text-[#35191C] px-2.5 sm:px-8 lg:px-12 py-4 sm:py-8">
       <div className="max-w-7xl mx-auto">
         {/* Breadcrumbs */}
-        <div className="mb-4 sm:mb-6 flex items-center gap-2 text-[10px] sm:text-xs uppercase tracking-widest text-[#B82E44]">
+        <div className="mb-4 sm:mb-6 flex items-center gap-2 text-xs uppercase tracking-widest text-[#B82E44]">
           <Link href="/" className="hover:underline transition-all">
             Home
           </Link>
@@ -37,7 +45,7 @@ export default async function FestivalCollectionPage() {
 
         {/* Page Header */}
         <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-10 px-1">
-          <span className="text-[#C77D62] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-1.5 sm:mb-2">
+          <span className="text-[#965238] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-xs font-bold block mb-1.5 sm:mb-2">
             ✦ AUSPICIOUS CELEBRATIONS • 91.6 GOLD &amp; 92.5 STERLING SILVER ✦
           </span>
           <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-[#9B1B30] tracking-tight mb-2 sm:mb-3">
@@ -49,7 +57,7 @@ export default async function FestivalCollectionPage() {
             <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
           </div>
           <p className="font-light text-[#6F4A4A] text-xs sm:text-base leading-relaxed">
-            Celebrate Dhanteras, Diwali, Navratri, and auspicious weddings with handcrafted gold, silver, and gemstone masterworks by Keshar Jewellers.
+            {seo.intro}
           </p>
         </div>
 
@@ -77,8 +85,8 @@ export default async function FestivalCollectionPage() {
         {/* Products Grid */}
         {products.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6 lg:gap-8">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {products.map((product, i) => (
+              <ProductCard key={product.id} product={product} priority={i < 2} />
             ))}
           </div>
         ) : (
@@ -111,6 +119,6 @@ export default async function FestivalCollectionPage() {
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

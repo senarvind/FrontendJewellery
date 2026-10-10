@@ -12,7 +12,7 @@ export default function KesharBrandPosterBanner() {
         </svg>
       ),
       mainText: "BIS 916 Hallmark Gold",
-      subText: "BIS Reg: ***HM/C-8290497727**",
+      subText: "BIS Reg: HM/C-8290497727",
     },
     {
       icon: (
@@ -71,7 +71,8 @@ export default function KesharBrandPosterBanner() {
               src="/images/keshar-brand-logo-poster.png"
               alt="KESHAR by Amityamini - SINCE 2003 Logo"
               fill
-              priority
+              preload
+              fetchPriority="high"
               className="object-contain"
               sizes="(max-width: 640px) 200px, (max-width: 1024px) 320px, 380px"
             />
@@ -92,9 +93,9 @@ export default function KesharBrandPosterBanner() {
 
               {/* Feature Text */}
               <div className="flex-1 text-left min-w-0">
-                <h4 className="font-serif font-bold text-xs sm:text-base text-[#5E121F] leading-tight truncate">
+                <p className="font-serif font-bold text-xs sm:text-base text-[#5E121F] leading-tight truncate">
                   {item.mainText}
-                </h4>
+                </p>
                 {item.subText && (
                   <p className="text-[9px] sm:text-xs text-[#7C1B2A]/80 font-medium truncate mt-0.5">
                     {item.subText}

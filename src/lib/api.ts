@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { Product } from "@/frontend/types/product";
 
 const API_BASE_URL = (
@@ -74,48 +75,75 @@ async function safeFetch(url: string, fallbackUrl?: string) {
   return null;
 }
 
-export async function getAllProducts(): Promise<Product[]> {
-  const primaryUrl = `${API_BASE_URL}/api/products`;
-  const fallbackUrl = `${DEFAULT_RENDER_BACKEND}/api/products`;
+// ── Product catalogue (used by server-rendered pages) ───────────────────────
+// Rules (SEO-critical):
+// • A real 404 from the backend means "not found" → page shows a real 404.
+// • Backend down / timeout → THROW. With ISR, Next.js keeps serving the last
+//   good cached page instead of indexing fake content.
+// • SAMPLE_PRODUCTS are only used in local development, never in production.
+const IS_DEV = process.env.NODE_ENV === "development";
+const IS_BUILD = process.env.NEXT_PHASE === "phase-production-build";
 
-  const data = await safeFetch(primaryUrl, fallbackUrl);
-  if (data && (data.success || Array.isArray(data.products))) {
-    return data.products || [];
+type CatalogJson = { success?: boolean; product?: Product; products?: Product[] };
+type CatalogResult = { found: true; data: CatalogJson } | { found: false };
+
+async function fetchCatalogJson(path: string): Promise<CatalogResult> {
+  const urls = Array.from(new Set([`${API_BASE_URL}${path}`, `${DEFAULT_RENDER_BACKEND}${path}`]));
+  let lastError: unknown = null;
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, {
+        next: { revalidate: 300 },
+        signal: AbortSignal.timeout(20000), // Render free tier can take ~15s to wake up
+      });
+      if (res.status === 404) return { found: false };
+      if (res.ok) return { found: true, data: (await res.json()) as CatalogJson };
+      lastError = new Error(`Product API ${res.status} for ${url}`);
+    } catch (err) {
+      lastError = err;
+    }
   }
-  return SAMPLE_PRODUCTS;
+  throw lastError ?? new Error(`Product API unavailable for ${path}`);
 }
 
-export async function getProductsByCategory(categorySlug: string): Promise<Product[]> {
-  const primaryUrl = `${API_BASE_URL}/api/products/category/${categorySlug}`;
-  const fallbackUrl = `${DEFAULT_RENDER_BACKEND}/api/products/category/${categorySlug}`;
-
-  const data = await safeFetch(primaryUrl, fallbackUrl);
-  if (data && (data.success || Array.isArray(data.products))) {
-    return data.products || [];
-  }
-
-  const normalized = categorySlug.toLowerCase().trim().replace(/s$/, "");
-  const filtered = SAMPLE_PRODUCTS.filter(
-    (p) =>
-      p.category.toLowerCase().includes(normalized) ||
-      normalized.includes(p.category.toLowerCase()) ||
-      p.productType.toLowerCase().includes(normalized)
-  );
-  return filtered;
+/** Backend unreachable: samples in dev, empty during `next build`, otherwise rethrow. */
+function catalogUnavailable<T>(err: unknown, devFallback: T, buildFallback: T): T {
+  if (IS_DEV) return devFallback;
+  if (IS_BUILD) return buildFallback;
+  throw err;
 }
 
-export async function getProductById(id: string): Promise<Product | null> {
-  const primaryUrl = `${API_BASE_URL}/api/products/${id}`;
-  const fallbackUrl = `${DEFAULT_RENDER_BACKEND}/api/products/${id}`;
-
-  const data = await safeFetch(primaryUrl, fallbackUrl);
-  if (data && data.product) {
-    return data.product;
+export const getAllProducts = cache(async (): Promise<Product[]> => {
+  try {
+    const result = await fetchCatalogJson("/api/products");
+    return result.found && Array.isArray(result.data?.products) ? result.data.products : [];
+  } catch (err) {
+    return catalogUnavailable(err, SAMPLE_PRODUCTS, []);
   }
+});
 
-  const found = SAMPLE_PRODUCTS.find((p) => p.id === id || p.id.includes(id));
-  return found || SAMPLE_PRODUCTS[0];
-}
+export const getProductsByCategory = cache(async (categorySlug: string): Promise<Product[]> => {
+  try {
+    const result = await fetchCatalogJson(`/api/products/category/${encodeURIComponent(categorySlug)}`);
+    // An unknown or empty category is not an error — just no products.
+    return result.found && Array.isArray(result.data?.products) ? result.data.products : [];
+  } catch (err) {
+    const samples = SAMPLE_PRODUCTS.filter((p) => p.category === categorySlug);
+    return catalogUnavailable(err, samples, []);
+  }
+});
+
+export const getProductById = cache(async (id: string): Promise<Product | null> => {
+  try {
+    const result = await fetchCatalogJson(`/api/products/${encodeURIComponent(id)}`);
+    // Deleted / mistyped id → null → page calls notFound() → real 404.
+    return result.found ? result.data?.product ?? null : null;
+  } catch (err) {
+    const sample = SAMPLE_PRODUCTS.find((p) => p.id === id) ?? null;
+    return catalogUnavailable(err, sample, null);
+  }
+});
 
 export async function getProductsByPriceRange(
   maxPrice: number,

@@ -27,7 +27,7 @@ export default function WishlistPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#FFF8F0] text-[#35191C] p-4 sm:p-8 lg:p-12">
+    <div className="min-h-screen bg-[#FFF8F0] text-[#35191C] p-4 sm:p-8 lg:p-12">
       <div className="max-w-7xl mx-auto">
         {/* Breadcrumb */}
         <div className="mb-6 flex items-center gap-2 text-xs uppercase tracking-widest text-[#B82E44]">
@@ -38,7 +38,7 @@ export default function WishlistPage() {
 
         {/* Page Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <span className="text-[#C77D62] uppercase tracking-[0.25em] text-xs font-bold block mb-2">
+          <span className="text-[#965238] uppercase tracking-[0.25em] text-xs font-bold block mb-2">
             ✦ BIS 91.6 GOLD & 92.5 STERLING HALLMARK CERTIFIED ✦
           </span>
           <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-[#9B1B30] tracking-tight mb-3">
@@ -117,6 +117,6 @@ export default function WishlistPage() {
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

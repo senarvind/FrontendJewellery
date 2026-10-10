@@ -19,18 +19,18 @@ export const CATEGORIES: CategoryItem[] = [
   { id: 8, name: "Chains", slug: "chains", icon: "⛓️", image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844037/keshar-categories/07-chains.jpg", gradient: "from-[#EAF2FE] to-[#D5E4FD]", href: "/products/chains" },
   { id: 9, name: "Pendants", slug: "pendants", icon: "🌸", image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844039/keshar-categories/08-pendants.jpg", gradient: "from-[#FDEBF1] to-[#F8D5E1]", href: "/products/pendants" },
   { id: 10, name: "Nose Pins", slug: "nose-pins", icon: "💫", image: "https://res.cloudinary.com/dxq570mvr/image/upload/v1789844042/keshar-categories/nosepins.jpg", gradient: "from-[#F9EFE5] to-[#F2E0CE]", href: "/products/nose-pins" },
-  { id: 11, name: "Maang Tikka", slug: "maang-tikka", icon: "👑", image: "/images/categories/maangtka.png", gradient: "from-[#F5F5F5] to-[#E5E5E5]", href: "/products/maang-tikka" },
-  { id: 12, name: "Anklets", slug: "anklets", icon: "✨", image: "/images/categories/anklets.png", gradient: "from-[#FDE8E9] to-[#F7D2D6]", href: "/products/anklets" },
-  { id: 13, name: "Toe Rings", slug: "toe-rings", icon: "👡", image: "/images/categories/toe-rings.png", gradient: "from-[#FCE4E8] to-[#F5CBD2]", href: "/products/toe-rings" },
+  { id: 11, name: "Maang Tikka", slug: "maang-tikka", icon: "👑", image: "/images/categories/maangtka.webp", gradient: "from-[#F5F5F5] to-[#E5E5E5]", href: "/products/maang-tikka" },
+  { id: 12, name: "Anklets", slug: "anklets", icon: "✨", image: "/images/categories/anklets.webp", gradient: "from-[#FDE8E9] to-[#F7D2D6]", href: "/products/anklets" },
+  { id: 13, name: "Toe Rings", slug: "toe-rings", icon: "👡", image: "/images/categories/toe-rings.webp", gradient: "from-[#FCE4E8] to-[#F5CBD2]", href: "/products/toe-rings" },
   { id: 14, name: "Kada", slug: "kada", icon: "⭕", image: "/images/categories/kada.jpg", gradient: "from-[#FDE7EB] to-[#F8D4D9]", href: "/products/kada" },
   { id: 15, name: "Waist Jewellery", slug: "waist-jewellery", icon: "✨", image: "/images/categories/waist-jewellery.jpg", gradient: "from-[#FCE2E6] to-[#F6C6CD]", href: "/products/waist-jewellery" },
   { id: 17, name: "Hair Jewellery", slug: "hair-jewellery", icon: "🌸", image: "/images/categories/hair-jewellery.jpg", gradient: "from-[#FDE5EA] to-[#F8CCD4]", href: "/products/hair-jewellery" },
   { id: 18, name: "Nath", slug: "nath", icon: "💎", image: "/images/categories/nath.jpg", gradient: "from-[#EAF2FE] to-[#D5E4FD]", href: "/products/nath" },
-  { id: 19, name: "Bridal Jewellery Sets", slug: "bridal-jewellery-sets", icon: "👑", image: "/images/categories/bridal-jewellery-sets.png", gradient: "from-[#FDEBF1] to-[#F8D5E1]", href: "/products/bridal-jewellery-sets" },
+  { id: 19, name: "Bridal Jewellery Sets", slug: "bridal-jewellery-sets", icon: "👑", image: "/images/categories/bridal-jewellery-sets.webp", gradient: "from-[#FDEBF1] to-[#F8D5E1]", href: "/products/bridal-jewellery-sets" },
 ];
 
 export const SPECIAL_COLLECTIONS: CategoryItem[] = [
-  { id: 101, name: "Evil Eye", slug: "evil-eye", icon: "🧿", image: "/images/categories/evil-eye.png", gradient: "from-[#EBF4FF] to-[#D0E2FF]", href: "/products/evil-eye" },
+  { id: 101, name: "Evil Eye", slug: "evil-eye", icon: "🧿", image: "/images/categories/evil-eye.webp", gradient: "from-[#EBF4FF] to-[#D0E2FF]", href: "/products/evil-eye" },
   { id: 102, name: "Kids & Baby", slug: "kids", icon: "🎀", image: "/images/categories/kids.jpg", gradient: "from-[#FFF0F5] to-[#FFD8E4]", href: "/products/kids" },
   { id: 103, name: "Silver Pens", slug: "pens", icon: "🖊️", image: "/images/categories/pens.jpg", gradient: "from-[#F0F4F8] to-[#D9E2EC]", href: "/products/pens" },
   { id: 104, name: "Pure Utensils", slug: "utensils", icon: "🏺", image: "/images/categories/pure-utensils.jpg", gradient: "from-[#FFF5EB] to-[#FFE4CC]", href: "/products/utensils" },

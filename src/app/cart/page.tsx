@@ -44,7 +44,7 @@ export default function CartPage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#FFF8F0] text-[#35191C] py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#FFF8F0] text-[#35191C] py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Breadcrumb Navigation */}
@@ -59,7 +59,7 @@ export default function CartPage() {
         {/* Page Header */}
         <div className="border-b border-[#E8CFC5] pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <span className="text-xs font-bold uppercase tracking-[0.25em] text-[#C77D62] block mb-1">
+            <span className="text-xs font-bold uppercase tracking-[0.25em] text-[#965238] block mb-1">
               ✦ BIS Hallmarked Fine Jewellery ✦
             </span>
             <h1 className="font-serif text-3xl sm:text-4xl text-[#7C1B2A] font-bold">
@@ -111,7 +111,7 @@ export default function CartPage() {
                 const product = item.product;
                 const unitPrice = product.sellingPrice || 0;
                 const itemTotal = unitPrice * item.quantity;
-                const frontImage = product.frontImage || "/images/placeholder.jpg";
+                const frontImage = product.frontImage || "/images/logo.png";
 
                 return (
                   <div
@@ -319,6 +319,6 @@ export default function CartPage() {
         />
 
       </div>
-    </main>
+    </div>
   );
 }

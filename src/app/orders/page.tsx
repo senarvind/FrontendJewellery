@@ -322,7 +322,7 @@ function TrackOrderContent() {
             </div>
             <div className="pt-2 flex justify-center gap-4">
               <Link
-                href="/products/all"
+                href="/products"
                 className="px-6 py-3 bg-[#7C1B2A] hover:bg-[#5C131F] text-[#FFF8F0] font-bold text-xs uppercase tracking-wider rounded-xl shadow-md transition-all"
               >
                 Browse Jewellery Collection →

@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getCustomizedProducts } from "@/lib/api";
 import ProductCard from "@/frontend/components/products/ProductCard";
+import { CATEGORY_SEO } from "@/frontend/data/categorySeo";
 
-export const revalidate = 60;
+export const revalidate = 300;
+
+const seo = CATEGORY_SEO["customized-jewellery"];
+export const metadata: Metadata = {
+  title: seo.title,
+  description: seo.description,
+  alternates: { canonical: "/products/customized-jewellery" },
+};
 
 export default async function CustomizedJewelleryPage() {
   const products = await getCustomizedProducts();
@@ -22,7 +31,7 @@ export default async function CustomizedJewelleryPage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#FFF8F0] text-[#35191C] px-2.5 sm:px-8 lg:px-12 py-4 sm:py-8">
+    <div className="min-h-screen bg-[#FFF8F0] text-[#35191C] px-2.5 sm:px-8 lg:px-12 py-4 sm:py-8">
       <div className="max-w-7xl mx-auto">
         {/* Back Navigation Bar */}
         <div className="mb-4 sm:mb-6 flex items-center justify-between gap-3 bg-[#FFF0EA] border border-[#E8CFC5] px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-xs">
@@ -35,22 +44,22 @@ export default async function CustomizedJewelleryPage() {
             </svg>
             <span>Back to Home</span>
           </Link>
-          <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#6F4A4A] overflow-hidden">
+          <div className="flex items-center gap-1.5 text-xs text-[#6F4A4A] overflow-hidden">
             <Link href="/" className="hover:text-[#9B1B30] font-medium hover:underline">Home</Link>
             <span>/</span>
             <Link href="/products" className="hover:text-[#9B1B30] font-medium hover:underline">Products</Link>
             <span>/</span>
-            <span className="text-[#9B1B30] font-bold truncate max-w-[140px] sm:max-w-none">Customer On Demand</span>
+            <span className="text-[#9B1B30] font-bold truncate max-w-[140px] sm:max-w-none">Customised Jewellery</span>
           </div>
         </div>
 
         {/* Page Header */}
         <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-10 px-1">
-          <span className="text-[#C77D62] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-[10px] sm:text-xs font-bold block mb-1.5 sm:mb-2">
+          <span className="text-[#965238] uppercase tracking-[0.2em] sm:tracking-[0.25em] text-xs font-bold block mb-1.5 sm:mb-2">
             ✦ BESPOKE CRAFTSMANSHIP • CUSTOM ORDERS • BIS 91.6 &amp; 92.5 CERTIFIED ✦
           </span>
           <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl text-[#9B1B30] tracking-tight mb-2 sm:mb-3">
-            Customer On Demand
+            {seo.h1}
           </h1>
           <div className="flex items-center justify-center gap-3 my-2 sm:my-3 text-[#D4AF37]/60 w-36 sm:w-48 mx-auto">
             <div className="h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent flex-1" />
@@ -111,8 +120,8 @@ export default async function CustomizedJewelleryPage() {
         {/* Products Grid */}
         {products.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-6 lg:gap-8">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {products.map((product, i) => (
+              <ProductCard key={product.id} product={product} priority={i < 2} />
             ))}
           </div>
         ) : (
@@ -145,6 +154,6 @@ export default async function CustomizedJewelleryPage() {
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

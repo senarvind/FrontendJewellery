@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { BUSINESS } from "@/lib/seo";
 
 export default function PoliciesPage() {
   const [activeTab, setActiveTab] = useState<string>("all");
@@ -273,14 +274,29 @@ export default function PoliciesPage() {
               🛡️ BIS Reg: HM/C-8290497727
             </span>
             <span className="px-3 py-1 bg-[#7C1B2A]/80 border border-[#D4AF37]/30 rounded-md text-[#FFF8F0]">
-              📍 Sarafa Bazar, Sehore (M.P.)
+              📍 Sarafa Market, Sehore (M.P.)
             </span>
           </div>
         </div>
       </section>
 
       {/* Main Content Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        {/* Business details (trust signals for customers and Google) */}
+        <section aria-labelledby="business-details" className="bg-[#FFFDFC] border border-[#E8CFC5] rounded-2xl p-4 sm:p-6 mb-8 shadow-sm">
+          <h2 id="business-details" className="font-serif text-lg sm:text-xl font-bold text-[#7C1B2A] mb-3">Business Details</h2>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-[#35191C]">
+            <div><dt className="inline font-semibold">Trade name: </dt><dd className="inline">{BUSINESS.legalName}</dd></div>
+            <div><dt className="inline font-semibold">Proprietor: </dt><dd className="inline">{BUSINESS.owner}</dd></div>
+            <div><dt className="inline font-semibold">GSTIN: </dt><dd className="inline font-mono">{BUSINESS.gstin}</dd></div>
+            <div><dt className="inline font-semibold">BIS Hallmark Reg.: </dt><dd className="inline font-mono">{BUSINESS.bisRegistration}</dd></div>
+            <div className="sm:col-span-2"><dt className="inline font-semibold">Address: </dt><dd className="inline">Charkha Line, Sarafa Market, Sehore, Madhya Pradesh – 466001</dd></div>
+            <div><dt className="inline font-semibold">Phone / WhatsApp: </dt><dd className="inline"><a href="tel:+919827415111" className="underline">{BUSINESS.phoneDisplay}</a></dd></div>
+            <div><dt className="inline font-semibold">Support email: </dt><dd className="inline"><a href={`mailto:${BUSINESS.email}`} className="underline break-all">{BUSINESS.email}</a></dd></div>
+            <div className="sm:col-span-2"><dt className="inline font-semibold">Store hours: </dt><dd className="inline">{BUSINESS.hoursDisplay.join(" • ")}</dd></div>
+          </dl>
+        </section>
+
         {/* Search & Navigation Bar */}
         <div className="bg-[#FFF0EA] border border-[#E8CFC5] rounded-2xl p-4 sm:p-6 mb-8 shadow-sm space-y-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -461,7 +477,7 @@ export default function PoliciesPage() {
             </a>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
